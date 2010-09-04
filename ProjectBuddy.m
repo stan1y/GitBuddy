@@ -43,9 +43,12 @@
 
 - (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
 {
-	int addedFilesSepIndex = [[[self itemDict] objectForKey:@"modified"] count];
-	int removedFilesSepIndex = [[[self itemDict] objectForKey:@"modified"] count] + [[[self itemDict] objectForKey:@"added"] count];
-
+	NSArray *modified = [[self itemDict] objectForKey:@"modified"];
+	NSArray *added = [[self itemDict] objectForKey:@"added"];
+	NSArray *removed = [[self itemDict] objectForKey:@"removed"];
+	NSArray *renamed = [[self itemDict] objectForKey:@"renamed"];
+	NSLog(@"updating menu: %d, %d, %d, %d", [modified count], [added count], [removed count], [renamed count]);
+	
 	switch (index) {
 		case CNG_MENU_RESET:
 			[item setTitle:@"Reset"];
@@ -72,30 +75,31 @@
 			
 			// changeset items
 		default:
-			if ( index - CNG_MENU_ITEMS == addedFilesSepIndex || index - CNG_MENU_ITEMS == removedFilesSepIndex ) {
-				//separator elements
-				[menu removeItemAtIndex:(index - CNG_MENU_ITEMS)];
-				[menu insertItem:[NSMenuItem separatorItem] atIndex:(index - CNG_MENU_ITEMS)];
-				
-			}
-			else if (index - CNG_MENU_ITEMS < addedFilesSepIndex) {
+			if ([modified count] && index - CNG_MENU_ITEMS < [modified count]) {
 				//modified files list
-				[item setTitle:[[[self itemDict] objectForKey:@"modified"] objectAtIndex:(index - CNG_MENU_ITEMS)]];
+				[item setTitle:[NSString stringWithFormat:@"%@ (changed)",[[[self itemDict] objectForKey:@"modified"] objectAtIndex:(index - CNG_MENU_ITEMS)]]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
-			else if (index - CNG_MENU_ITEMS < removedFilesSepIndex) { 
+			if ([added count] && index - CNG_MENU_ITEMS >= [modified count]) { 
 				//added files list
-				[item setTitle:[[[self itemDict] objectForKey:@"added"] objectAtIndex:(index - CNG_MENU_ITEMS)]];
+				[item setTitle:[NSString stringWithFormat:@"%@ (added)",[[[self itemDict] objectForKey:@"added"] objectAtIndex:(index - CNG_MENU_ITEMS - [modified count])]]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
-			else {
-				//removed file list
-				[item setTitle:[[[self itemDict] objectForKey:@"removed"] objectAtIndex:(index - CNG_MENU_ITEMS)]];
+			if ([removed count] && index - CNG_MENU_ITEMS >= [modified count] + [added count]) { 
+				//removed files list
+				[item setTitle:[NSString stringWithFormat:@"%@ (removed)",[[[self itemDict] objectForKey:@"removed"] objectAtIndex:(index - CNG_MENU_ITEMS - [modified count] - [added count])]]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
+			if ([renamed count] && index - CNG_MENU_ITEMS >= [modified count] + [added count] + [removed count]) { 
+				//renamed files list
+				[item setTitle:[NSString stringWithFormat:@"%@ (renamed)",[[[self itemDict] objectForKey:@"renamed"] objectAtIndex:(index - CNG_MENU_ITEMS - [modified count] - [added count] - [removed count])]]];
+				[item setAction:@selector(showChanges:)];
+				[item setTarget:self];
+			}
+			NSLog(@"changeset item at index %d : %@", index - CNG_MENU_ITEMS, item);
 			break;
 	}
 	return YES;
@@ -109,10 +113,13 @@
 - (int) totalChangedFiles
 {
 	int total = 0;
-	total += [[[self itemDict] valueForKey:@"modified"] count];
-	total += [[[self itemDict] valueForKey:@"added"] count];
-	total += [[[self itemDict] valueForKey:@"removed"] count];
-	total += [[[self itemDict] valueForKey:@"untacked"] count];
+	for(NSString * key in [[self itemDict] allKeys]) {
+		//skip metadata storage keys
+		if (key ==  @"remote" || key == @"branches") {
+			continue;
+		}
+		total += [[[self itemDict] valueForKey:key] count];
+	}
 	return total;
 }
 
@@ -124,9 +131,9 @@
 	[[self itemDict] setObject:[changes objectForKey:@"modified"] forKey:@"modified"];
 	[[self itemDict] setObject:[changes objectForKey:@"added"] forKey:@"added"];
 	[[self itemDict] setObject:[changes objectForKey:@"removed"] forKey:@"removed"];
-	[[self itemDict] setObject:[changes objectForKey:@"untracked"] forKey:@"untacked"];
+	[[self itemDict] setObject:[changes objectForKey:@"renamed"] forKey:@"renamed"];
 	
-	[self setCurrentBranch:[[changes objectForKey:@"current_branch"] objectAtIndex:0]];
+	[self setCurrentBranch:[[changes objectForKey:@"branch"] objectAtIndex:0]];
 	[parentItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangedFiles]]];
 }
 
@@ -148,66 +155,78 @@
 		return nil;
 	}
 	
-	itemDict = [[NSMutableDictionary alloc] init];
-	projectMenu = [[NSMenu alloc] init];
-	onBranchMenu = [[NSMenu alloc] init]; 
-	remoteMenu = [[NSMenu alloc] init];
-	changesMenu = [[NSMenu alloc] init];
-	wrapper = [[GitWrapper alloc] init];
-	
-	[self setParentItem:anItem];
-	[self setTitle:aTitle];
-	[self setPath:aPath];
-	
-	[self scanRemote];
-	[self scanChanges];
-	[self scanBranches];
-	
-	//build project menu
-	NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(removePath:) keyEquivalent:[NSString string]];
-	[removePath setTarget:self];
-	NSMenuItem *rescanPath = [[NSMenuItem alloc] initWithTitle:@"Rescan path" action:@selector(rescan:) keyEquivalent:[NSString string]];
-	[rescanPath setTarget:self];
-	NSMenuItem *onBranch = [[NSMenuItem alloc] initWithTitle:@"On branch" action:nil keyEquivalent:[NSString string]];
-	NSMenuItem *remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
-	NSMenuItem *changes = [[NSMenuItem alloc] initWithTitle:@"Changes" action:nil keyEquivalent:[NSString string]];
-	NSMenuItem *commit = [[NSMenuItem alloc] initWithTitle:@"Commit" action:@selector(commit:) keyEquivalent:[NSString string]];
-	[commit setTarget:self];
-	[projectMenu addItem:removePath];
-	[projectMenu addItem:rescanPath];
-	[projectMenu addItem:onBranch];
-	[projectMenu addItem:remote];
-	[projectMenu addItem:changes];
-	[projectMenu addItem:commit];
-	[anItem setSubmenu:projectMenu];
-	
-	//build branch menu
-	[onBranch setSubmenu:onBranchMenu];
-	for(NSString * branch in [[self itemDict] objectForKey:@"branches"]) {
-		NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:branch action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
-		[b setTarget:self];
-		[onBranchMenu addItem:b];
+	@try {
+		itemDict = [[NSMutableDictionary alloc] init];
+		projectMenu = [[NSMenu alloc] init];
+		onBranchMenu = [[NSMenu alloc] init]; 
+		remoteMenu = [[NSMenu alloc] init];
+		changesMenu = [[NSMenu alloc] init];
+		wrapper = [[GitWrapper alloc] init];
+		
+		[self setParentItem:anItem];
+		[self setTitle:aTitle];
+		[self setPath:aPath];
+		
+		[self scanRemote];
+		[self scanChanges];
+		[self scanBranches];
+		
+		//build project menu
+		NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(removePath:) keyEquivalent:[NSString string]];
+		[removePath setTarget:self];
+		NSMenuItem *rescanPath = [[NSMenuItem alloc] initWithTitle:@"Rescan path" action:@selector(rescan:) keyEquivalent:[NSString string]];
+		[rescanPath setTarget:self];
+		NSMenuItem *onBranch = [[NSMenuItem alloc] initWithTitle:@"On branch" action:nil keyEquivalent:[NSString string]];
+		NSMenuItem *remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
+		NSMenuItem *changes = [[NSMenuItem alloc] initWithTitle:@"Changes" action:nil keyEquivalent:[NSString string]];
+		NSMenuItem *commit = [[NSMenuItem alloc] initWithTitle:@"Commit" action:@selector(commit:) keyEquivalent:[NSString string]];
+		[commit setTarget:self];
+		[projectMenu addItem:removePath];
+		[projectMenu addItem:rescanPath];
+		[projectMenu addItem:onBranch];
+		[projectMenu addItem:remote];
+		[projectMenu addItem:changes];
+		[projectMenu addItem:commit];
+		[anItem setSubmenu:projectMenu];
+		
+		//build branch menu
+		[onBranch setSubmenu:onBranchMenu];
+		for(NSString * branch in [[self itemDict] objectForKey:@"branches"]) {
+			NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:branch action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
+			[b setTarget:self];
+			[onBranchMenu addItem:b];
+		}
+		NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch..." action:@selector(newBranch:) keyEquivalent:[NSString string]];
+		[newBranch setTarget:self];
+		[onBranchMenu addItem:newBranch];
+		
+		//build remote menu
+		[remote setSubmenu:remoteMenu];
+		for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
+			NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
+			[r setTarget:self];
+			[remoteMenu addItem:r];
+		}
+		NSMenuItem *newSource = [[NSMenuItem alloc] initWithTitle:@"New Source..." action:@selector(newSource:) keyEquivalent:[NSString string]];
+		[newSource setTarget:self];
+		[remoteMenu addItem:newSource];
+		
+		//changes menu setup
+		[changes setSubmenu:changesMenu];
+		[changesMenu setDelegate:self];
+		
+		return self;
 	}
-	NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch..." action:@selector(newBranch:) keyEquivalent:[NSString string]];
-	[newBranch setTarget:self];
-	[onBranchMenu addItem:newBranch];
-	
-	//build remote menu
-	[remote setSubmenu:remoteMenu];
-	for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
-		NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
-		[r setTarget:self];
-		[remoteMenu addItem:r];
+	@catch (NSException * e) {
+		NSLog(@"---------Exception----------");
+		NSLog(@"%@", e);
+		NSLog(@"----------------------------");
+		
+		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to initialized" code:-1 userInfo:[e userInfo]]];
+		[[NSApplication sharedApplication] terminate:nil];
+		//never here :D
+		return nil;
 	}
-	NSMenuItem *newSource = [[NSMenuItem alloc] initWithTitle:@"New Source..." action:@selector(newSource:) keyEquivalent:[NSString string]];
-	[newSource setTarget:self];
-	[remoteMenu addItem:newSource];
-	
-	//changes menu setup
-	[changes setSubmenu:changesMenu];
-	[changesMenu setDelegate:self];
-	
-	return self;
 }
 
 - (void) dealloc
