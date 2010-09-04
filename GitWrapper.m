@@ -48,7 +48,7 @@
 	[gitWrapper setStandardError:stderrPipe];
 	[gitWrapper setStandardOutput:stdoutPipe];
 	
-	NSLog(@"GitWrapper: /usr/bin/python %@ %@", wrapperPath, [_args componentsJoinedByString:@" "]);
+	NSLog(@"GitWrapper: /usr/bin/python %@", [_args componentsJoinedByString:@" "]);
 	int totalSlept = 0;
 	[gitWrapper launch];
 	
@@ -73,30 +73,33 @@
 	}
 	else {
 		int rc = [gitWrapper terminationStatus];
-		if (rc != 0) {
+		NSLog(@"GitWrapper: exit code %d", rc);
+		//	0 - there are staged changed ready to commit
+		//	1 - there are unstaged changes
+		if (rc == 0 || rc == 1) {
+			//read output and parse 
+			NSString * output = [[[NSString alloc] initWithData:[[stdoutPipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding] autorelease];
+			NSError * err = nil;
+			id jsonObj = [parser objectWithString:output error:&err];
+			if (err) {
+				[[NSApplication sharedApplication] presentError:err];
+				return nil;
+			}
+			if (jsonObj) {
+				NSLog(@"getCommandJson -> [%@] %@", [jsonObj class], jsonObj);
+				return jsonObj;
+			}
+			else {
+				NSLog(@"getCommandJson -> nil");
+				return nil;
+			}
+		}
+		else {
 			NSString * errorMessage = [[NSString alloc] initWithData:[[stderrPipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding];
 			NSRunAlertPanel(@"Oups...", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", rc, errorMessage], @"Continue", nil, nil);
 			
 			return nil;
 		}
-		
-		//read output and parse 
-		NSString * output = [[[NSString alloc] initWithData:[[stdoutPipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding] autorelease];
-		NSError * err = nil;
-		id jsonObj = [parser objectWithString:output error:&err];
-		if (err) {
-			[[NSApplication sharedApplication] presentError:err];
-			return nil;
-		}
-		if (jsonObj) {
-			NSLog(@"getCommandJson -> [%@] %@", [jsonObj class], jsonObj);
-			return jsonObj;
-		}
-		else {
-			NSLog(@"getCommandJson -> nil");
-			return nil;
-		}
-
 	}
 }
 

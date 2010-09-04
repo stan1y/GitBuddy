@@ -9,8 +9,11 @@ import re
 from optparse import OptionParser
 
 __STATUS_TOKENS = {
-	'current_branch' : '(?<=On.branch.)\w+',
-	'modified' : '(?<=modified:   )\S+'
+	'branch'	: '(?<=On.branch.)\w+',
+	'modified'	: '(?<=modified:   )\S+',
+	'added'		: '(?<=added:   )\S+',
+	'removed'	: '(?<=added:   )\S+',
+	'renamed'	: '(?<=renamed:   )\S+',
 }
 
 __ERR_USAGE = 1
@@ -19,30 +22,28 @@ __ERR_GIT = 2
 def cmd(command, **kwargs):
 	return subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, **kwargs)
 
-def get_status(git, path):
+def git_status(git, path):
 	pwd = os.getcwdu()
 	os.chdir(path)
 	proc = cmd([git, 'status'])
 	proc.wait()
 	os.chdir(pwd)
-	if proc.returncode != 1:
-		sys.stderr.write('git status exited with code %d : %s\n' % (proc.returncode, ''.join(proc.stderr.readlines())))
-		return None
-	else:
-		status = { 'path' : [ path ], 'added' : [], 'removed' : [], 'untracked' : [] }
-		for line in proc.stdout.readlines():
-			for token in __STATUS_TOKENS:
-				m = re.search(__STATUS_TOKENS[token], line.strip())
-				if m:
-					value = m.group(0).strip()
-					if value:
-						if token in status:
-							list_value = status[token]
-							list_value.append(value.strip())
-						else: 
-							list_value = [ value.strip() ]
-						status[token] = list_value
-		return status
+	
+	err = ''.join(proc.stderr.readlines())
+	status = {'gitrc' : proc.returncode, 'giterr' : err}
+	#init status with arrays
+	for token in __STATUS_TOKENS: status[token] = []
+	#populate arrays
+	for line in proc.stdout.readlines():
+		for token in __STATUS_TOKENS:
+			m = re.search(__STATUS_TOKENS[token], line.strip())
+			if m:
+				value = m.group(0).strip()
+				if value:
+					files = status[token]
+					files.append(value.strip())
+					#status[token] = files
+	return status
 		
 if __name__ == '__main__':
 	this_dir = os.path.dirname(os.path.abspath(inspect.getfile( inspect.currentframe())))
@@ -63,7 +64,7 @@ if __name__ == '__main__':
 			parser.print_help()
 			sys.exit(__ERR_USAGE)
 			
-		status = get_status(options.git, args[0])
+		status = git_status(options.git, args[0])
 		if status:
 			sys.stdout.write(json.dumps(status) + '\n')
 			sys.exit(0)
