@@ -29,7 +29,7 @@ def get_status(git, path):
 		sys.stderr.write('git status exited with code %d : %s\n' % (proc.returncode, ''.join(proc.stderr.readlines())))
 		return None
 	else:
-		status = { 'path' : [ path ] }
+		status = { 'path' : [ path ], 'added' : [], 'removed' : [], 'untracked' : [] }
 		for line in proc.stdout.readlines():
 			for token in __STATUS_TOKENS:
 				m = re.search(__STATUS_TOKENS[token], line.strip())
