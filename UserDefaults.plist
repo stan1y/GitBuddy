@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>gitPath</key>
+	<string>/opt/local/bin/git</string>
+	<key>gitTimeout</key>
+	<integer>5</integer>
+	<key>lastEventId</key>
+	<integer>0</integer>
+	<key>monitoredPaths</key>
+	<array/>
+	<key>excludedPatterns</key>
+	<array>
+		<string>\S*\.git\S*</string>
+	</array>
+</dict>
+</plist>
