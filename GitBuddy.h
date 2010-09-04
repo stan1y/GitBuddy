@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "GitWrapper.h"
+#import "ProjectBuddy.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -21,21 +21,18 @@
 	
 	NSPanel *addPathPanel;
 	NSTextField *addPathField;
-	
-	GitWrapper *wrapper;
 }
 
 @property (assign) IBOutlet NSTextField *addPathField;
 @property (assign) IBOutlet NSPanel *addPathPanel;
 
-- (void) scanUpdatesAtPaths:(NSArray *)paths;
 - (void) initializeEventForPaths:(NSArray *)pathsToWatch;
 - (NSMenuItem *) menuItemForPath:(NSString *)path;
-- (NSMenuItem *) newMenuItemWithPath:(NSString *)path;
+- (NSMenuItem *) newMenuItem:(NSString *)title withPath:(NSString *)path;
 - (BOOL) addMonitoredPath:(NSString *)path;
 - (NSArray *) monitoredPathsArray;
 
-- (int) totalChangedFiles:(NSDictionary *) changes;
+- (void) scanUpdatesAtPaths:(NSArray *)paths;
 
 - (IBAction) browseForPath:(id)sender;
 - (IBAction) addPath:(id)sender;

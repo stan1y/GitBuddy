@@ -13,14 +13,6 @@
 
 // initial number of menu items in status menu
 #define MENUITEMS 5
-// initial number of menu items in monitored path menu
-#define PATHMENUITEMS 5
-// indexes of menu items in monitored path menu
-#define RMPATH_INDEX 0
-#define PUSH_INDEX 1
-#define STAGE_INDEX 2
-#define BRANCH_INDEX 3
-#define SEP_INDEX 4
 
 @implementation GitBuddy
 
@@ -115,82 +107,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		
 		NSMenuItem *folderItem = [self menuItemForPath:p];
 		if (folderItem) {			
-			NSMutableDictionary *dict = [folderItem representedObject];
-			//update changes dict
-			NSDictionary * changesDict = [wrapper getStatus:[dict valueForKey:@"fullPath"]];
-			if (changesDict) {
-				[dict setObject:changesDict forKey:@"changes"];
-				[folderItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [dict valueForKey:@"title"], [self totalChangedFiles:changesDict]]];
-			}
+			ProjectBuddy *pbuddy = [folderItem representedObject];
+			[pbuddy scanChanges];
 		}
 	}
-}
-
-//	--- Path menu delegate
-
-- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
-{
-	NSMenuItem * parentItem = [self menuItemForPath:[menu title]];
-	NSDictionary * dict = [parentItem representedObject];
-	switch (index) {
-		case RMPATH_INDEX:
-			[item setTitle:@"Remove"];
-			[item setAction:@selector(removePath:)];
-			[item setTarget:self];
-			break;
-			
-		case PUSH_INDEX:
-			[item setTitle:@"Push"];
-			[item setAction:@selector(pushClicked:)];
-			[item setTarget:self];
-			break;
-		
-		case STAGE_INDEX:
-			[item setTitle:@"Stage changes"];
-			[item setAction:@selector(stageChangesClicked:)];
-			[item setTarget:self];
-			break;
-			
-		case BRANCH_INDEX:
-			[item setTitle:@"Move to branch"];
-			[item setAction:@selector(moveToBranchChangesClicked:)];
-			break;
-	
-		case SEP_INDEX:
-			[menu removeItemAtIndex:4];
-			[menu insertItem:[NSMenuItem separatorItem] atIndex:4];
-			break;
-		
-		// changeset items
-		default:
-			NSLog(@"title: %@", [[[dict valueForKey:@"changes"] valueForKey:@"modified"] objectAtIndex:index - PATHMENUITEMS]);
-			[item setTitle:[[[dict valueForKey:@"changes"] valueForKey:@"modified"] objectAtIndex:index - PATHMENUITEMS]];
-			[item setAction:@selector(showChangeSet:)];
-			[item setTarget:self];
-
-			break;
-	}
-	return YES;
-}
-
-- (int) totalChangedFiles:(NSDictionary *) changes
-{
-	int total = 0;
-	total += [[changes valueForKey:@"modified"] count];
-	//total += [[changes valueForKey:@"added"] count];
-	//total += [[changes valueForKey:@"removed"] count];
-	//total += [[changes valueForKey:@"untacked"] count];
-	return total;
-}
-
-- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
-{
-	NSMenuItem * parentItem = [self menuItemForPath:[menu title]];
-	if (parentItem) {
-		NSDictionary * dict = [parentItem representedObject];
-		return PATHMENUITEMS + [self totalChangedFiles:[dict valueForKey:@"changes"]];
-	}
-	return PATHMENUITEMS;
 }
 
 //	--- Monitored paths api
@@ -215,14 +135,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	return nil;
 }
 
-- (NSMenuItem *) newMenuItemWithPath:(NSString *)path
+- (NSMenuItem *) newMenuItem:(NSString *)title withPath:(NSString *)path
 {
 	//insert new
 	int insertIndex = [statusMenu numberOfItems] - 1;
-	NSMenuItem *pathItem = [[NSMenuItem alloc] initWithTitle:path action:nil keyEquivalent:[NSString string]];
-	NSMenu *pathMenu = [[NSMenu alloc] initWithTitle:path];
-	[pathMenu setDelegate:self];
-	[pathItem setSubmenu:pathMenu];	
+	NSMenuItem *pathItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:[NSString string]];
+	ProjectBuddy * pbuddy = [[ProjectBuddy alloc] initBuddy:pathItem forPath:path withTitle:title];
+	[pathItem setRepresentedObject:pbuddy];
 	[statusMenu insertItem:pathItem atIndex:insertIndex];
 	
 	return pathItem;
@@ -234,7 +153,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		NSArray * items = [[statusMenu itemArray] subarrayWithRange:NSMakeRange(MENUITEMS - 1, [statusMenu numberOfItems] - MENUITEMS)];
 		NSMutableArray * paths = [[NSMutableArray alloc] initWithCapacity:[items count]];
 		for (NSMenuItem * i in items) {
-			[paths addObject:[[i representedObject] valueForKey:@"fullPath"]];
+			ProjectBuddy *pbuddy = [i representedObject];
+			[paths addObject:[pbuddy path]];
 		}
 		return paths;
 	}
@@ -254,13 +174,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	BOOL validPath = (exists && dotGit && isDirectory && isDotGitDirectory);
 	if (validPath) {
 		//add new monitored path
-		NSMenuItem *item = [self newMenuItemWithPath:path];
-		NSMutableDictionary *pathDict = [[NSMutableDictionary alloc] init];
-		[pathDict setObject:[NSNumber numberWithInt:0] forKey:@"changesCount"];
-		[pathDict setObject:[path stringByExpandingTildeInPath] forKey:@"fullPath"];
-		[pathDict setObject:path forKey:@"title"];
-		[item setRepresentedObject:pathDict];
-		
+		[self newMenuItem:path withPath:[path stringByExpandingTildeInPath]];
 		//scan for changes after repo was added
 		[self scanUpdatesAtPaths:[self monitoredPathsArray]];
 		//restart events with new repo
@@ -338,7 +252,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
 {
 	NSLog(@"Starting GitBuddy");
-	wrapper = [[GitWrapper alloc] init];
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
 	unsigned long long eventId = [[defaults objectForKey:@"lastEventId"] intValue];
@@ -366,7 +279,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusImage release];
 	[statusAltImage release];
 	[statusItem release];
-	[wrapper release];
 	[lastEventId release];
 	[addPathField release];
 	[addPathPanel release];
