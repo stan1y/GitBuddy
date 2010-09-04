@@ -69,7 +69,7 @@
 
 // Selectors
 
-- (IBAction) remove:(id)sender;
+- (IBAction) removePath:(id)sender;
 - (IBAction) rescan:(id)sender;
 - (IBAction) commit:(id)sender;
 

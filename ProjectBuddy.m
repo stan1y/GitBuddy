@@ -15,7 +15,7 @@
 
 // Selectors
 
-- (IBAction) remove:(id)sender
+- (IBAction) removePath:(id)sender
 {}
 - (IBAction) rescan:(id)sender
 {}
@@ -49,19 +49,20 @@
 	switch (index) {
 		case CNG_MENU_RESET:
 			[item setTitle:@"Reset"];
-			[item setAction:@selector(resetChanges)];
+			[item setAction:@selector(resetChanges:)];
 			[item setTarget:self];
 			break;
 			
 		case CNG_MENU_STAGE:
 			[item setTitle:@"Stage"];
-			[item setAction:@selector(stageChanges)];
+			[item setAction:@selector(stageChanges:)];
 			[item setTarget:self];
 			break;
 			
 		case CNG_MENU_MVBRANCH:
 			[item setTitle:@"Move to new branch..."];
-			[item setAction:@selector(moveChangesToNewBranch)];
+			[item setAction:@selector(moveChangesToNewBranch:)];
+			[item setTarget:self];
 			break;
 			
 		case CNG_MENU_SEP:
@@ -80,19 +81,19 @@
 			else if (index - CNG_MENU_ITEMS < addedFilesSepIndex) {
 				//modified files list
 				[item setTitle:[[[self itemDict] objectForKey:@"modified"] objectAtIndex:(index - CNG_MENU_ITEMS)]];
-				[item setAction:@selector(showChangeSet)];
+				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
 			else if (index - CNG_MENU_ITEMS < removedFilesSepIndex) { 
 				//added files list
 				[item setTitle:[[[self itemDict] objectForKey:@"added"] objectAtIndex:(index - CNG_MENU_ITEMS)]];
-				[item setAction:@selector(showChangeSet)];
+				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
 			else {
 				//removed file list
 				[item setTitle:[[[self itemDict] objectForKey:@"removed"] objectAtIndex:(index - CNG_MENU_ITEMS)]];
-				[item setAction:@selector(showChangeSet)];
+				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
 			break;
@@ -163,12 +164,15 @@
 	[self scanBranches];
 	
 	//build project menu
-	NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(remove:) keyEquivalent:[NSString string]];
-	NSMenuItem *rescanPath = [[NSMenuItem alloc] initWithTitle:@"Rescan path" action:@selector(remove:) keyEquivalent:[NSString string]];
+	NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(removePath:) keyEquivalent:[NSString string]];
+	[removePath setTarget:self];
+	NSMenuItem *rescanPath = [[NSMenuItem alloc] initWithTitle:@"Rescan path" action:@selector(rescan:) keyEquivalent:[NSString string]];
+	[rescanPath setTarget:self];
 	NSMenuItem *onBranch = [[NSMenuItem alloc] initWithTitle:@"On branch" action:nil keyEquivalent:[NSString string]];
 	NSMenuItem *remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
 	NSMenuItem *changes = [[NSMenuItem alloc] initWithTitle:@"Changes" action:nil keyEquivalent:[NSString string]];
 	NSMenuItem *commit = [[NSMenuItem alloc] initWithTitle:@"Commit" action:@selector(commit:) keyEquivalent:[NSString string]];
+	[commit setTarget:self];
 	[projectMenu addItem:removePath];
 	[projectMenu addItem:rescanPath];
 	[projectMenu addItem:onBranch];
@@ -181,18 +185,22 @@
 	[onBranch setSubmenu:onBranchMenu];
 	for(NSString * branch in [[self itemDict] objectForKey:@"branches"]) {
 		NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:branch action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
+		[b setTarget:self];
 		[onBranchMenu addItem:b];
 	}
 	NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch..." action:@selector(newBranch:) keyEquivalent:[NSString string]];
+	[newBranch setTarget:self];
 	[onBranchMenu addItem:newBranch];
 	
 	//build remote menu
 	[remote setSubmenu:remoteMenu];
 	for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
 		NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
+		[r setTarget:self];
 		[remoteMenu addItem:r];
 	}
 	NSMenuItem *newSource = [[NSMenuItem alloc] initWithTitle:@"New Source..." action:@selector(newSource:) keyEquivalent:[NSString string]];
+	[newSource setTarget:self];
 	[remoteMenu addItem:newSource];
 	
 	//changes menu setup
