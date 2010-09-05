@@ -25,6 +25,7 @@
 		766B547712325E43008738D4 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B547212325E43008738D4 /* SBJsonWriter.m */; };
 		766B55C912328322008738D4 /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 766B55C812328322008738D4 /* UserDefaults.plist */; };
 		766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
+		766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -77,6 +78,8 @@
 		766B55C812328322008738D4 /* UserDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = UserDefaults.plist; sourceTree = "<group>"; };
 		766B57CB1232BFD6008738D4 /* ProjectBuddy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectBuddy.h; sourceTree = "<group>"; };
 		766B57CC1232BFD6008738D4 /* ProjectBuddy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectBuddy.m; sourceTree = "<group>"; };
+		766B59551233A86C008738D4 /* ChangeSetViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeSetViewer.h; sourceTree = "<group>"; };
+		766B59561233A86C008738D4 /* ChangeSetViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeSetViewer.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* GitBuddy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GitBuddy-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GitBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -103,6 +106,8 @@
 				766B543812324DA2008738D4 /* GitWrapper.m */,
 				766B57CB1232BFD6008738D4 /* ProjectBuddy.h */,
 				766B57CC1232BFD6008738D4 /* ProjectBuddy.m */,
+				766B59551233A86C008738D4 /* ChangeSetViewer.h */,
+				766B59561233A86C008738D4 /* ChangeSetViewer.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -282,6 +287,7 @@
 				766B547612325E43008738D4 /* SBJsonParser.m in Sources */,
 				766B547712325E43008738D4 /* SBJsonWriter.m in Sources */,
 				766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */,
+				766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
