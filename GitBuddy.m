@@ -108,7 +108,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		NSMenuItem *folderItem = [self menuItemForPath:p];
 		if (folderItem) {			
 			ProjectBuddy *pbuddy = [folderItem representedObject];
-			[pbuddy scanChanges];
+			[pbuddy rescan:nil];
 		}
 	}
 }
