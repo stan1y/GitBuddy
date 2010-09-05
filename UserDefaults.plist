@@ -8,6 +8,10 @@
 	<integer>5</integer>
 	<key>lastEventId</key>
 	<integer>0</integer>
+	<key>useOpenDiff</key>
+	<true/>
+	<key>customDiffViewer</key>
+	<string></string>
 	<key>monitoredPaths</key>
 	<array/>
 	<key>excludedPatterns</key>
