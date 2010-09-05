@@ -16,7 +16,6 @@
 		return nil;
 	}
 	
-	gitLock = [[NSLock alloc] init];
 	parser = [[SBJsonParser alloc] init];
 	wrapperPath = [[NSBundle mainBundle] pathForResource:@"wrapper" ofType:@"py"];
 	[wrapperPath retain];
@@ -48,7 +47,7 @@
 	[gitWrapper setStandardError:stderrPipe];
 	[gitWrapper setStandardOutput:stdoutPipe];
 	
-	NSLog(@"GitWrapper: /usr/bin/python %@", [_args componentsJoinedByString:@" "]);
+	NSLog(@"git operation: /usr/bin/python %@", [_args componentsJoinedByString:@" "]);
 	int totalSlept = 0;
 	[gitWrapper launch];
 	
@@ -73,10 +72,12 @@
 	}
 	else {
 		int rc = [gitWrapper terminationStatus];
-		NSLog(@"GitWrapper: exit code %d", rc);
-		//	0 - there are staged changed ready to commit
-		//	1 - there are unstaged changes
-		if (rc == 0 || rc == 1) {
+		NSLog(@"wrapper exit code %d", rc);
+		//	wrapper exit codes:
+		//		0 - ok
+		//		1 - incorrect usage
+		//		2 - git failed with unexpected code
+		if (rc == 0) {
 			//read output and parse 
 			NSString * output = [[[NSString alloc] initWithData:[[stdoutPipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding] autorelease];
 			NSError * err = nil;
@@ -86,11 +87,9 @@
 				return nil;
 			}
 			if (jsonObj) {
-				NSLog(@"getCommandJson -> [%@] %@", [jsonObj class], jsonObj);
 				return jsonObj;
 			}
 			else {
-				NSLog(@"getCommandJson -> nil");
 				return nil;
 			}
 		}
@@ -105,16 +104,34 @@
 
 //	--- Wrapper API	---
 
-- (NSArray *) getBranches:(NSString *)path
+- (NSDictionary *) getBranches:(NSString *)path
 {
-	//FIXME
-	return [NSArray arrayWithObject:@"master"];
+	// /usr/bin/python wrapper.py --branch-list <path>
+	NSMutableArray *args = [NSMutableArray array];
+	[args addObject:@"--branch-list"];
+	[args addObject:path];
+	
+	id jsonObj = [self getCommandJson:args];
+	if (jsonObj ) {
+		if ([jsonObj isKindOfClass:[NSDictionary class]])
+			return jsonObj;
+		else {
+			NSLog(@"getChanges error: unexpected json received [%@]: %@", [jsonObj class], jsonObj);
+			return nil;
+		}
+	}
+	else {
+		NSLog(@"getChanges error: no json received.");
+		return nil;
+	}
 }
 
-- (NSArray *) getRemote:(NSString *)path
+- (NSDictionary *) getRemote:(NSString *)path
 {
-	//FIXME 
-	return [NSArray arrayWithObject:@"origin"];
+	//FIXME
+	id dict = [NSMutableDictionary dictionary];
+	[dict setObject:[NSArray arrayWithObject:@"origin"] forKey:@"remote"];
+	return dict;
 }
 
 - (NSDictionary *) getChanges:(NSString *)path

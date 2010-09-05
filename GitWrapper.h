@@ -10,7 +10,6 @@
 #import "JSON.h"
 
 @interface GitWrapper : NSObject {
-	NSLock * gitLock;
 	NSString * wrapperPath;
 	NSString * gitPath;
 	SBJsonParser *parser;
@@ -19,7 +18,7 @@
 
 - (id) getCommandJson:(NSArray *)args;
 - (NSDictionary *) getChanges:(NSString *)path;
-- (NSArray *) getBranches:(NSString *)path;
-- (NSArray *) getRemote:(NSString *)path;
+- (NSDictionary *) getBranches:(NSString *)path;
+- (NSDictionary *) getRemote:(NSString *)path;
 
 @end
