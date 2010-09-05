@@ -8,15 +8,16 @@
 
 #import <Cocoa/Cocoa.h>
 #import "GitWrapper.h"
+#import "ChangeSetViewer.h"
 
 /*
- Exit
+
  About
  Preferences
  Add Git Repo
  ------
  /Path/to/project (3) ->	Remove path
-							Rescan path
+ Exit						Rescan path
 							On Branch	->	[master, Add New Branch...]
 							Remote		->	[origin, Add New Remote...]
 							Changes		->	Reset
@@ -48,6 +49,8 @@
 	NSString * currentBranch;
 	NSMutableDictionary * itemDict;
 	GitWrapper *wrapper;
+	NSLock * wrapperLock;
+	NSOperationQueue *queue;
 }
 
 @property (nonatomic, retain) NSMutableDictionary * itemDict;
@@ -58,10 +61,6 @@
 
 - (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle;
 - (int) totalChangedFiles;
-
-- (void) scanChanges;
-- (void) scanRemote;
-- (void) scanBranches;
 
 //	Menu delegate
 - (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel;

@@ -13,12 +13,63 @@
 @synthesize path, title, parentItem;
 @synthesize currentBranch, itemDict;
 
+// Dictionary management
+
+- (void) mergeData:(NSDictionary *)dict
+{
+	@synchronized (self) {
+		NSEnumerator* e = [dict keyEnumerator];
+		id theKey = nil;
+		while((theKey = [e nextObject]) != nil)
+		{
+			id theObject = [dict objectForKey:theKey];
+			[[self itemDict] setObject:theObject forKey:theKey];
+		}
+	}
+}
+					
+
 // Selectors
 
 - (IBAction) removePath:(id)sender
-{}
+{
+	if (NSRunInformationalAlertPanel(@"Confirm repo removal", [NSString stringWithFormat:@"You are about to delete Git repo %@ from tracking. Are you sure?", [self path]], @"Remove repo", @"Cancel", nil) == 1) {
+		[[parentItem menu] removeItem:parentItem];
+		[self release];
+	}
+}
+
 - (IBAction) rescan:(id)sender
-{}
+{
+	if ([wrapperLock tryLock]) {
+		@try {
+			NSLog(@"Rescanning...");
+			[self mergeData:[wrapper getChanges:[self path]]];
+			[self mergeData:[wrapper getBranches:[self path]]];
+			[self mergeData:[wrapper getRemote:[self path]]];
+			
+			[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangedFiles]]];
+			
+			NSLog(@"Status:\n");
+			NSLog(@"%@", [self itemDict]);
+			NSLog(@"  ***");
+		}
+		@catch (NSException * e) {
+			NSLog(@"---------Exception----------");
+			NSLog(@"%@", e);
+			NSLog(@"----------------------------");
+			
+			[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to scan Git repo" code:-1 userInfo:[e userInfo]]];
+		}
+		@finally {
+			[wrapperLock unlock];
+		}
+	}
+	else {
+		NSLog(@"Project busy processing another event...");
+	}
+
+}
 - (IBAction) commit:(id)sender
 {}
 - (IBAction) switchToSource:(id)sender
@@ -36,8 +87,11 @@
 - (IBAction) moveChangesToNewBranch:(id)sender
 {}
 - (IBAction) showChanges:(id)sender
-{}
-
+{
+	ChangeSetViewer * viewer = [ChangeSetViewer viewModified:@"/dev/null" diffTo:[[self path] stringByAppendingPathComponent:[sender representedObject]]];
+	[queue addOperation:viewer];
+	[viewer release];
+}
 
 //	--- Changes Menu Delegate
 
@@ -48,6 +102,7 @@
 	NSArray *removed = [[self itemDict] objectForKey:@"removed"];
 	NSArray *renamed = [[self itemDict] objectForKey:@"renamed"];
 	NSLog(@"updating menu: %d, %d, %d, %d", [modified count], [added count], [removed count], [renamed count]);
+	NSString *itemPath = @"";
 	
 	switch (index) {
 		case CNG_MENU_RESET:
@@ -77,28 +132,33 @@
 		default:
 			if ([modified count] && index - CNG_MENU_ITEMS < [modified count]) {
 				//modified files list
-				[item setTitle:[NSString stringWithFormat:@"%@ (changed)",[[[self itemDict] objectForKey:@"modified"] objectAtIndex:(index - CNG_MENU_ITEMS)]]];
+				itemPath = [[[self itemDict] objectForKey:@"modified"] objectAtIndex:(index - CNG_MENU_ITEMS)];
+				[item setTitle:[NSString stringWithFormat:@"%@ (changed)", itemPath]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
 			if ([added count] && index - CNG_MENU_ITEMS >= [modified count]) { 
 				//added files list
-				[item setTitle:[NSString stringWithFormat:@"%@ (added)",[[[self itemDict] objectForKey:@"added"] objectAtIndex:(index - CNG_MENU_ITEMS - [modified count])]]];
+				itemPath = [[[self itemDict] objectForKey:@"added"] objectAtIndex:(index - CNG_MENU_ITEMS  - [modified count])];
+				[item setTitle:[NSString stringWithFormat:@"%@ (added)", itemPath]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
 			if ([removed count] && index - CNG_MENU_ITEMS >= [modified count] + [added count]) { 
 				//removed files list
-				[item setTitle:[NSString stringWithFormat:@"%@ (removed)",[[[self itemDict] objectForKey:@"removed"] objectAtIndex:(index - CNG_MENU_ITEMS - [modified count] - [added count])]]];
+				itemPath = [[[self itemDict] objectForKey:@"removed"] objectAtIndex:(index - CNG_MENU_ITEMS  - [modified count] - [added count])];
+				[item setTitle:[NSString stringWithFormat:@"%@ (removed)", itemPath]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
 			if ([renamed count] && index - CNG_MENU_ITEMS >= [modified count] + [added count] + [removed count]) { 
 				//renamed files list
-				[item setTitle:[NSString stringWithFormat:@"%@ (renamed)",[[[self itemDict] objectForKey:@"renamed"] objectAtIndex:(index - CNG_MENU_ITEMS - [modified count] - [added count] - [removed count])]]];
+				itemPath = [[[self itemDict] objectForKey:@"renamed"] objectAtIndex:(index - CNG_MENU_ITEMS  - [modified count] - [added count] - [removed count])];
+				[item setTitle:[NSString stringWithFormat:@"%@ (renamed)", itemPath]];
 				[item setAction:@selector(showChanges:)];
 				[item setTarget:self];
 			}
+			[item setRepresentedObject:itemPath];
 			NSLog(@"changeset item at index %d : %@", index - CNG_MENU_ITEMS, item);
 			break;
 	}
@@ -112,39 +172,7 @@
 
 - (int) totalChangedFiles
 {
-	int total = 0;
-	for(NSString * key in [[self itemDict] allKeys]) {
-		//skip metadata storage keys
-		if (key ==  @"remote" || key == @"branches") {
-			continue;
-		}
-		total += [[[self itemDict] valueForKey:key] count];
-	}
-	return total;
-}
-
-//	---	Git access
-
-- (void) scanChanges
-{
-	NSDictionary * changes = [wrapper getChanges:[self path]];
-	[[self itemDict] setObject:[changes objectForKey:@"modified"] forKey:@"modified"];
-	[[self itemDict] setObject:[changes objectForKey:@"added"] forKey:@"added"];
-	[[self itemDict] setObject:[changes objectForKey:@"removed"] forKey:@"removed"];
-	[[self itemDict] setObject:[changes objectForKey:@"renamed"] forKey:@"renamed"];
-	
-	[self setCurrentBranch:[[changes objectForKey:@"branch"] objectAtIndex:0]];
-	[parentItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangedFiles]]];
-}
-
-- (void) scanRemote
-{
-	[[self itemDict] setObject:[wrapper getRemote:[self path]] forKey:@"remote"];
-}
-
-- (void) scanBranches
-{
-	[[self itemDict] setObject:[wrapper getBranches:[self path]] forKey:@"branches"];
+	return [[[self itemDict] objectForKey:@"modified"] count] + [[[self itemDict] objectForKey:@"added"] count] + [[[self itemDict] objectForKey:@"removed"] count] + [[[self itemDict] objectForKey:@"renamed"] count];
 }
 
 //	--- Initialization
@@ -155,22 +183,21 @@
 		return nil;
 	}
 	
+	itemDict = [[NSMutableDictionary alloc] init];
+	projectMenu = [[NSMenu alloc] init];
+	onBranchMenu = [[NSMenu alloc] init]; 
+	remoteMenu = [[NSMenu alloc] init];
+	changesMenu = [[NSMenu alloc] init];
+	wrapper = [[GitWrapper alloc] init];
+	wrapperLock = [[NSLock alloc] init];
+	
+	[self setParentItem:anItem];
+	[self setTitle:aTitle];
+	[self setPath:aPath];
+	
+	[self rescan:nil];
+	
 	@try {
-		itemDict = [[NSMutableDictionary alloc] init];
-		projectMenu = [[NSMenu alloc] init];
-		onBranchMenu = [[NSMenu alloc] init]; 
-		remoteMenu = [[NSMenu alloc] init];
-		changesMenu = [[NSMenu alloc] init];
-		wrapper = [[GitWrapper alloc] init];
-		
-		[self setParentItem:anItem];
-		[self setTitle:aTitle];
-		[self setPath:aPath];
-		
-		[self scanRemote];
-		[self scanChanges];
-		[self scanBranches];
-		
 		//build project menu
 		NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(removePath:) keyEquivalent:[NSString string]];
 		[removePath setTarget:self];
@@ -188,6 +215,9 @@
 		[projectMenu addItem:changes];
 		[projectMenu addItem:commit];
 		[anItem setSubmenu:projectMenu];
+		
+		//calls to other programs as operations
+		queue = [[NSOperationQueue alloc] init];
 		
 		//build branch menu
 		[onBranch setSubmenu:onBranchMenu];
@@ -222,7 +252,7 @@
 		NSLog(@"%@", e);
 		NSLog(@"----------------------------");
 		
-		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to initialized" code:-1 userInfo:[e userInfo]]];
+		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"Failed to initalize project watcher" code:-1 userInfo:[e userInfo]]];
 		[[NSApplication sharedApplication] terminate:nil];
 		//never here :D
 		return nil;
@@ -231,6 +261,7 @@
 
 - (void) dealloc
 {
+	[queue release];
 	[title release];
 	[path release];
 	[currentBranch release];
