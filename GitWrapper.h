@@ -7,18 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "JSON.h"
 
 @interface GitWrapper : NSObject {
 	NSString * wrapperPath;
 	NSString * gitPath;
-	SBJsonParser *parser;
 	int timeout;
 }
 
-- (id) getCommandJson:(NSArray *)args;
-- (NSDictionary *) getChanges:(NSString *)path;
-- (NSDictionary *) getBranches:(NSString *)path;
-- (NSDictionary *) getRemote:(NSString *)path;
+- (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock;
 
 @end
