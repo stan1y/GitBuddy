@@ -9,11 +9,14 @@ import re
 from optparse import OptionParser
 
 __STATUS_TOKENS = {
-	'on_branch'	: '(?<=On.branch.)\S+',
-	'modified'	: '(?<=modified:   )\S+',
-	'added'		: '(?<=new.file:   )\S+',
-	'removed'	: '(?<=deleted:   )\S+',
-	'renamed'	: '(?<=renamed:   )\S+',
+	'modified'	: '(?<=modified:...)\S+',
+	'added'		: '(?<=new.file:...)\S+',
+	'removed'	: '(?<=deleted:...)\S+',
+	'renamed'	: '(?<=renamed:...)\S+',
+}
+
+__UNTRACKED_STATUS = {
+	'files'		: '(?:\t\S*)$'
 }
 
 __BRANCH_LIST_TOKENS = {
@@ -51,6 +54,39 @@ def b_cmd_json(git, repo, command, tokens):
 					items = status[token]
 					items.append(value.strip())
 	return status
+	
+def b_cmd_json_parts(git, repo, command, token_groups):
+	proc = b_cmd_chdir(git, repo, command)
+	err = ''.join(proc.stderr.readlines())
+	#init status with git info
+	status = {'gitrc' : proc.returncode, 'giterr' : err}
+
+	#add group dicts
+	for grp in token_groups:
+		status[grp] = {}
+		for token in token_groups[grp][1]:
+			status[grp][token] = []
+	
+	#populate arrays
+	current_group = None
+	for line in proc.stdout.readlines():
+		#is token header
+		for grp in token_groups:
+			if token_groups[grp][0] in line: 
+				current_group = grp
+				break
+				
+		#check line with token in current group
+		if current_group:
+			tokens = token_groups[current_group][1]
+			for token in tokens:
+				m = re.search(tokens[token], line.strip())
+				if m:
+					value = m.group(0).strip()
+					if value:
+						items = status[current_group][token]
+						items.append(value.strip())
+	return status
 
 if __name__ == '__main__':
 	this_dir = os.path.dirname(os.path.abspath(inspect.getfile( inspect.currentframe())))
@@ -65,6 +101,7 @@ if __name__ == '__main__':
 	parser.add_option("--branch-rm", help="git branch [name]")
 	parser.add_option("--branch-add", help="git branch -d [name]")
 	parser.add_option("--remote-list", action="store_true", default=False, help="git branch -r")
+	parser.add_option("--staged-list", action="store_true", default=False, help="git commit --dry-run")
 	(options, args) = parser.parse_args()
 	
 	if not options.repo:
@@ -79,7 +116,11 @@ if __name__ == '__main__':
 		sys.stderr.write('request: %s\n' % repr(options));
 	
 	if options.status:
-		obj = b_cmd_json(options.git, options.repo, ['status'], __STATUS_TOKENS)
+		obj = b_cmd_json_parts(options.git, options.repo, ['status'], {
+			'staged'	: [ 'Changes to be committed', __STATUS_TOKENS ],
+			'unstaged'	: [ 'Changed but not updated', __STATUS_TOKENS ],
+			'untracked'	: [ 'Untracked files', __UNTRACKED_STATUS ]
+		})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 	
@@ -102,6 +143,7 @@ if __name__ == '__main__':
 		obj = b_cmd_json(options.git, options.repo, ['branch', '-r'], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
+
 	else:
 		parser.print_help()
 		sys.exit(1)

@@ -21,7 +21,6 @@
 		[jsonResult release];
 	}
 	
-	
 	[super dealloc];
 }
 
@@ -79,7 +78,7 @@
 	
 	if ( [gitWrapper terminationReason] != NSTaskTerminationReasonExit) {
 		NSRunAlertPanel(@"Oups...", @"Git command terminated with unknown status. Something went really wrong.", @"Exit", nil, nil);
-		NSLog(@"Aborting...");
+		NSLog(@"Git failed with unknown reason");
 		[[NSApplication sharedApplication] terminate:nil];
 		[gitWrapper release];
 		return;
@@ -89,6 +88,7 @@
 		NSLog(@"wrapper exit code %d", rc);
 		//	wrapper exit codes: -1 is incorrect usage, other - git exit code
 		if (rc == -1) {
+			NSLog(@"Git usage error code %d", rc);
 			NSRunAlertPanel(@"Oups... Git command failed.", @"Git wrapper failed with error saying that usage is wrong. That mostly means unknown git installed here.", @"Exit", nil, nil);
 			
 			[[NSApplication sharedApplication] terminate:nil];
@@ -99,6 +99,7 @@
 			NSError * err = nil;
 			id jsonObj = [parser objectWithString:output error:&err];
 			if (err) {
+				NSLog(@"Git error: %@", err);
 				[[NSApplication sharedApplication] presentError:err];
 				return;
 			}
@@ -107,6 +108,7 @@
 				
 				//check json answer
 				if ([[jsonObj objectForKey:@"giterr"] length] > 0 ){
+					NSLog(@"Git error: %@", [jsonObj objectForKey:@"giterr"]);
 					NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [jsonObj objectForKey:@"giterr"]], @"Exit", nil, nil);
 					
 					[[NSApplication sharedApplication] terminate:nil];
