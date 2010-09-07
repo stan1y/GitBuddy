@@ -26,14 +26,14 @@
 			[[self itemDict] setObject:theObject forKey:theKey];
 		}
 		
-		[self rebuildMenu];
+		[self updateMenuItems];
 	}
 }
 					
 
 // Selectors
 
-- (IBAction) removePath:(id)sender
+- (IBAction) remove:(id)sender
 {
 	if (NSRunInformationalAlertPanel(@"Confirm repo removal", [NSString stringWithFormat:@"You are about to delete Git repo %@ from tracking. Are you sure?", [self path]], @"Remove repo", @"Cancel", nil) == 1) {
 		[[parentItem menu] removeItem:parentItem];
@@ -44,10 +44,14 @@
 - (IBAction) rescan:(id)sender
 {
 	if ([wrapperLock tryLock]) {
+		
+		[changedSubMenu setPending:YES];
+		[stagedSubMenu setPending:YES];
+		
 		@try {
 			NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 			NSLog(@"Quering repo at %@...", path);
-			//scan remote, branches and changes
+			//scan remote, branch and changes
 			[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 				[self mergeData:dict];
 			}];
@@ -56,29 +60,34 @@
 			}];
 			[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 				[self mergeData:dict];
-				[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangedFiles]]];
+				[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangeSetItems]]];
 				NSLog(@"Status:\n");
 				NSLog(@"%@", [self itemDict]);
 				NSLog(@"  ***");
+				[changedSubMenu setPending:NO];
+				[stagedSubMenu setPending:NO];
+				[parentMenu update];
 			}];
 		}
 		@catch (NSException * e) {
+			[wrapperLock unlock];
 			NSLog(@"---------Exception----------");
 			NSLog(@"%@", e);
 			NSLog(@"----------------------------");
 			
 			[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to scan Git repo" code:-1 userInfo:[e userInfo]]];
 		}
-		@finally {
-			[wrapperLock unlock];
-		}
 	}
 	else {
-		NSLog(@"Project busy processing another event...");
+		NSLog(@"ProjectBuddy is busy processing another event...");
 	}
 
 }
 - (IBAction) commit:(id)sender
+{}
+- (IBAction) push:(id)sender
+{}
+- (IBAction) pull:(id)sender
 {}
 - (IBAction) switchToSource:(id)sender
 {}
@@ -90,164 +99,99 @@
 {}
 - (IBAction) resetChanges:(id)sender
 {}
-- (IBAction) stageChanges:(id)sender
+- (IBAction) stageSelectedFiles:(id)sender
 {}
-- (IBAction) moveChangesToNewBranch:(id)sender
+- (IBAction) stageAll:(id)sender
 {}
-- (IBAction) showChanges:(id)sender
+- (IBAction) unstageFile:(id)sender
+{}
+- (IBAction) deselectAll:(id)sender
+{}
+- (IBAction) selectAll:(id)sender
+{}
+
+- (IBAction) toggleSelectFileToStage:(id)sender
 {
-	ChangeSetViewer * viewer = [ChangeSetViewer viewModified:@"/dev/null" diffTo:[[self path] stringByAppendingPathComponent:[sender representedObject]]];
-	[[[NSApp delegate] queue] addOperation:viewer];
-	[viewer release];
+	[sender setState:![sender state]];
+	
+	//unselect
+	for(NSString * selectedFile in selectedChanges) {
+		if (selectedFile == [sender title]) {
+			[selectedChanges removeObject:selectedFile];
+			NSLog(@"Unselect file: %@", [sender title]);
+			return;
+		}
+	}
+	
+	//select file
+	NSLog(@"Select file: %@", [sender title]);
+	[selectedChanges addObject:[sender title]];
 }
 
-//	--- Changes Menu Delegate
+//	-- Project Items
 
-- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
+- (BOOL) isPending
 {
-	NSArray *modified = [[self itemDict] objectForKey:@"modified"];
-	NSArray *added = [[self itemDict] objectForKey:@"added"];
-	NSArray *removed = [[self itemDict] objectForKey:@"removed"];
-	NSArray *renamed = [[self itemDict] objectForKey:@"renamed"];
-	NSLog(@"updating menu: %d, %d, %d, %d", [modified count], [added count], [removed count], [renamed count]);
-	NSString *itemPath = @"";
-	
-	switch (index) {
-		case CNG_MENU_RESET:
-			[item setTitle:@"Reset"];
-			[item setAction:@selector(resetChanges:)];
-			[item setTarget:self];
-			break;
-			
-		case CNG_MENU_STAGE:
-			[item setTitle:@"Stage"];
-			[item setAction:@selector(stageChanges:)];
-			[item setTarget:self];
-			break;
-			
-		case CNG_MENU_MVBRANCH:
-			[item setTitle:@"Move to new branch..."];
-			[item setAction:@selector(moveChangesToNewBranch:)];
-			[item setTarget:self];
-			break;
-			
-		case CNG_MENU_SEP:
-			[menu removeItemAtIndex:CNG_MENU_SEP];
-			[menu insertItem:[NSMenuItem separatorItem] atIndex:CNG_MENU_SEP];
-			break;
-			
-			// changeset items
-		default:
-			if ([modified count] && index - CNG_MENU_ITEMS < [modified count]) {
-				//modified files list
-				itemPath = [[[self itemDict] objectForKey:@"modified"] objectAtIndex:(index - CNG_MENU_ITEMS)];
-				[item setTitle:[NSString stringWithFormat:@"%@ (changed)", itemPath]];
-				[item setAction:@selector(showChanges:)];
-				[item setTarget:self];
-			}
-			if ([added count] && index - CNG_MENU_ITEMS >= [modified count]) { 
-				//added files list
-				itemPath = [[[self itemDict] objectForKey:@"added"] objectAtIndex:(index - CNG_MENU_ITEMS  - [modified count])];
-				[item setTitle:[NSString stringWithFormat:@"%@ (added)", itemPath]];
-				[item setAction:@selector(showChanges:)];
-				[item setTarget:self];
-			}
-			if ([removed count] && index - CNG_MENU_ITEMS >= [modified count] + [added count]) { 
-				//removed files list
-				itemPath = [[[self itemDict] objectForKey:@"removed"] objectAtIndex:(index - CNG_MENU_ITEMS  - [modified count] - [added count])];
-				[item setTitle:[NSString stringWithFormat:@"%@ (removed)", itemPath]];
-				[item setAction:@selector(showChanges:)];
-				[item setTarget:self];
-			}
-			if ([renamed count] && index - CNG_MENU_ITEMS >= [modified count] + [added count] + [removed count]) { 
-				//renamed files list
-				itemPath = [[[self itemDict] objectForKey:@"renamed"] objectAtIndex:(index - CNG_MENU_ITEMS  - [modified count] - [added count] - [removed count])];
-				[item setTitle:[NSString stringWithFormat:@"%@ (renamed)", itemPath]];
-				[item setAction:@selector(showChanges:)];
-				[item setTarget:self];
-			}
-			[item setRepresentedObject:itemPath];
-			NSLog(@"changeset item at index %d : %@", index - CNG_MENU_ITEMS, item);
-			break;
+	if ([wrapperLock tryLock]) {
+		[wrapperLock unlock];
+		return NO;
 	}
 	return YES;
 }
 
-- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
+- (int) totalChangeSetItems
 {
-	return CNG_MENU_ITEMS + [self totalChangedFiles];
+	return [changedSubMenu totalNumberOfFiles] + [stagedSubMenu totalNumberOfFiles];
 }
 
-- (int) totalChangedFiles
+- (void) updateMenuItems
 {
-	return [[[self itemDict] objectForKey:@"modified"] count] + [[[self itemDict] objectForKey:@"added"] count] + [[[self itemDict] objectForKey:@"removed"] count] + [[[self itemDict] objectForKey:@"renamed"] count];
-}
-
-//	--- Menu building ---
-
-- (void) rebuildMenu
-{
-	NSLog(@"Rebuilding menu for %@...", title);
-	@try {
-		//crear
-		[projectMenu removeAllItems];
-		[onBranchMenu removeAllItems];
-		[remoteMenu removeAllItems];
-		[changesMenu removeAllItems];
-		
-		//build project menu
-		NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(removePath:) keyEquivalent:[NSString string]];
-		[removePath setTarget:self];
-		NSMenuItem *rescanPath = [[NSMenuItem alloc] initWithTitle:@"Rescan path" action:@selector(rescan:) keyEquivalent:[NSString string]];
-		[rescanPath setTarget:self];
-		NSMenuItem *onBranch = [[NSMenuItem alloc] initWithTitle:@"On branch" action:nil keyEquivalent:[NSString string]];
-		NSMenuItem *remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
-		NSMenuItem *changes = [[NSMenuItem alloc] initWithTitle:@"Changes" action:nil keyEquivalent:[NSString string]];
-		NSMenuItem *commit = [[NSMenuItem alloc] initWithTitle:@"Commit" action:@selector(commit:) keyEquivalent:[NSString string]];
-		[commit setTarget:self];
-		[projectMenu addItem:removePath];
-		[projectMenu addItem:rescanPath];
-		[projectMenu addItem:onBranch];
-		[projectMenu addItem:remote];
-		[projectMenu addItem:changes];
-		[projectMenu addItem:commit];
-		[parentItem setSubmenu:projectMenu];
-		
-		//build branch menu
-		[onBranch setSubmenu:onBranchMenu];
-		for(NSString * branch in [[self itemDict] objectForKey:@"branches"]) {
-			NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:branch action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
-			[b setTarget:self];
-			[onBranchMenu addItem:b];
-		}
-		NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch..." action:@selector(newBranch:) keyEquivalent:[NSString string]];
-		[newBranch setTarget:self];
-		[onBranchMenu addItem:newBranch];
-		
-		//build remote menu
-		[remote setSubmenu:remoteMenu];
-		for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
-			NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
-			[r setTarget:self];
-			[remoteMenu addItem:r];
-		}
-		NSMenuItem *newSource = [[NSMenuItem alloc] initWithTitle:@"New Source..." action:@selector(newSource:) keyEquivalent:[NSString string]];
-		[newSource setTarget:self];
-		[remoteMenu addItem:newSource];
-		
-		//changes menu setup
-		[changes setSubmenu:changesMenu];
-		[changesMenu setDelegate:self];
-		
-		NSLog(@"Done.");
+	//update dynamic menus
+	[changedSubMenu setData:[[self itemDict] objectForKey:@"unstaged"]];
+	[stagedSubMenu setData:[[self itemDict] objectForKey:@"staged"]];
+	
+	//update branch list
+	[branchMenu removeAllItems];
+	//new branch
+	NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch" action:@selector(newBranch:) keyEquivalent:[NSString string]];
+	[newBranch setTarget:self];
+	[branchMenu addItem:newBranch];
+	//separator
+	[branchMenu addItem:[NSMenuItem separatorItem]];
+	//branch list
+	for(NSString * br in [[self itemDict] objectForKey:@"branch"]) {
+		NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:br action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
+		[b setTarget:self];
+		[branchMenu addItem:b];
 	}
-	@catch (NSException * e) {
-		NSLog(@"---------Exception----------");
-		NSLog(@"%@", e);
-		NSLog(@"----------------------------");
-		
-		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"Failed to initalize project watcher" code:-1 userInfo:[e userInfo]]];
-		[[NSApplication sharedApplication] terminate:nil];
+	
+	//update remote list
+	[remoteMenu removeAllItems];
+	//new remote
+	NSMenuItem *newRemote = [[NSMenuItem alloc] initWithTitle:@"Add Remote Branch" action:@selector(newSource:) keyEquivalent:[NSString string]];
+	[newRemote setTarget:self];
+	[remoteMenu addItem:newRemote];
+	//separator
+	[remoteMenu addItem:[NSMenuItem separatorItem]];
+	//remote branch list
+	for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
+		NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
+		[r setTarget:self];
+		[remoteMenu addItem:r];
+	}
+	
+	//set number of modified and staged files
+	if ([changedSubMenu totalNumberOfFiles]) {
+		[changed setTitle:[NSString stringWithFormat:@"Changed (%d)", [changedSubMenu totalNumberOfFiles] ]];
+	}
+	else {
+		[changed setTitle:@"Changed"];	
+	}
+	if ([stagedSubMenu totalNumberOfFiles]) {
+		[staged setTitle:[NSString stringWithFormat:@"Staged (%d)", [stagedSubMenu totalNumberOfFiles] ]];
+	}
+	else {
+		[staged setTitle:@"Staged"];
 	}
 }
 
@@ -259,18 +203,83 @@
 		return nil;
 	}
 	
-	itemDict = [[NSMutableDictionary alloc] init];
-	projectMenu = [[NSMenu alloc] init];
-	onBranchMenu = [[NSMenu alloc] init]; 
-	remoteMenu = [[NSMenu alloc] init];
-	changesMenu = [[NSMenu alloc] init];
+	//git access
 	wrapper = [[GitWrapper alloc] init];
 	wrapperLock = [[NSLock alloc] init];
 	
-	[self setParentItem:anItem];
+	//project properties
+	itemDict = [[NSMutableDictionary alloc] init];
 	[self setTitle:aTitle];
 	[self setPath:aPath];
-	[self rebuildMenu];
+	
+	//set parent menu
+	[self setParentItem:anItem];
+	parentMenu = [[NSMenu alloc] init];
+	[parentItem setSubmenu:parentMenu];
+	
+	//branch menu
+	branchMenu = [[NSMenu alloc] init];
+	branch = [[NSMenuItem alloc] initWithTitle:@"Branch" action:nil keyEquivalent:[NSString string]];
+	[branch setSubmenu:branchMenu];
+	[parentMenu addItem:branch];
+	
+	//remote menu
+	remoteMenu = [[NSMenu alloc] init];
+	remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
+	[remote setSubmenu:remoteMenu];
+	[parentMenu addItem:remote];
+	
+	//changed menu
+	changedMenu = [[NSMenu alloc] init];
+	changedSubMenu = [[ProjectSubMenu alloc] initWithDict:[[self itemDict] objectForKey:@"unstaged"] forMenu:changedMenu];
+	changed = [[NSMenuItem alloc] initWithTitle:@"Changed" action:nil keyEquivalent:[NSString string]];
+	NSMenuItem *stageAll = [[NSMenuItem alloc] initWithTitle:@"Select & Stage All" action:@selector(stageAll:) keyEquivalent:[NSString string]];
+	[stageAll setTarget:self];
+	NSMenuItem *stageSelected = [[NSMenuItem alloc] initWithTitle:@"Stage Selected Only" action:@selector(stageSelectedFiles:) keyEquivalent:[NSString string]];
+	[stageSelected setTarget:self];
+	NSMenuItem *selectAll = [[NSMenuItem alloc] initWithTitle:@"Select All" action:@selector(selectAll:) keyEquivalent:[NSString string]];
+	[selectAll setTarget:self];
+	NSMenuItem *deselectAll = [[NSMenuItem alloc] initWithTitle:@"Deselect All" action:@selector(deselectAll:) keyEquivalent:[NSString string]];
+	[deselectAll setTarget:self];
+	[changedSubMenu setInitialItems:[NSArray arrayWithObjects:stageAll, stageSelected, selectAll,  deselectAll, [NSMenuItem separatorItem], nil]];
+	[changedSubMenu setItemSelector:@selector(toggleSelectFileToStage:) target:self];
+	[changed setSubmenu:changedMenu];
+	[changedMenu setDelegate:changedSubMenu];
+	[parentMenu addItem:changed];
+	
+	//staged
+	stagedMenu = [[NSMenu alloc] init];
+	stagedSubMenu = [[ProjectSubMenu alloc] initWithDict:[[self itemDict] objectForKey:@"staged"] forMenu:stagedMenu];
+	staged = [[NSMenuItem alloc] initWithTitle:@"Staged" action:nil keyEquivalent:[NSString string]];
+	NSMenuItem *commit = [[NSMenuItem alloc] initWithTitle:@"Commit" action:@selector(commit:) keyEquivalent:[NSString string]];
+	[commit setTarget:self];
+	NSMenuItem *unStageAll = [[NSMenuItem alloc] initWithTitle:@"Unstage All" action:nil keyEquivalent:[NSString string]];
+	[unStageAll setTarget:self];
+	[stagedSubMenu setInitialItems:[NSArray arrayWithObjects: commit, unStageAll, [NSMenuItem separatorItem], nil]];
+	[stagedSubMenu setItemSelector:@selector(unstageFile:) target:self];
+	[staged setSubmenu:stagedMenu];
+	[stagedMenu setDelegate:stagedSubMenu];
+	[parentMenu addItem:staged];
+					  
+					  
+	//push
+	push = [[NSMenuItem alloc] initWithTitle:@"Push" action:@selector(push:) keyEquivalent:[NSString string]];
+	[push setTarget:self];
+	[parentMenu addItem:push];
+	
+	//pull
+	pull = [[NSMenuItem alloc] initWithTitle:@"Pull" action:@selector(pull:) keyEquivalent:[NSString string]];
+	[pull setTarget:self];
+	[parentMenu	addItem:pull];
+	
+	//rescan
+	rescan = [[NSMenuItem alloc] initWithTitle:@"Rescan" action:@selector(rescan:) keyEquivalent:[NSString string]];
+	[rescan setTarget:self];
+	[parentMenu addItem:rescan];
+	
+	remove = [[NSMenuItem alloc] initWithTitle:@"Remove Repo" action:@selector(remove:) keyEquivalent:[NSString string]];
+	[remove setTarget:self];
+	[parentMenu addItem:remove];
 	
 	return self;
 }
@@ -281,10 +290,12 @@
 	[path release];
 	[currentBranch release];
 	[itemDict release];
-	[projectMenu release];
-	[onBranchMenu release];
+	[branchMenu release];
+	[parentMenu release];
 	[remoteMenu release];
-	[changesMenu release];
+	[changedMenu release];
+	[stagedMenu release];
+	[selectedChanges release];
 	
 	[super dealloc];
 }
