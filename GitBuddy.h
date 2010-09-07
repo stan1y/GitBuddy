@@ -16,13 +16,20 @@
 	NSImage *statusImage;
 	NSImage *statusAltImage;
 	
+	double minimalUpdateTimeSec;
+	double lastUpdatedSec;
 	NSNumber* lastEventId;
     FSEventStreamRef stream;
 	
 	NSPanel *addPathPanel;
 	NSTextField *addPathField;
+	NSOperationQueue *queue;
+	
+	NSLock *eventsLock;
+	NSArray *queuedEvents;
 }
 
+@property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addPathField;
 @property (assign) IBOutlet NSPanel *addPathPanel;
 
@@ -44,3 +51,6 @@
 - (IBAction) showGitManual:(id)sender;
 
 @end
+
+//get current time in seconds
+double now_seconds();

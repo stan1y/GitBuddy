@@ -7,7 +7,7 @@
 //
 
 #import "GitBuddy.h"
-
+#include <time.h>
 
 //	-- Default menu items settings
 
@@ -18,6 +18,7 @@
 
 @synthesize addPathPanel;
 @synthesize addPathField;
+@synthesize queue;
 
 //	--- File System Events processing
 
@@ -46,7 +47,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     GitBuddy *buddy = (GitBuddy *)userData;
 	size_t i;
     for(i=0; i < numEvents; i++){
-		NSLog(@"Processing event %d, last %d", eventIds[i], [buddy lastEventId]);
+		NSLog(@"received event %d, last %d", eventIds[i], [buddy lastEventId]);
 		if (eventIds[i] > [buddy lastEventId]) {
 			NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
 			if ([paths isKindOfClass:[NSArray class]]) {
@@ -93,24 +94,53 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 - (void) scanUpdatesAtPaths:(NSArray *)paths
 {
+	//processing events
+	[eventsLock lock];
+	
+	//merge events
+	NSArray * merged = [queuedEvents arrayByAddingObjectsFromArray:paths];
+	[queuedEvents release];
+	queuedEvents = merged;
+	[queuedEvents retain];
+	
+	NSLog(@"Total %d events in queue.", [queuedEvents count]);
+	
+	//check minimal period
+	double delta = now_seconds() - lastUpdatedSec;
+	NSLog(@"event after %.2f seconds, period is %.2f seconds.", delta, minimalUpdateTimeSec);
+	if (delta < minimalUpdateTimeSec) {
+		[eventsLock unlock];
+		return;
+	}
+	
+	NSLog(@"Processing events...");
+	NSMutableSet * foldersToRescan = [NSMutableSet set];
 	NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
-	for(NSString *p in paths) {
-		
+	for(NSString *p in queuedEvents) {
 		//check if path is excluded
 		for(int i=0; i< [excludedPatterns count]; i++) {
 			NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self matches %@", [excludedPatterns objectAtIndex:i]];
 			if ([predicate evaluateWithObject:p]) {
 				//path is excluded
-				return;
+				continue;
 			}
 		}
 		
+		NSLog(@"\t-%@", p);
 		NSMenuItem *folderItem = [self menuItemForPath:p];
-		if (folderItem) {			
-			ProjectBuddy *pbuddy = [folderItem representedObject];
-			[pbuddy rescan:nil];
+		if (folderItem) {
+			[foldersToRescan addObject:folderItem];
 		}
 	}
+	
+	NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
+	for(NSMenuItem *mi in foldersToRescan) {
+		[[mi representedObject] rescan:nil];
+	}
+	
+	lastUpdatedSec = now_seconds();
+	NSLog(@"Update done on: %f", lastUpdatedSec);
+	[eventsLock unlock];
 }
 
 //	--- Monitored paths api
@@ -256,7 +286,19 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
 	unsigned long long eventId = [[defaults objectForKey:@"lastEventId"] intValue];
 	[self setLastEventId:eventId];
+	NSLog(@"Last event id: %d", [lastEventId unsignedLongLongValue]);
+	minimalUpdateTimeSec = [defaults doubleForKey:@"minimalUpdateTimeSec"];
+	NSLog(@"Minimal update period in seconds: %.2f", minimalUpdateTimeSec);
+	lastUpdatedSec = now_seconds();
 	
+	//events queue
+	queuedEvents = [[NSArray alloc] init];
+	eventsLock = [[NSLock alloc] init];
+	
+	//calls to other programs as operations
+	queue = [[NSOperationQueue alloc] init];
+	
+	//status item
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
 	[statusItem retain];
 	statusImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"StatusIconBlack" ofType:@"png"]];
@@ -270,7 +312,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem setToolTip: @"GitBuddy"];
 	[statusItem setHighlightMode: YES];
 	
-	NSLog(@"Last event id: %d", [lastEventId unsignedLongLongValue]);
 	[self initMonitoredPaths:[defaults arrayForKey:@"monitoredPaths"]];
 }
 
@@ -282,6 +323,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[lastEventId release];
 	[addPathField release];
 	[addPathPanel release];
+	[queue release];
+	[queuedEvents release];
 
 	[super dealloc];
 }
@@ -302,3 +345,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 }
 
 @end
+
+double now_seconds()
+{
+	return (double)clock() / CLOCKS_PER_SEC;
+}
