@@ -12,6 +12,10 @@
 	<true/>
 	<key>customDiffViewer</key>
 	<string></string>
+	<key>editorCmd</key>
+	<string>mate</string>
+	<key>minimalUpdateTimeSec</key>
+	<string>2</string>
 	<key>monitoredPaths</key>
 	<array/>
 	<key>excludedPatterns</key>
