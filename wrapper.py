@@ -11,8 +11,8 @@ from optparse import OptionParser
 __STATUS_TOKENS = {
 	'on_branch'	: '(?<=On.branch.)\S+',
 	'modified'	: '(?<=modified:   )\S+',
-	'added'		: '(?<=added:   )\S+',
-	'removed'	: '(?<=added:   )\S+',
+	'added'		: '(?<=new.file:   )\S+',
+	'removed'	: '(?<=deleted:   )\S+',
 	'renamed'	: '(?<=renamed:   )\S+',
 }
 
@@ -21,106 +21,87 @@ __BRANCH_LIST_TOKENS = {
 	'branches'			: '(?:.\S+)\S+'
 }
 
-__ERR_USAGE = 1
-__ERR_GIT = 2
+__ERR_USAGE = -1
 
 def cmd(command, **kwargs):
 	return subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, **kwargs)
-
-def git_status(git, path):
+	
+def b_cmd_chdir(git, repo, command):
+	command.insert(0, git)
 	pwd = os.getcwdu()
-	os.chdir(path)
-	proc = cmd([git, 'status'])
+	os.chdir(repo)
+	proc = cmd(command)
 	proc.wait()
 	os.chdir(pwd)
+	return proc
 	
+def b_cmd_json(git, repo, command, tokens):
+	proc = b_cmd_chdir(git, repo, command)
 	err = ''.join(proc.stderr.readlines())
 	status = {'gitrc' : proc.returncode, 'giterr' : err}
 	#init status with git info
-	for token in __STATUS_TOKENS: status[token] = []
+	for token in tokens: status[token] = []
 	#populate arrays
 	for line in proc.stdout.readlines():
-		for token in __STATUS_TOKENS:
-			m = re.search(__STATUS_TOKENS[token], line.strip())
+		for token in tokens:
+			m = re.search(tokens[token], line.strip())
 			if m:
 				value = m.group(0).strip()
 				if value:
 					items = status[token]
 					items.append(value.strip())
-					#status[token] = files
 	return status
-
-def git_branch_list(git, path):
-	pwd = os.getcwdu()
-	os.chdir(path)
-	proc = cmd([git, 'branch'])
-	proc.wait()
-	os.chdir(pwd)
-	err = ''.join(proc.stderr.readlines())
-	list_dict = {'gitrc' : proc.returncode, 'giterr' : err}
-	#init status with git info
-	for token in __BRANCH_LIST_TOKENS: list_dict[token] = []
-	for line in proc.stdout.readlines():
-		for token in __BRANCH_LIST_TOKENS:
-			m = re.search(__BRANCH_LIST_TOKENS[token], line.strip())
-			if m:
-				value = m.group(0).strip()
-				if value:
-					items = list_dict[token]
-					items.append(value.strip())
-	return list_dict;
 
 if __name__ == '__main__':
 	this_dir = os.path.dirname(os.path.abspath(inspect.getfile( inspect.currentframe())))
 
 	parser = OptionParser()
+	
+	parser.add_option("--debug-request", action="store_true", default=False, help="print json view of request")
+	parser.add_option("--repo", help="path to git repository")
 	parser.add_option("--git", help="path to git binary, default is /opt/local/bin/git")
-	parser.add_option("--status", action="store_true", default=False, help="git status <path>")
-	parser.add_option("--diff", action="store_true", default=False, help="git diff <path1> <path2>")
-	parser.add_option("--branch-list", action="store_true", default=False, help="git branch <path>")
+	parser.add_option("--status", action="store_true", default=False, help="git status")
+	parser.add_option("--branch-list", action="store_true", default=False, help="git branch")
+	parser.add_option("--branch-rm", help="git branch [name]")
+	parser.add_option("--branch-add", help="git branch -d [name]")
+	parser.add_option("--remote-list", action="store_true", default=False, help="git branch -r")
 	(options, args) = parser.parse_args()
+	
+	if not options.repo:
+		sys.stderr.write('--repo is required argument\n')
+		parser.print_help()
+		sys.exit(__ERR_USAGE)
 	
 	if not options.git:
 		options.git = "/opt/local/bin/git"
 	
-	sys.stderr.write('request:\n');
-	sys.stderr.write(repr(options) + '\n');
+	if options.debug_request:
+		sys.stderr.write('request: %s\n' % repr(options));
 	
 	if options.status:
-		if len(args) < 1:
-			sys.stderr.write('--status require an argument of path\n')
-			parser.print_help()
-			sys.exit(__ERR_USAGE)
-			
-		status = git_status(options.git, args[0])
-		if status:
-			sys.stdout.write(json.dumps(status) + '\n')
-			sys.exit(0)
-		else:
-			sys.stderr.write('failed to get status of %s\n' % args[0])
-			sys.exit(__ERR_GIT)
+		obj = b_cmd_json(options.git, options.repo, ['status'], __STATUS_TOKENS)
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
 	
 	elif options.branch_list:
-		if len(args) < 1:
-			sys.stderr.write('--status require an argument of path\n')
-			parser.print_help()
-			sys.exit(__ERR_USAGE)
-		
-		list_dict = git_branch_list(options.git, args[0]);
-		if list_dict:
-			sys.stdout.write(json.dumps(list_dict) + '\n')
-			sys.exit(0)
-		else:
-			sys.stderr.write('failed to get branch list of %s\n' % args[0])
-			sys.exit(__ERR_GIT)
+		obj = b_cmd_json(options.git, options.repo, ['branch'], __BRANCH_LIST_TOKENS)
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+			
+	elif options.branch_rm:
+		obj = b_cmd_json(options.git, options.repo, ['branch', '-d', options.branch_rm], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
 	
-	elif options.diff:
-		if len(args) < 2:
-			sys.stderr.write('--diff requires two path arguments\n')
-			parser.print_help()
-			sys.exit(__ERR_USAGE)
-		pass
-		
+	elif options.branch_add:
+		obj = b_cmd_json(options.git, options.repo, ['branch', options.branch_add], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+	
+	elif options.remote_list:
+		obj = b_cmd_json(options.git, options.repo, ['branch', '-r'], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
 	else:
 		parser.print_help()
 		sys.exit(1)
