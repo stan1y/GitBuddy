@@ -43,11 +43,6 @@
 
 - (IBAction) browseForPath:(id)sender;
 - (IBAction) addPath:(id)sender;
-- (IBAction) pushClicked:(id)sender;
-- (IBAction) stageChangesClicked:(id)sender;
-- (IBAction) moveToBranchChangesClicked:(id)sender;
-- (IBAction) showChangeSet:(id)sender;
-- (IBAction) removePath:(id)sender;
 - (IBAction) showGitManual:(id)sender;
 
 @end

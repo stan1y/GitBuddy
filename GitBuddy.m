@@ -47,7 +47,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     GitBuddy *buddy = (GitBuddy *)userData;
 	size_t i;
     for(i=0; i < numEvents; i++){
-		NSLog(@"received event %d, last %d", eventIds[i], [buddy lastEventId]);
 		if (eventIds[i] > [buddy lastEventId]) {
 			NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
 			if ([paths isKindOfClass:[NSArray class]]) {
@@ -102,18 +101,14 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[queuedEvents release];
 	queuedEvents = merged;
 	[queuedEvents retain];
-	
-	NSLog(@"Total %d events in queue.", [queuedEvents count]);
-	
 	//check minimal period
 	double delta = now_seconds() - lastUpdatedSec;
-	NSLog(@"event after %.2f seconds, period is %.2f seconds.", delta, minimalUpdateTimeSec);
-	if (delta < minimalUpdateTimeSec) {
+	if (lastUpdatedSec && delta < minimalUpdateTimeSec) {
 		[eventsLock unlock];
 		return;
 	}
 	
-	NSLog(@"Processing events...");
+	NSLog(@"Processing events %d events in queue.", [queuedEvents count]);
 	NSMutableSet * foldersToRescan = [NSMutableSet set];
 	NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
 	for(NSString *p in queuedEvents) {
@@ -157,8 +152,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 {
 	for (int index = MENUITEMS - 1; index < [statusMenu numberOfItems] - 1; index++) {
 		NSMenuItem *i = [statusMenu itemAtIndex:index];
-		NSDictionary *dict = [i representedObject];
-		if ([path rangeOfString:[dict valueForKey:@"title"]].location == 0) {
+		ProjectBuddy * pbuddy = [i representedObject];
+		if ([path rangeOfString:[pbuddy path]].location == 0) {
 			return i;
 		}
 	}
@@ -216,15 +211,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 //	--- UI Callbacks
 - (IBAction) showGitManual:(id)sender
 {}
-- (IBAction) showChangeSet:(id)sender
-{}
-- (IBAction) pushClicked:(id)sender
-{}
-- (IBAction) stageChangesClicked:(id)sender
-{}
-- (IBAction) moveToBranchChangesClicked:(id)sender
-{}
-
 - (IBAction) browseForPath:(id)sender
 {
 	NSOpenPanel *op = [NSOpenPanel openPanel];
@@ -246,18 +232,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 	else {
 		NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor", @"Try again", nil, nil);
-	}
-}
-
-- (IBAction) removePath:(id)sender
-{
-	NSString *path = [[sender menu] title];
-	NSMenuItem * parentItem = [self menuItemForPath:path];
-	int rc = NSRunInformationalAlertPanel(@"Removing path", [NSString stringWithFormat:@"Do you want to remove Git repository %@ from watch list?", path], @"Remove repo", @"Cancel", nil);
-	if (rc == 1) {
-		[statusMenu removeItem:parentItem];
-		[parentItem release];
-		[self initializeEventForPaths:[self monitoredPathsArray]];
 	}
 }
 
@@ -289,7 +263,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSLog(@"Last event id: %d", [lastEventId unsignedLongLongValue]);
 	minimalUpdateTimeSec = [defaults doubleForKey:@"minimalUpdateTimeSec"];
 	NSLog(@"Minimal update period in seconds: %.2f", minimalUpdateTimeSec);
-	lastUpdatedSec = now_seconds();
+	lastUpdatedSec = 0;
 	
 	//events queue
 	queuedEvents = [[NSArray alloc] init];
