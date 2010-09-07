@@ -50,7 +50,6 @@
 	NSMutableDictionary * itemDict;
 	GitWrapper *wrapper;
 	NSLock * wrapperLock;
-	NSOperationQueue *queue;
 }
 
 @property (nonatomic, retain) NSMutableDictionary * itemDict;
@@ -61,6 +60,8 @@
 
 - (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle;
 - (int) totalChangedFiles;
+- (void) mergeData:(NSDictionary *)dict;
+- (void) rebuildMenu;
 
 //	Menu delegate
 - (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel;

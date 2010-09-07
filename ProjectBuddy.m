@@ -25,6 +25,8 @@
 			id theObject = [dict objectForKey:theKey];
 			[[self itemDict] setObject:theObject forKey:theKey];
 		}
+		
+		[self rebuildMenu];
 	}
 }
 					
@@ -43,16 +45,22 @@
 {
 	if ([wrapperLock tryLock]) {
 		@try {
-			NSLog(@"Rescanning...");
-			[self mergeData:[wrapper getChanges:[self path]]];
-			[self mergeData:[wrapper getBranches:[self path]]];
-			[self mergeData:[wrapper getRemote:[self path]]];
-			
-			[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangedFiles]]];
-			
-			NSLog(@"Status:\n");
-			NSLog(@"%@", [self itemDict]);
-			NSLog(@"  ***");
+			NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+			NSLog(@"Quering repo at %@...", path);
+			//scan remote, branches and changes
+			[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+				[self mergeData:dict];
+			}];
+			[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+				[self mergeData:dict];
+			}];
+			[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+				[self mergeData:dict];
+				[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangedFiles]]];
+				NSLog(@"Status:\n");
+				NSLog(@"%@", [self itemDict]);
+				NSLog(@"  ***");
+			}];
 		}
 		@catch (NSException * e) {
 			NSLog(@"---------Exception----------");
@@ -89,7 +97,7 @@
 - (IBAction) showChanges:(id)sender
 {
 	ChangeSetViewer * viewer = [ChangeSetViewer viewModified:@"/dev/null" diffTo:[[self path] stringByAppendingPathComponent:[sender representedObject]]];
-	[queue addOperation:viewer];
+	[[[NSApp delegate] queue] addOperation:viewer];
 	[viewer release];
 }
 
@@ -175,29 +183,18 @@
 	return [[[self itemDict] objectForKey:@"modified"] count] + [[[self itemDict] objectForKey:@"added"] count] + [[[self itemDict] objectForKey:@"removed"] count] + [[[self itemDict] objectForKey:@"renamed"] count];
 }
 
-//	--- Initialization
+//	--- Menu building ---
 
-- (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle
+- (void) rebuildMenu
 {
-	if ( !(self = [super init])) {
-		return nil;
-	}
-	
-	itemDict = [[NSMutableDictionary alloc] init];
-	projectMenu = [[NSMenu alloc] init];
-	onBranchMenu = [[NSMenu alloc] init]; 
-	remoteMenu = [[NSMenu alloc] init];
-	changesMenu = [[NSMenu alloc] init];
-	wrapper = [[GitWrapper alloc] init];
-	wrapperLock = [[NSLock alloc] init];
-	
-	[self setParentItem:anItem];
-	[self setTitle:aTitle];
-	[self setPath:aPath];
-	
-	[self rescan:nil];
-	
+	NSLog(@"Rebuilding menu for %@...", title);
 	@try {
+		//crear
+		[projectMenu removeAllItems];
+		[onBranchMenu removeAllItems];
+		[remoteMenu removeAllItems];
+		[changesMenu removeAllItems];
+		
 		//build project menu
 		NSMenuItem *removePath = [[NSMenuItem alloc] initWithTitle:@"Remove path" action:@selector(removePath:) keyEquivalent:[NSString string]];
 		[removePath setTarget:self];
@@ -214,10 +211,7 @@
 		[projectMenu addItem:remote];
 		[projectMenu addItem:changes];
 		[projectMenu addItem:commit];
-		[anItem setSubmenu:projectMenu];
-		
-		//calls to other programs as operations
-		queue = [[NSOperationQueue alloc] init];
+		[parentItem setSubmenu:projectMenu];
 		
 		//build branch menu
 		[onBranch setSubmenu:onBranchMenu];
@@ -245,7 +239,7 @@
 		[changes setSubmenu:changesMenu];
 		[changesMenu setDelegate:self];
 		
-		return self;
+		NSLog(@"Done.");
 	}
 	@catch (NSException * e) {
 		NSLog(@"---------Exception----------");
@@ -254,14 +248,35 @@
 		
 		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"Failed to initalize project watcher" code:-1 userInfo:[e userInfo]]];
 		[[NSApplication sharedApplication] terminate:nil];
-		//never here :D
+	}
+}
+
+//	--- Initialization ---
+
+- (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle
+{
+	if ( !(self = [super init])) {
 		return nil;
 	}
+	
+	itemDict = [[NSMutableDictionary alloc] init];
+	projectMenu = [[NSMenu alloc] init];
+	onBranchMenu = [[NSMenu alloc] init]; 
+	remoteMenu = [[NSMenu alloc] init];
+	changesMenu = [[NSMenu alloc] init];
+	wrapper = [[GitWrapper alloc] init];
+	wrapperLock = [[NSLock alloc] init];
+	
+	[self setParentItem:anItem];
+	[self setTitle:aTitle];
+	[self setPath:aPath];
+	[self rebuildMenu];
+	
+	return self;
 }
 
 - (void) dealloc
 {
-	[queue release];
 	[title release];
 	[path release];
 	[currentBranch release];
