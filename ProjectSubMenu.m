@@ -15,16 +15,19 @@
 - (void) dealloc
 {
 	[data release];
+	[project release];
 	[super dealloc];
 }
 
-- (id) initWithDict:(NSDictionary*)dict forMenu:(NSMenu *)aMenu
+- (id) initProject:(NSString*)prj withDict:(NSDictionary*)dict forMenu:(NSMenu *)aMenu
 {
 	if ( !(self = [super init]) ) {
 		return nil;
 	}
 	
 	[self setPending:NO];
+	project = prj;
+	[project retain];
 	itemsInitially = 0;
 	menu = aMenu;
 	[menu retain];
@@ -74,8 +77,10 @@
 {
 	if (pending) {
 		[item setTitle:@"Pending..."];
+		return YES;
 	}
 	else {
+
 		if (index >= itemsInitially) {
 			NSArray *modified = [data objectForKey:@"modified"];
 			NSArray *added = [data objectForKey:@"added"];
@@ -107,15 +112,22 @@
 			[item setRepresentedObject:itemPath];
 			[item setAction:itemSelector];
 			[item setTarget:itemTarget];
+			
+			//set icon
+			[item setState:YES];
+			NSString * filePath = [project stringByAppendingPathComponent:itemPath];
+			NSImage *img = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
+			[img setSize:NSMakeSize(16, 16)];
+			[item setOnStateImage:img];
 		}
+		
+		return YES;
 	}
-
-	return YES;
 }
 
 - (int) totalNumberOfFiles
 {
-	return [[data objectForKey:@"modified"] count] + [[data objectForKey:@"added"] count] + [[data objectForKey:@"removed"] count] + [[data objectForKey:@"renamed"] count];
+	return [[data objectForKey:@"count"] intValue];
 }
 
 - (NSInteger)numberOfItemsInMenu:(NSMenu *)menu

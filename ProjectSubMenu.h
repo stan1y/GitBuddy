@@ -12,6 +12,7 @@
 @interface ProjectSubMenu : NSObject<NSMenuDelegate> {
 	NSDictionary *data;
 	NSMenu *menu;
+	NSString *project;
 	int itemsInitially;
 	
 	SEL itemSelector;
@@ -22,7 +23,7 @@
 
 @property (assign) BOOL pending;
 
-- (id) initWithDict:(NSDictionary*)dict forMenu:(NSMenu *)aMenu;
+- (id) initProject:(NSString*)project withDict:(NSDictionary*)dict forMenu:(NSMenu *)aMenu;
 - (void) setData:(NSDictionary*)dict;
 - (void) setInitialItems:(NSArray*)items;
 - (void) setItemSelector:(SEL)sel target:(id)aTarget;
