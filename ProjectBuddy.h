@@ -78,10 +78,6 @@
 
 - (IBAction) stageSelectedFiles:(id)sender;
 - (IBAction) stageAll:(id)sender;
-- (IBAction) selectAll:(id)sender;
-- (IBAction) deselectAll:(id)sender;
-
-- (IBAction) toggleSelectFileToStage:(id)sender;
 - (IBAction) unstageFile:(id)sender;
 
 

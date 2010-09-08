@@ -100,33 +100,17 @@
 - (IBAction) resetChanges:(id)sender
 {}
 - (IBAction) stageSelectedFiles:(id)sender
-{}
+{
+	[[[NSApp delegate] filesStager] setProject:[self itemDict]];
+	[[[NSApp delegate] filesStager] showWindow:sender];
+}
 - (IBAction) stageAll:(id)sender
-{}
+{
+	[[[NSApp delegate] filesStager] setProject:[self itemDict]];
+	[[[NSApp delegate] filesStager] showWindow:sender];
+}
 - (IBAction) unstageFile:(id)sender
 {}
-- (IBAction) deselectAll:(id)sender
-{}
-- (IBAction) selectAll:(id)sender
-{}
-
-- (IBAction) toggleSelectFileToStage:(id)sender
-{
-	[sender setState:![sender state]];
-	
-	//unselect
-	for(NSString * selectedFile in selectedChanges) {
-		if (selectedFile == [sender title]) {
-			[selectedChanges removeObject:selectedFile];
-			NSLog(@"Unselect file: %@", [sender title]);
-			return;
-		}
-	}
-	
-	//select file
-	NSLog(@"Select file: %@", [sender title]);
-	[selectedChanges addObject:[sender title]];
-}
 
 //	-- Project Items
 
@@ -159,7 +143,7 @@
 	//separator
 	[branchMenu addItem:[NSMenuItem separatorItem]];
 	//branch list
-	for(NSString * br in [[self itemDict] objectForKey:@"branch"]) {
+	for(NSString * br in [[self itemDict] objectForKey:@"branches"]) {
 		NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:br action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
 		[b setTarget:self];
 		[branchMenu addItem:b];
@@ -208,7 +192,7 @@
 	wrapperLock = [[NSLock alloc] init];
 	
 	//project properties
-	itemDict = [[NSMutableDictionary alloc] init];
+	itemDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aPath, @"path", aTitle, @"title", nil];
 	[self setTitle:aTitle];
 	[self setPath:aPath];
 	
@@ -231,17 +215,13 @@
 	
 	//changed menu
 	changedMenu = [[NSMenu alloc] init];
-	changedSubMenu = [[ProjectSubMenu alloc] initWithDict:[[self itemDict] objectForKey:@"unstaged"] forMenu:changedMenu];
+	changedSubMenu = [[ProjectSubMenu alloc] initProject:aPath withDict:[[self itemDict] objectForKey:@"unstaged"] forMenu:changedMenu];
 	changed = [[NSMenuItem alloc] initWithTitle:@"Changed" action:nil keyEquivalent:[NSString string]];
-	NSMenuItem *stageAll = [[NSMenuItem alloc] initWithTitle:@"Select & Stage All" action:@selector(stageAll:) keyEquivalent:[NSString string]];
+	NSMenuItem *stageAll = [[NSMenuItem alloc] initWithTitle:@"Stage Files" action:@selector(stageSelectedFiles:) keyEquivalent:[NSString string]];
 	[stageAll setTarget:self];
-	NSMenuItem *stageSelected = [[NSMenuItem alloc] initWithTitle:@"Stage Selected Only" action:@selector(stageSelectedFiles:) keyEquivalent:[NSString string]];
+	NSMenuItem *stageSelected = [[NSMenuItem alloc] initWithTitle:@"Stage All Files" action:@selector(stageAll:) keyEquivalent:[NSString string]];
 	[stageSelected setTarget:self];
-	NSMenuItem *selectAll = [[NSMenuItem alloc] initWithTitle:@"Select All" action:@selector(selectAll:) keyEquivalent:[NSString string]];
-	[selectAll setTarget:self];
-	NSMenuItem *deselectAll = [[NSMenuItem alloc] initWithTitle:@"Deselect All" action:@selector(deselectAll:) keyEquivalent:[NSString string]];
-	[deselectAll setTarget:self];
-	[changedSubMenu setInitialItems:[NSArray arrayWithObjects:stageAll, stageSelected, selectAll,  deselectAll, [NSMenuItem separatorItem], nil]];
+	[changedSubMenu setInitialItems:[NSArray arrayWithObjects:stageAll, stageSelected, [NSMenuItem separatorItem], nil]];
 	[changedSubMenu setItemSelector:@selector(toggleSelectFileToStage:) target:self];
 	[changed setSubmenu:changedMenu];
 	[changedMenu setDelegate:changedSubMenu];
@@ -249,7 +229,7 @@
 	
 	//staged
 	stagedMenu = [[NSMenu alloc] init];
-	stagedSubMenu = [[ProjectSubMenu alloc] initWithDict:[[self itemDict] objectForKey:@"staged"] forMenu:stagedMenu];
+	stagedSubMenu = [[ProjectSubMenu alloc] initProject:aPath withDict:[[self itemDict] objectForKey:@"staged"] forMenu:stagedMenu];
 	staged = [[NSMenuItem alloc] initWithTitle:@"Staged" action:nil keyEquivalent:[NSString string]];
 	NSMenuItem *commit = [[NSMenuItem alloc] initWithTitle:@"Commit" action:@selector(commit:) keyEquivalent:[NSString string]];
 	[commit setTarget:self];
