@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ProjectBuddy.h"
+#import "FilesStager.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -27,7 +28,12 @@
 	
 	NSLock *eventsLock;
 	NSArray *queuedEvents;
+	
+	FilesStager *filesStager;
 }
+
+//assigned from nib
+@property (assign) IBOutlet FilesStager *filesStager;
 
 @property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addPathField;
@@ -44,6 +50,7 @@
 - (IBAction) browseForPath:(id)sender;
 - (IBAction) addPath:(id)sender;
 - (IBAction) showGitManual:(id)sender;
+- (IBAction) checkUpdates:(id)sender;
 
 @end
 

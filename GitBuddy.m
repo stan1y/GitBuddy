@@ -19,6 +19,7 @@
 @synthesize addPathPanel;
 @synthesize addPathField;
 @synthesize queue;
+@synthesize filesStager;
 
 //	--- File System Events processing
 
@@ -209,8 +210,19 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 }
 
 //	--- UI Callbacks
+
+- (IBAction) checkUpdates:(id)sender
+{
+}
+
 - (IBAction) showGitManual:(id)sender
-{}
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	if (![[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[defaults stringForKey:@"gitManualUrl"]]]) {
+		NSLog(@"Failed to open url: %@", [defaults stringForKey:@"gitManualUrl"]);
+	}
+}
+
 - (IBAction) browseForPath:(id)sender
 {
 	NSOpenPanel *op = [NSOpenPanel openPanel];
@@ -255,7 +267,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 												  
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
 {
-	NSLog(@"Starting GitBuddy");
+	NSLog(@"Starting GitBuddy version ");
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
 	unsigned long long eventId = [[defaults objectForKey:@"lastEventId"] intValue];

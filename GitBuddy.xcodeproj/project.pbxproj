@@ -27,7 +27,10 @@
 		766B55C912328322008738D4 /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 766B55C812328322008738D4 /* UserDefaults.plist */; };
 		766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
 		766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
+		767E35191237CD2A009AB7D6 /* ChangesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767E35181237CD2A009AB7D6 /* ChangesSource.m */; };
 		76FADB701235596F0075EAC0 /* GitWrapperCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */; };
+		76FC45CF1236D67600C314A0 /* ProjectFilesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */; };
+		76FC45F21236E74700C314A0 /* FilesStager.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45F11236E74700C314A0 /* FilesStager.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -84,8 +87,14 @@
 		766B57CC1232BFD6008738D4 /* ProjectBuddy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectBuddy.m; sourceTree = "<group>"; };
 		766B59551233A86C008738D4 /* ChangeSetViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeSetViewer.h; sourceTree = "<group>"; };
 		766B59561233A86C008738D4 /* ChangeSetViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeSetViewer.m; sourceTree = "<group>"; };
+		767E35171237CD2A009AB7D6 /* ChangesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangesSource.h; sourceTree = "<group>"; };
+		767E35181237CD2A009AB7D6 /* ChangesSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangesSource.m; sourceTree = "<group>"; };
 		76FADB6E1235596F0075EAC0 /* GitWrapperCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitWrapperCommand.h; sourceTree = "<group>"; };
 		76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GitWrapperCommand.m; sourceTree = "<group>"; };
+		76FC45CD1236D67600C314A0 /* ProjectFilesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectFilesSource.h; sourceTree = "<group>"; };
+		76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectFilesSource.m; sourceTree = "<group>"; };
+		76FC45F01236E74700C314A0 /* FilesStager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilesStager.h; sourceTree = "<group>"; };
+		76FC45F11236E74700C314A0 /* FilesStager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilesStager.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* GitBuddy-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GitBuddy-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GitBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -118,6 +127,12 @@
 				76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */,
 				765C8F96123697AD00FCFF42 /* ProjectSubMenu.h */,
 				765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */,
+				76FC45CD1236D67600C314A0 /* ProjectFilesSource.h */,
+				76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */,
+				76FC45F01236E74700C314A0 /* FilesStager.h */,
+				76FC45F11236E74700C314A0 /* FilesStager.m */,
+				767E35171237CD2A009AB7D6 /* ChangesSource.h */,
+				767E35181237CD2A009AB7D6 /* ChangesSource.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -300,6 +315,9 @@
 				766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */,
 				76FADB701235596F0075EAC0 /* GitWrapperCommand.m in Sources */,
 				765C8F98123697AD00FCFF42 /* ProjectSubMenu.m in Sources */,
+				76FC45CF1236D67600C314A0 /* ProjectFilesSource.m in Sources */,
+				76FC45F21236E74700C314A0 /* FilesStager.m in Sources */,
+				767E35191237CD2A009AB7D6 /* ChangesSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
