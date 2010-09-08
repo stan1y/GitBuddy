@@ -2,6 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>autoUpdate</key>
+	<true/>
+	<key>gitManualUrl</key>
+	<string>http://www.kernel.org/pub/software/scm/git/docs/user-manual.html</string>
+	<key>stableUrl</key>
+	<string>http://www.endlessinsomnia.com/lab/updates/gitbuddy/stable.plist</string>
+	<key>develUrl</key>
+	<string>http://www.endlessinsomnia.com/lab/updates/gitbuddy/devel.plist</string>
+	<key>selectedUpdateSource</key>
+	<integer>0</integer>
 	<key>gitPath</key>
 	<string>/opt/local/bin/git</string>
 	<key>gitTimeout</key>
@@ -9,7 +19,7 @@
 	<key>lastEventId</key>
 	<integer>0</integer>
 	<key>useOpenDiff</key>
-	<true/>
+	<false/>
 	<key>customDiffViewer</key>
 	<string></string>
 	<key>editorCmd</key>
