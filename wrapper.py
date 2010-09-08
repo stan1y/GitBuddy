@@ -24,6 +24,15 @@ __BRANCH_LIST_TOKENS = {
 	'branches'			: '(?:.\S+)\S+'
 }
 
+__REMOTE_LIST_TOKENS = {
+	'remote'			: '(?:.\S+)\S+'
+}
+
+__LS_FILES_INDEX = {
+	'keys'		: '(?:\s\S*)\s',
+	'files'		: '(?:\t\S*)$'
+}
+
 __ERR_USAGE = -1
 
 def cmd(command, **kwargs):
@@ -38,6 +47,17 @@ def b_cmd_chdir(git, repo, command):
 	os.chdir(pwd)
 	return proc
 	
+def b_cmd_lines(git, repo, command):
+	proc = b_cmd_chdir(git, repo, command)
+	err = ''.join(proc.stderr.readlines())
+	status = {'gitrc' : proc.returncode, 'giterr' : err, 'lines' : []}
+	count = 0
+	for line in proc.stdout.readlines():
+		status['lines'].append(line.strip())
+		count += 1
+	status['count'] = count
+	return status
+	
 def b_cmd_json(git, repo, command, tokens):
 	proc = b_cmd_chdir(git, repo, command)
 	err = ''.join(proc.stderr.readlines())
@@ -45,6 +65,7 @@ def b_cmd_json(git, repo, command, tokens):
 	#init status with git info
 	for token in tokens: status[token] = []
 	#populate arrays
+	count = 0
 	for line in proc.stdout.readlines():
 		for token in tokens:
 			m = re.search(tokens[token], line.strip())
@@ -52,7 +73,9 @@ def b_cmd_json(git, repo, command, tokens):
 				value = m.group(0).strip()
 				if value:
 					items = status[token]
+					count += 1
 					items.append(value.strip())
+	status["count"] = count
 	return status
 	
 def b_cmd_json_parts(git, repo, command, token_groups):
@@ -63,7 +86,7 @@ def b_cmd_json_parts(git, repo, command, token_groups):
 
 	#add group dicts
 	for grp in token_groups:
-		status[grp] = {}
+		status[grp] = {'count' : 0}
 		for token in token_groups[grp][1]:
 			status[grp][token] = []
 	
@@ -86,6 +109,7 @@ def b_cmd_json_parts(git, repo, command, token_groups):
 					if value:
 						items = status[current_group][token]
 						items.append(value.strip())
+						status[current_group]['count'] += 1 
 	return status
 
 if __name__ == '__main__':
@@ -101,7 +125,9 @@ if __name__ == '__main__':
 	parser.add_option("--branch-rm", help="git branch [name]")
 	parser.add_option("--branch-add", help="git branch -d [name]")
 	parser.add_option("--remote-list", action="store_true", default=False, help="git branch -r")
-	parser.add_option("--staged-list", action="store_true", default=False, help="git commit --dry-run")
+	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
+	parser.add_option("--show", help="git show [key]")
+	parser.add_option("--diff", help="git diff [path]")
 	(options, args) = parser.parse_args()
 	
 	if not options.repo:
@@ -140,10 +166,25 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 	
 	elif options.remote_list:
-		obj = b_cmd_json(options.git, options.repo, ['branch', '-r'], {})
+		obj = b_cmd_json(options.git, options.repo, ['branch', '-r'], __REMOTE_LIST_TOKENS)
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
-
+		
+	elif options.staged_index:
+		obj = b_cmd_json(options.git, options.repo, ['ls-files', '-s'], __LS_FILES_INDEX)
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.show:
+		obj = b_cmd_lines(options.git, options.repo, ['show', options.show])
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.diff:
+		obj = b_cmd_lines(options.git, options.repo, ['diff', options.diff])
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
 	else:
 		parser.print_help()
 		sys.exit(1)
