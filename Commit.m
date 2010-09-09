@@ -56,7 +56,7 @@
 	//commit files
 	GitWrapper* wrapper = [GitWrapper sharedInstance];
 	NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
-	NSString *commitArg = [NSString stringWithFormat:@"--commit=\"%@\"", msg];
+	NSString *commitArg = [NSString stringWithFormat:@"--commit=%@", msg];
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, commitArg, nil] withCompletionBlock:^(NSDictionary *dict){
 		
 		//rescan after commit
