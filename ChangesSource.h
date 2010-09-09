@@ -27,6 +27,7 @@
 @property (assign) IBOutlet NSProgressIndicator *indicator;
 @property (retain, readonly) NSMutableDictionary *gitObjectsIndex;
 - (void) rebuildIndex:(NSString *)projectPath withCompletionBlock:(void (^)(void))codeBlock;
+
 - (void) updateWithChangeset:(NSString *)filePath inPath:(NSString *)projectPath;
 - (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath;
 

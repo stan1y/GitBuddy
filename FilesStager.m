@@ -24,9 +24,16 @@
 	project = [dict copy];
 	[project retain];
 	
+	NSLog(@"Loading File Stager with Project Dictionary:");
+	NSLog(@"%@", dict);
+	NSLog(@" *** ");
+	
 	[title setStringValue:@"Loading Git index..."];
 	[stagedView setEnabled:NO];
 	[unstagedView setEnabled:NO];
+	
+	[stagedView registerForDraggedTypes:[NSArray arrayWithObject:@"StageItem"]];
+	[unstagedView registerForDraggedTypes:[NSArray arrayWithObject:@"StageItem"]];
 	
 	[changesSource rebuildIndex:[project objectForKey:@"path"] withCompletionBlock: ^{
 		[stagedView setEnabled:YES];
@@ -51,19 +58,39 @@
 //	TableView selection
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
 {
+	NSString *file = [[aTableView dataSource] fileAtIndex:rowIndex];
+	[title setStringValue:[NSString stringWithFormat:@"Preview of %@", file]  ];
+	
+	//deselect opposite table if it was selected
 	if ([aTableView dataSource] == stagedSource) {
 		[unstagedView deselectAll:nil];
-		[title setStringValue:[NSString stringWithFormat:@"Preview of ChangeSet %@", [[changesSource gitObjectsIndex] objectForKey:[[aTableView dataSource] fileAtIndex:rowIndex]]]  ];
-		[changesSource updateWithChangeset:[[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
-		return YES;
 	}
 	else if ([aTableView dataSource] == unstagedSource){
-		NSString *filePath = [[project objectForKey:@"path"] stringByAppendingPathComponent:[[aTableView dataSource] fileAtIndex:rowIndex]];
-		[title setStringValue:[NSString stringWithFormat:@"Diff of %@", filePath] ];
 		[stagedView deselectAll:nil];
-		[changesSource updateWithFileDiff:[[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
-		return YES;
 	}
+	
+	//sources have their own copy of staged & unstaged
+	//dicts to support grag & drop operations
+	//need to make sure which one file really belongs
+	NSString* grp = [[aTableView dataSource] fileInGroup:file];
+	NSLog(@"Loading %@ (%@)", file, grp);
+	NSArray * stagedGroup = [[project objectForKey:@"staged"] objectForKey:grp];
+	NSArray * unstagedGroup = [[project objectForKey:@"unstaged"] objectForKey:grp];
+	NSLog(@"Staged Files:");
+	NSLog(@"%@", stagedGroup);
+	NSLog(@" *** ");
+	NSLog(@"Unstaged Files:");
+	NSLog(@"%@", unstagedGroup);
+	NSLog(@" *** ");
+	if ( [stagedGroup indexOfObject:file] != NSNotFound ) {
+		//belogs to staged.group.file
+		[changesSource updateWithChangeset:[[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+	}
+	else if ( [unstagedGroup indexOfObject:file] != NSNotFound ){
+		//belogs to unstaged.group.file
+		[changesSource updateWithFileDiff:[[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+	}
+	
 	return YES;
 }
 
@@ -76,29 +103,22 @@
 	}
 	
 	if (aTableView == stagedView || aTableView == unstagedView) {
-		int grp = -1;
-		NSString *f = [[aTableView dataSource] fileAtIndex:rowIndex inGroupIndex:&grp];
-		switch (grp) {
-			case 0:
-				//modified
-				[aCell setTextColor:[NSColor orangeColor]];
-				break;
-			case 1:
-				//added
-				[aCell setTextColor:[NSColor greenColor]];
-				break;
-			case 2:
-			case 3:
-				//removed
-				//renamed
-				[aCell setTextColor:[NSColor redColor]];
-				break;
-			default:
-				break;
+		NSString* grp = nil;
+		int offset = 0;
+		[[aTableView dataSource] fileAtIndex:rowIndex inGroup:&grp groupIndexOffset:&offset];;
+		
+		if ([grp isEqual:@"modified"]) {
+			[aCell setTextColor:[NSColor orangeColor]];
 		}
-	}
-	else
-	{
+		else if ([grp isEqual:@"added"]) {
+			[aCell setTextColor:[NSColor greenColor]];
+		}
+		else if ([grp isEqual:@"removed"] || [grp isEqual:@"renamed"]) {
+			[aCell setTextColor:[NSColor orangeColor]];
+		}
+		
+	} else {
+		
 		NSString *str = [[aTableView dataSource] stringAtIndex:rowIndex];
 		if ([str length] > 0) {
 			NSLog(@"%d - %@", [str characterAtIndex:0], str);

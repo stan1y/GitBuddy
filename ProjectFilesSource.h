@@ -17,7 +17,10 @@
 }
 
 - (void)loadProjectData:(NSDictionary*)pData forPath:(NSString*)p;
-- (id)fileAtIndex:(int)index;
-- (id)fileAtIndex:(int)index inGroupIndex:(int*)grpIndex;
+- (NSString *)fileAtIndex:(int)index;
+- (NSString *)fileAtIndex:(int)index inGroup:(NSString**)grp groupIndexOffset:(int*)offset;
+
+- (void)addFile:(NSString*)file toGroup:(NSString*)group;
+- (void)removeFile:(NSString*)file fromGroup:(NSString*)group;
 
 @end

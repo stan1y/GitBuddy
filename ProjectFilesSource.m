@@ -8,15 +8,50 @@
 
 #import "ProjectFilesSource.h"
 
-
 @implementation ProjectFilesSource
+
+static NSArray *_arrayDataKeys;
+
+//
+//	Keys Arrays to read groups
+//	in [self data]
+//
++ (NSArray*) dataKeys
+{
+	if (!_arrayDataKeys) {
+		_arrayDataKeys = [[NSArray alloc] initWithObjects:
+						  @"modified",
+						  @"added",
+						  @"removed",
+						  @"renamed",
+						  nil];
+	}
+	return _arrayDataKeys;
+}
+
+- (id) init
+{
+	if ( !(self = [super init])) {
+		return nil;
+	}
+	return self;
+}
 
 - (void)loadProjectData:(NSDictionary*)pData forPath:(NSString*)p
 {
-	data = [pData mutableCopy];
-	[data retain];
-	path = [p copy];
-	[path retain];
+	//copy of arrays
+	data = [[NSMutableDictionary alloc] init];
+	for (NSString *k in [ProjectFilesSource dataKeys]) {
+		[data setObject:[[NSMutableArray alloc] initWithArray:[pData objectForKey:k] copyItems:YES] forKey:k];
+	}
+	[data setObject:[NSNumber numberWithInt:[[pData objectForKey:@"count"] intValue]] forKey:@"count"];
+
+	//copy path
+	path = [[NSString alloc] initWithString:p];
+	
+	NSLog(@"Loading Project File Source Data (%@):", self);
+	NSLog(@"%@", data);
+	NSLog(@" *** ");
 }
 
 - (void) dealloc
@@ -26,48 +61,76 @@
 	[super dealloc];
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+//
+//	Files Inspection API
+//
+
+- (NSString *)fileAtIndex:(int)index
 {
-	return [[data objectForKey:@"count"] intValue];
+	NSString *grp = nil;
+	int grpOffset = 0;
+	NSString *file = [self fileAtIndex:index inGroup:&grp groupIndexOffset:&grpOffset];
+	return file;
 }
 
-- (id)fileAtIndex:(int)index
+-(NSString *)fileInGroup:(NSString*)file
 {
-	int grp = -1;
-	return [self fileAtIndex:index inGroupIndex:&grp];
-}
-
-- (id)fileAtIndex:(int)index inGroupIndex:(int*)grpIndex
-{
-	NSArray *modified = [data objectForKey:@"modified"];
-	NSArray *added = [data objectForKey:@"added"];
-	NSArray *removed = [data objectForKey:@"removed"];
-	NSArray *renamed = [data objectForKey:@"renamed"];
-	
-	if ([modified count] && index < [modified count]) {
-		*grpIndex = 0;
-		return [modified objectAtIndex:index];
-	}
-	if ([added count] && index >= [modified count] ) {
-		*grpIndex = 1;
-		return [added objectAtIndex:(index - [modified count])];
-	}
-	if ([removed count] && index >= [modified count] + [added count]) {
-		*grpIndex = 2;
-		return [removed objectAtIndex:(index - [modified count] - [added count])];
-	}
-	if ([renamed count] && index >= [modified count] + [added count] + [removed count]) {
-		*grpIndex = 3;
-		return [renamed objectAtIndex:(index - [modified count] - [added count] - [removed count])];
+	for(NSString *k in [ProjectFilesSource dataKeys]) {
+		if ([[data objectForKey:k] indexOfObject:file] != NSNotFound) {
+			return k;
+		}
 	}
 	
 	return nil;
 }
 
+- (NSString *)fileAtIndex:(int)index inGroup:(NSString**)grp groupIndexOffset:(int*)offset
+{
+	*offset = 0;
+	for(NSString *k in [ProjectFilesSource dataKeys]) {
+		*offset += [[data objectForKey:k] count];
+		if ( index < *offset ) {
+			*grp = k;
+			return [[data objectForKey:k] objectAtIndex:index];
+		}		
+	}
+		
+	return nil;
+}
+
+- (void)addFile:(NSString*)file toGroup:(NSString*)group
+{
+	NSLog(@"Adding file %@ from %@", file, group);
+	
+	[(NSMutableArray*)[data objectForKey:group] addObject:file];
+	int count = [[data objectForKey:@"count"] intValue];
+	count++;
+	[data setObject:[NSNumber numberWithInt:count] forKey:@"count"];
+}
+
+- (void)removeFile:(NSString*)file fromGroup:(NSString*)group
+{
+	NSLog(@"Removing file %@ from %@", file, group);
+	
+	[(NSMutableArray*)[data objectForKey:group] removeObject:file];
+	int count = [[data objectForKey:@"count"] intValue];
+	count--;
+	[data setObject:[NSNumber numberWithInt:count] forKey:@"count"];
+}
+
+//
+//	Table View Data Source
+//
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	return [[data objectForKey:@"count"] intValue];
+}
+
+
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	NSString *file = [self fileAtIndex:rowIndex];
-	NSLog(@"Listing %@", [path stringByAppendingPathComponent:file]);
 	NSString *col = [aTableColumn identifier];
 	if ([col isEqual:@"icon"]) {
 		return [[NSWorkspace sharedWorkspace] iconForFile:[path stringByAppendingPathComponent:file]];
@@ -80,20 +143,54 @@
 	}
 }
 
-- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
-{
-}
-			
-- (NSArray *)tableView:(NSTableView *)aTableView namesOfPromisedFilesDroppedAtDestination:(NSURL *)dropDestination forDraggedRowsWithIndexes:(NSIndexSet *)indexSet
-{
-}
-
+//validate received drop
 - (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id < NSDraggingInfo >)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
 {
+	if ([info draggingSource] != aTableView && operation == NSTableViewDropAbove) {
+		return NSDragOperationMove;
+	}
+	return NSDragOperationNone;
 }
 
+//accept drop
+- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
+{
+	NSPasteboard* pboard = [info draggingPasteboard];
+	NSArray * droppedFiles = [NSKeyedUnarchiver unarchiveObjectWithData:[pboard dataForType:@"StageItem"]];
+	
+	//add & remove dropped file
+	NSString *grp = [[[info draggingSource] dataSource] fileInGroup:[droppedFiles objectAtIndex:row]];
+	NSLog(@"Dropped file %@ (%@)", [droppedFiles objectAtIndex:row], grp);
+	ProjectFilesSource* source = (ProjectFilesSource*)[[info draggingSource] dataSource];
+	[self addFile:[droppedFiles objectAtIndex:row] toGroup:grp];
+	[source removeFile:[droppedFiles objectAtIndex:row] fromGroup:grp];
+	
+	NSLog(@"Project File Sources Modified");
+	NSLog(@"Receiver: %@", self);
+	NSLog(@"%@", data);
+	
+	NSLog(@" *** ");
+	
+	//reload receiver
+	[aTableView reloadData];
+	//reload source
+	[[info draggingSource] reloadData];
+	
+	return YES;
+}
+
+//start dragging
 - (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
+	NSMutableArray *dragged = [[NSMutableArray alloc] init];
+	[rowIndexes enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop) {
+		[dragged addObject:[self fileAtIndex:idx]];
+	}];
+	
+	NSData *d = [NSKeyedArchiver archivedDataWithRootObject:dragged];
+    [pboard declareTypes:[NSArray arrayWithObject:@"StageItem"] owner:self];
+    [pboard setData:d forType:@"StageItem"];
+	return YES;
 }
 				
 

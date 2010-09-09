@@ -61,7 +61,7 @@
 			[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 				[self mergeData:dict];
 				[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangeSetItems]]];
-				NSLog(@"Status:\n");
+				NSLog(@"Project Status Dictionary:\n");
 				NSLog(@"%@", [self itemDict]);
 				NSLog(@"  ***");
 				[changedSubMenu setPending:NO];
