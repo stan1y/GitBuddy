@@ -101,12 +101,12 @@
 {}
 - (IBAction) stageSelectedFiles:(id)sender
 {
-	[[[NSApp delegate] filesStager] setProject:[self itemDict]];
+	[[[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:NO];
 	[[[NSApp delegate] filesStager] showWindow:sender];
 }
 - (IBAction) stageAll:(id)sender
 {
-	[[[NSApp delegate] filesStager] setProject:[self itemDict]];
+	[[[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:YES];
 	[[[NSApp delegate] filesStager] showWindow:sender];
 }
 - (IBAction) unstageFile:(id)sender
