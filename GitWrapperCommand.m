@@ -109,9 +109,13 @@
 				//check json answer
 				if ([[jsonObj objectForKey:@"giterr"] length] > 0 ){
 					NSLog(@"Git error: %@", [jsonObj objectForKey:@"giterr"]);
-					NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [jsonObj objectForKey:@"giterr"]], @"Exit", nil, nil);
+					int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [jsonObj objectForKey:@"giterr"]], @"Terminate", @"Continue", nil);
 					
-					[[NSApplication sharedApplication] terminate:nil];
+					//terminate
+					if (rc == 1) {
+						[[NSApplication sharedApplication] terminate:nil];
+					}
+					//continue
 					return;
 				}
 				return;
