@@ -19,7 +19,7 @@
 	NSTableView *stagedView;
 	NSTableView *unstagedView;
 	
-	
+	BOOL checkOnClose;
 }
 
 //assigned from nib
@@ -30,6 +30,15 @@
 @property (assign) IBOutlet NSTableView *stagedView;
 @property (assign) IBOutlet NSTableView *unstagedView;
 
+//callbacks
+- (IBAction) stageFiles:(id)sender;
+- (IBAction) stageAndCommitFiles:(id)sender;
+
+//modifications
+- (NSDictionary *) filesToUnStage;
+- (NSDictionary *) filesToStage;
+
+//initialize with project
 - (void) setProject:(NSDictionary *)dict stageAll:(BOOL)stage;
 
 //table view selection

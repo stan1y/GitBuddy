@@ -7,11 +7,14 @@
 //
 
 #import "FilesStager.h"
+#import "GitWrapper.h"
 
 @implementation FilesStager
 
 @synthesize stagedSource, unstagedSource, changesSource;
 @synthesize stagedView, unstagedView, title;
+
+//	- Initialization
 
 - (void) dealloc
 {
@@ -29,7 +32,9 @@
 		[project release];
 		project = nil;
 	}
+	
 	project = [[NSDictionary alloc] initWithDictionary:dict	copyItems:YES];
+	checkOnClose = YES;
 	
 	NSLog(@"Loading File Stager with Project Dictionary:");
 	NSLog(@"%@", dict);
@@ -78,7 +83,116 @@
 	}];
 }
 
-//	TableView selection
+- (NSDictionary *) filesToStage
+{
+	NSMutableDictionary *toStage = [NSMutableDictionary dictionary];
+	for(NSString * key in [ProjectFilesSource dataKeys]) {
+		
+		for(NSString *stagedInSource in [[stagedSource data] objectForKey:key]) {
+			//check it is in project array
+			if ([[[project objectForKey:@"staged"] objectForKey:key] indexOfObject:stagedInSource] == NSNotFound) {
+				//not found
+				NSLog(@"File to stage: %@", stagedInSource);
+				[toStage setObject:key forKey:stagedInSource];
+			}
+		}
+	}
+	return toStage;
+}
+
+- (NSDictionary *) filesToUnStage
+{
+	NSMutableDictionary *toUnStage = [NSMutableDictionary dictionary];
+	for(NSString * key in [ProjectFilesSource dataKeys]) {
+		
+		for(NSString *unstagedInSource in [[unstagedSource data] objectForKey:key]) {
+			//check it is in project array
+			if ([[[project objectForKey:@"unstaged"] objectForKey:key] indexOfObject:unstagedInSource] == NSNotFound) {
+				//not found
+				NSLog(@"File to unstage: %@", unstagedInSource);
+				[toUnStage setObject:key forKey:unstagedInSource];
+			}
+		}
+	}
+	return toUnStage;
+}
+
+//	- Callbacks
+
+- (IBAction) stageFiles:(id)sender
+{
+	NSDictionary *toStage = [self filesToStage];
+	NSDictionary *toUnStage = [self filesToUnStage];
+	
+	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", [project objectForKey:@"path"]];
+	if ([toUnStage count]) {
+		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [[toUnStage allKeys] componentsJoinedByString:@","]];
+		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+			
+			if ([dict objectForKey:@"gitrc"] == 0) {
+				NSLog(@"UnStaged files %@ successfuly", [[toUnStage allKeys] componentsJoinedByString:@","]);
+			}
+		}];
+	}
+	
+	NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [[toStage allKeys] componentsJoinedByString:@","]];
+	if ([toStage count]) {
+		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+			
+			if ([dict objectForKey:@"gitrc"] == 0) {
+				NSLog(@"Staged files %@ successfuly", [[toStage allKeys] componentsJoinedByString:@","]);
+			}
+		}];
+	}
+	
+	//close window
+	checkOnClose = NO;
+	[[self window] performClose:nil];
+}
+
+- (IBAction) stageAndCommitFiles:(id)sender
+{
+	NSDictionary *toStage = [self filesToStage];
+	NSDictionary *toUnStage = [self filesToUnStage];
+	
+	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", [project objectForKey:@"path"]];
+	
+	if ([toUnStage count]) {
+		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [[toUnStage allKeys] componentsJoinedByString:@","]];
+		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+			if ([dict objectForKey:@"gitrc"] == 0) {
+				NSLog(@"UnStaged files %@ successfuly", [[toUnStage allKeys] componentsJoinedByString:@","]);
+			}
+		}];
+		
+	}
+	
+	if ([toStage count]) {
+		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [[toStage allKeys] componentsJoinedByString:@","]];
+		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+			
+			if ([dict objectForKey:@"gitrc"] == 0) {
+				NSLog(@"Staged files %@ successfuly, Commiting...", [[toStage allKeys] componentsJoinedByString:@","]);
+				
+				NSString * commitArg = [NSString stringWithFormat:@"--commit=%@", [[toStage allKeys] componentsJoinedByString:@","]];
+				[wrapper executeGit:[NSArray arrayWithObjects:commitArg, repoArg, nil] withCompletionBlock:^(NSDictionary *commitDict) {
+					if ([commitDict objectForKey:@"gitrc"] == 0) {
+						NSLog(@"Commited files %@ successfuly", [[toStage allKeys] componentsJoinedByString:@","]);
+					}
+				}];
+			}
+		}];
+	}
+	
+	//close window
+	checkOnClose = NO;
+	[[self window] performClose:nil];
+}
+
+//	- TableView delegate
+
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
 {
 	NSString *file = [[aTableView dataSource] fileAtIndex:rowIndex];
@@ -117,8 +231,6 @@
 	return YES;
 }
 
-// TableView selection
-
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if (![aCell isKindOfClass:[NSTextFieldCell class]]) {
@@ -144,7 +256,6 @@
 		
 		NSString *str = [[aTableView dataSource] stringAtIndex:rowIndex];
 		if ([str length] > 0) {
-			NSLog(@"%d - %@", [str characterAtIndex:0], str);
 			if ( [str characterAtIndex:0] == 43 ) {
 				[aCell setTextColor:[NSColor greenColor]];
 			}
@@ -164,35 +275,19 @@
 	}
 }
 
+//	- Window delegate
+
 - (BOOL) windowShouldClose:(id)sender
 {
-	//check difference with project arrays and
-	//copies in sources
-	NSMutableDictionary *toStage = [NSMutableDictionary dictionary];
-	NSMutableDictionary *toUnStage = [NSMutableDictionary dictionary];
 	
-	for(NSString * key in [ProjectFilesSource dataKeys]) {
-		
-		NSLog(@"Checking changes to '%@' files", key);
-		for(NSString *stagedInSource in [[stagedSource data] objectForKey:key]) {
-			//check it is in project array
-			if ([[[project objectForKey:@"staged"] objectForKey:key] indexOfObject:stagedInSource] == NSNotFound) {
-				//not found
-				NSLog(@"File to stage: %@", stagedInSource);
-				[toStage setObject:key forKey:stagedInSource];
-			}
-		}
-		
-		for(NSString *unstagedInSource in [[unstagedSource data] objectForKey:key]) {
-			//check it is in project array
-			if ([[[project objectForKey:@"unstaged"] objectForKey:key] indexOfObject:unstagedInSource] == NSNotFound) {
-				//not found
-				NSLog(@"File to unstage: %@", unstagedInSource);
-				[toUnStage setObject:key forKey:unstagedInSource];
-			}
-		}
+	if (!checkOnClose) {
+		return YES;
 	}
 	
+	//check difference with project arrays and
+	//copies in sources
+	NSDictionary *toStage = [self filesToStage];
+	NSDictionary *toUnStage = [self filesToUnStage];
 	
 	if ([[toStage allKeys] count] > 0 || [[toUnStage allKeys] count] > 0) {
 		int rc = NSRunInformationalAlertPanel([NSString stringWithFormat:@"You have %d files to stage and %d files to unstage.", [[toStage allKeys] count], [[toUnStage allKeys] count]] , @"Click on Stage Changes to confirm staging or Close Anyway to dispose all activity. Also you click on Cancel to return to File Stager.", @"Stage Changes", @"Cancel", @"Close Anyway");
