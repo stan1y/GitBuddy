@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "GitWrapper.h"
 #import "ChangeSetViewer.h"
 #import "ProjectSubMenu.h"
 
@@ -42,9 +41,6 @@
 	// Project properties read from dict
 	NSString * currentBranch;
 	
-	GitWrapper *wrapper;
-	NSLock * wrapperLock;
-	
 	NSMutableArray * selectedChanges;
 }
 
@@ -56,8 +52,6 @@
 
 - (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle;
 - (int) totalChangeSetItems;
-
-- (BOOL) isPending;
 
 - (void) mergeData:(NSDictionary *)dict;
 - (void) updateMenuItems;

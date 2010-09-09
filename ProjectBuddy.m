@@ -7,6 +7,7 @@
 //
 
 #import "ProjectBuddy.h"
+#import "GitWrapper.h"
 
 @implementation ProjectBuddy
 
@@ -43,45 +44,38 @@
 
 - (IBAction) rescan:(id)sender
 {
-	if ([wrapperLock tryLock]) {
-		
-		[changedSubMenu setPending:YES];
-		[stagedSubMenu setPending:YES];
-		
-		@try {
-			NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
-			NSLog(@"Quering repo at %@...", path);
-			//scan remote, branch and changes
-			[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-				[self mergeData:dict];
-			}];
-			[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-				[self mergeData:dict];
-			}];
-			[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-				[self mergeData:dict];
-				[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangeSetItems]]];
-				NSLog(@"Project Status Dictionary:\n");
-				NSLog(@"%@", [self itemDict]);
-				NSLog(@"  ***");
-				[changedSubMenu setPending:NO];
-				[stagedSubMenu setPending:NO];
-				[parentMenu update];
-			}];
-		}
-		@catch (NSException * e) {
-			[wrapperLock unlock];
-			NSLog(@"---------Exception----------");
-			NSLog(@"%@", e);
-			NSLog(@"----------------------------");
-			
-			[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to scan Git repo" code:-1 userInfo:[e userInfo]]];
-		}
+	[changedSubMenu setPending:YES];
+	[stagedSubMenu setPending:YES];
+	
+	@try {
+		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+		NSLog(@"Quering repo at %@...", path);
+		//scan remote, branch and changes
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
+		[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			[self mergeData:dict];
+		}];
+		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			[self mergeData:dict];
+		}];
+		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			[self mergeData:dict];
+			[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangeSetItems]]];
+			NSLog(@"Project Status Dictionary:\n");
+			NSLog(@"%@", [self itemDict]);
+			NSLog(@"  ***");
+			[changedSubMenu setPending:NO];
+			[stagedSubMenu setPending:NO];
+			[parentMenu update];
+		}];
 	}
-	else {
-		NSLog(@"ProjectBuddy is busy processing another event...");
+	@catch (NSException * e) {
+		NSLog(@"---------Exception----------");
+		NSLog(@"%@", e);
+		NSLog(@"----------------------------");
+		
+		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to scan Git repo" code:-1 userInfo:[e userInfo]]];
 	}
-
 }
 - (IBAction) commit:(id)sender
 {}
@@ -111,17 +105,6 @@
 }
 - (IBAction) unstageFile:(id)sender
 {}
-
-//	-- Project Items
-
-- (BOOL) isPending
-{
-	if ([wrapperLock tryLock]) {
-		[wrapperLock unlock];
-		return NO;
-	}
-	return YES;
-}
 
 - (int) totalChangeSetItems
 {
@@ -186,16 +169,13 @@
 	if ( !(self = [super init])) {
 		return nil;
 	}
-	
-	//git access
-	wrapper = [[GitWrapper alloc] init];
-	wrapperLock = [[NSLock alloc] init];
+
 	
 	//project properties
 	itemDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aPath, @"path", aTitle, @"title", nil];
 	[self setTitle:aTitle];
 	[self setPath:aPath];
-	
+		
 	//set parent menu
 	[self setParentItem:anItem];
 	parentMenu = [[NSMenu alloc] init];
