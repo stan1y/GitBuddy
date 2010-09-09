@@ -89,8 +89,6 @@
 {
 	[self rescanWithCompletionBlock: ^{}];
 }
-- (IBAction) commit:(id)sender
-{}
 - (IBAction) push:(id)sender
 {}
 - (IBAction) pull:(id)sender
@@ -103,6 +101,11 @@
 {}
 - (IBAction) newBranch:(id)sender
 {}
+- (IBAction) commit:(id)sender
+{
+	[[(GitBuddy*)[NSApp delegate] commit] commitProject:[self itemDict] atPath:path];
+	[[(GitBuddy*)[NSApp delegate] commit] showWindow:sender];
+}
 - (IBAction) showPreview:(id)sender
 {
 	[[(GitBuddy*)[NSApp delegate] preview] loadPreviewOf:[sender representedObject] inPath:path];
@@ -118,7 +121,6 @@
 	[[(GitBuddy*)[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:YES];
 	[[(GitBuddy*)[NSApp delegate] filesStager] showWindow:sender];
 }
-
 - (IBAction) unstageFile:(id)sender
 {
 	int rc = NSRunInformationalAlertPanel(@"Config File Unstaging", [NSString stringWithFormat:@"You are about to unstage file %@. Are you sure about it?", [sender representedObject]], @"Yes", @"No", nil);
