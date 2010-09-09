@@ -8,6 +8,7 @@
 
 #import "ProjectBuddy.h"
 #import "GitWrapper.h"
+#import "GitBuddy.h"
 
 @implementation ProjectBuddy
 
@@ -38,7 +39,7 @@
 {
 	if (NSRunInformationalAlertPanel(@"Confirm repo removal", [NSString stringWithFormat:@"You are about to delete Git repo %@ from tracking. Are you sure?", [self path]], @"Remove repo", @"Cancel", nil) == 1) {
 		[[parentItem menu] removeItem:parentItem];
-		[self release];
+		[self release]; 
 	}
 }
 
@@ -67,6 +68,9 @@
 			[changedSubMenu setPending:NO];
 			[stagedSubMenu setPending:NO];
 			[parentMenu update];
+			
+			//set counter for project
+			[ (GitBuddy*)[NSApp delegate] setCounter:[self totalChangeSetItems] forProject:path];
 			
 			//call user code block
 			codeBlock();
@@ -101,18 +105,18 @@
 {}
 - (IBAction) showPreview:(id)sender
 {
-	[[[NSApp delegate] preview] loadPreviewOf:[sender representedObject] inPath:path];
-	[[[NSApp delegate] preview] showWindow:sender];
+	[[(GitBuddy*)[NSApp delegate] preview] loadPreviewOf:[sender representedObject] inPath:path];
+	[[(GitBuddy*)[NSApp delegate] preview] showWindow:sender];
 }
 - (IBAction) stageSelectedFiles:(id)sender
 {
-	[[[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:NO];
-	[[[NSApp delegate] filesStager] showWindow:sender];
+	[[(GitBuddy*)[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:NO];
+	[[(GitBuddy*)[NSApp delegate] filesStager] showWindow:sender];
 }
 - (IBAction) stageAll:(id)sender
 {
-	[[[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:YES];
-	[[[NSApp delegate] filesStager] showWindow:sender];
+	[[(GitBuddy*)[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:YES];
+	[[(GitBuddy*)[NSApp delegate] filesStager] showWindow:sender];
 }
 
 - (IBAction) unstageFile:(id)sender
@@ -127,7 +131,7 @@
 			[self rescan:nil];
 		}];
 	}
-	
+	 
 }
 
 - (int) totalChangeSetItems
