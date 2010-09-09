@@ -15,14 +15,21 @@
 
 - (void) dealloc
 {
-	[project release];
+	if (project) {
+		[project release];
+	}
+	
 	[super dealloc];
 }
 
-- (void) setProject:(NSDictionary *)dict
+- (void) setProject:(NSDictionary *)dict stageAll:(BOOL)stage
 {
-	project = [dict copy];
-	[project retain];
+	//copy project
+	if (project) {
+		[project release];
+		project = nil;
+	}
+	project = [[NSDictionary alloc] initWithDictionary:dict	copyItems:YES];
 	
 	NSLog(@"Loading File Stager with Project Dictionary:");
 	NSLog(@"%@", dict);
@@ -42,16 +49,32 @@
 		//load project files to table views
 		[stagedSource loadProjectData:[project objectForKey:@"staged"] forPath:[project objectForKey:@"path"]];
 		[unstagedSource loadProjectData:[project objectForKey:@"unstaged"] forPath:[project objectForKey:@"path"]];
-		[stagedView reloadData];
-		[unstagedView reloadData];
+
 		if ([[[project objectForKey:@"unstaged"] objectForKey:@"count"] intValue] > 0) {
-			[unstagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-			[self tableView:unstagedView shouldSelectRow:0];
+			
+			//copy unstaged file
+			if (stage) {
+				[stagedSource copyFilesFrom:unstagedSource];
+				
+				//select file in staged, since all is copied
+				[stagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+				[self tableView:stagedView shouldSelectRow:0];
+			}
+			else {
+				//select in unstaged
+				[unstagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+				[self tableView:unstagedView shouldSelectRow:0];
+			}
 		}
 		else if ([[[project objectForKey:@"staged"] objectForKey:@"count"] intValue] > 0) {
+			
+			//no unstaged, select in staged
 			[stagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 			[self tableView:stagedView shouldSelectRow:0];
 		}
+		
+		[stagedView reloadData];
+		[unstagedView reloadData];
 	}];
 }
 
@@ -139,6 +162,65 @@
 		[aCell setTextColor:[NSColor lightGrayColor]];
 		return;
 	}
+}
+
+- (BOOL) windowShouldClose:(id)sender
+{
+	//check difference with project arrays and
+	//copies in sources
+	NSMutableDictionary *toStage = [NSMutableDictionary dictionary];
+	NSMutableDictionary *toUnStage = [NSMutableDictionary dictionary];
+	
+	for(NSString * key in [ProjectFilesSource dataKeys]) {
+		
+		NSLog(@"Checking changes to '%@' files", key);
+		for(NSString *stagedInSource in [[stagedSource data] objectForKey:key]) {
+			//check it is in project array
+			if ([[[project objectForKey:@"staged"] objectForKey:key] indexOfObject:stagedInSource] == NSNotFound) {
+				//not found
+				NSLog(@"File to stage: %@", stagedInSource);
+				[toStage setObject:key forKey:stagedInSource];
+			}
+		}
+		
+		for(NSString *unstagedInSource in [[unstagedSource data] objectForKey:key]) {
+			//check it is in project array
+			if ([[[project objectForKey:@"unstaged"] objectForKey:key] indexOfObject:unstagedInSource] == NSNotFound) {
+				//not found
+				NSLog(@"File to unstage: %@", unstagedInSource);
+				[toUnStage setObject:key forKey:unstagedInSource];
+			}
+		}
+	}
+	
+	
+	if ([[toStage allKeys] count] > 0 || [[toUnStage allKeys] count] > 0) {
+		int rc = NSRunInformationalAlertPanel([NSString stringWithFormat:@"You have %d files to stage and %d files to unstage.", [[toStage allKeys] count], [[toUnStage allKeys] count]] , @"Click on Stage Changes to confirm staging or Close Anyway to dispose all activity. Also you click on Cancel to return to File Stager.", @"Stage Changes", @"Cancel", @"Close Anyway");
+		switch (rc) {
+			case 0:
+			default:
+				NSLog(@"Close canceled by user");
+				
+				return NO;
+				break;
+				
+			case 1:
+				//procced changes
+				NSLog(@"Stating %d files & unstaging %d files", [[toStage allKeys] count] , [[toUnStage allKeys] count]);
+				
+				return YES;
+				break;
+				
+			case -1:
+				NSLog(@"Disposing %d staged files & %d unstaging files", [[toStage allKeys] count] , [[toUnStage allKeys] count]);
+				
+				return YES;
+				break;
+		}
+	}
+	
+	//no changes
+	return YES;
 }
 
 @end

@@ -10,7 +10,7 @@
 #import "ProjectFilesSource.h"
 #import "ChangesSource.h"
 
-@interface FilesStager : NSWindowController<NSTableViewDelegate> {
+@interface FilesStager : NSWindowController<NSTableViewDelegate, NSWindowDelegate> {
 	ProjectFilesSource *stagedSource;
 	ProjectFilesSource *unstagedSource;
 	ChangesSource *changesSource;
@@ -30,12 +30,15 @@
 @property (assign) IBOutlet NSTableView *stagedView;
 @property (assign) IBOutlet NSTableView *unstagedView;
 
-- (void) setProject:(NSDictionary *)dict;
+- (void) setProject:(NSDictionary *)dict stageAll:(BOOL)stage;
 
 //table view selection
-- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex;
+- (BOOL) tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex;
 
 //table view hightligth
-- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
+- (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
+
+//file stager window delegate
+- (BOOL) windowShouldClose:(id)sender;
 
 @end
