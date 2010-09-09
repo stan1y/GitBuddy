@@ -8,6 +8,7 @@
 
 #import "GitWrapper.h"
 #import "GitWrapperCommand.h"
+#import "GitBuddy.h"
 
 @implementation GitWrapper
 
@@ -52,7 +53,7 @@ static GitWrapper *_sharedGitWrapper = nil;
 	[cmd setCompletionBlock: ^{
 		codeBlock([cmd jsonResult]);
 	}];
-	[[[NSApp delegate] queue] addOperation:cmd];
+	[[(GitBuddy*)[NSApp delegate] queue] addOperation:cmd];
 	[cmd release];
 }
 
