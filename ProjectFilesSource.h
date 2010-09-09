@@ -16,11 +16,19 @@
 	NSString * path;
 }
 
+//static array of group names (keys) 
+//in [self data] containing arrays of files in groups
++ (NSArray*) dataKeys;
+
+@property (retain, readonly) NSMutableDictionary* data;
+
 - (void)loadProjectData:(NSDictionary*)pData forPath:(NSString*)p;
 - (NSString *)fileAtIndex:(int)index;
 - (NSString *)fileAtIndex:(int)index inGroup:(NSString**)grp groupIndexOffset:(int*)offset;
 
 - (void)addFile:(NSString*)file toGroup:(NSString*)group;
 - (void)removeFile:(NSString*)file fromGroup:(NSString*)group;
+
+- (void) copyFilesFrom:(ProjectFilesSource *)source;
 
 @end

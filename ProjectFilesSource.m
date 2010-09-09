@@ -10,6 +10,8 @@
 
 @implementation ProjectFilesSource
 
+@synthesize data;
+
 static NSArray *_arrayDataKeys;
 
 //
@@ -116,6 +118,16 @@ static NSArray *_arrayDataKeys;
 	int count = [[data objectForKey:@"count"] intValue];
 	count--;
 	[data setObject:[NSNumber numberWithInt:count] forKey:@"count"];
+}
+
+- (void) copyFilesFrom:(ProjectFilesSource *)source
+{
+	for (NSString *k in [ProjectFilesSource dataKeys] ) {
+		for (NSString * file in [[source data] objectForKey:k]) {
+			[self addFile:file toGroup:k];
+		}
+	}
+	[[source data] removeAllObjects];
 }
 
 //
