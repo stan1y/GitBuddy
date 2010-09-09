@@ -204,7 +204,7 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 		
 	elif options.commit:
-		obj = b_cmd_json(options.git, options.repo, ['commit', '-m', '"%s"' % options.commit], {})
+		obj = b_cmd_json(options.git, options.repo, ['commit', '-m', '%s' % options.commit], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
