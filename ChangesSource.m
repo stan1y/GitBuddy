@@ -7,6 +7,7 @@
 //
 
 #import "ChangesSource.h"
+#import "GitWrapper.h"
 
 @implementation ChangesSource
 
@@ -18,7 +19,6 @@
 		return nil;
 	}
 	
-	wrapper = [[GitWrapper alloc] init];
 	gitObjectsIndex = nil;
 	
 	return self;
@@ -26,7 +26,6 @@
 
 - (void) dealloc
 {
-	[wrapper release];
 	[gitObjectsIndex release];
 	[currentSource release];
 	[super dealloc];
@@ -40,6 +39,7 @@
 	[indicator setHidden:NO];
 	[indicator startAnimation:nil];
 	//scan remote, branch and changes
+	GitWrapper * wrapper = [GitWrapper sharedInstance];
 	[wrapper executeGit:[NSArray arrayWithObjects:@"--staged-index", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
@@ -72,7 +72,7 @@
 	[tableView setEnabled:NO];
 	[indicator setHidden:NO];
 	[indicator startAnimation:nil];
-	
+	GitWrapper * wrapper = [GitWrapper sharedInstance];
 	[wrapper executeGit:[NSArray arrayWithObjects:showArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 		if (currentSource) {
 			[currentSource release];
@@ -98,6 +98,7 @@
 	[indicator setHidden:NO];
 	[indicator startAnimation:nil];
 	
+	GitWrapper * wrapper = [GitWrapper sharedInstance];
 	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 		if (currentSource) {
 			[currentSource release];

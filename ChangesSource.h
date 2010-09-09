@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "GitWrapper.h"
 
 //	Class implements table view source with
 //	diff contents either from:
@@ -17,7 +16,6 @@
 	NSMutableDictionary *gitObjectsIndex;
 	NSDictionary *currentSource;
 	
-	GitWrapper *wrapper;
 	NSTableView *tableView;
 	NSProgressIndicator *indicator;
 }
