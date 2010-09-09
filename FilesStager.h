@@ -33,7 +33,7 @@
 //callbacks
 - (IBAction) stageFiles:(id)sender;
 - (IBAction) stageAndCommitFiles:(id)sender;
-- (void) stageFiles:(BOOL)commit;
+- (void) stageAndCommit:(BOOL)commit;
 
 //modifications
 - (NSDictionary *) filesToUnStage;

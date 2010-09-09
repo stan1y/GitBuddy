@@ -9,6 +9,8 @@
 #import "FilesStager.h"
 #import "GitWrapper.h"
 #import "Highlight.h"
+#import "GitBuddy.h"
+#import "ProjectBuddy.h"
 
 @implementation FilesStager
 
@@ -92,7 +94,7 @@
 		for(NSString *stagedInSource in [[stagedSource data] objectForKey:key]) {
 			//check it is in project array
 			if ([stagedSource isForeignFile:stagedInSource]) {
-				NSLog(@"File to unstage: %@", stagedInSource);
+				NSLog(@"File to stage: %@", stagedInSource);
 				[toStage setObject:key forKey:stagedInSource];
 			}
 		}
@@ -120,17 +122,17 @@
 
 - (IBAction) stageFiles:(id)sender
 {
-	[self stageFiles:NO];
+	[self stageAndCommit:NO];
 }
 
 - (IBAction) stageAndCommitFiles:(id)sender
 {
-	[self stageFiles:YES];
+	[self stageAndCommit:YES];
 }
 
-- (void) stageFiles:(BOOL)commit
+- (void) stageAndCommit:(BOOL)commit
 {
-	NNSDictionary *toStage = [self filesToStage];
+	NSDictionary *toStage = [self filesToStage];
 	NSDictionary *toUnStage = [self filesToUnStage];
 	
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
@@ -139,11 +141,7 @@
 		NSLog(@"There are %d files to unstaged.", [toUnStage count]);
 		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [[toUnStage allKeys] componentsJoinedByString:@","]];
 		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
-			
-			if ([dict objectForKey:@"gitrc"] == 0) {
-				NSLog(@"Unstaged files %@ successfuly", [[toUnStage allKeys] componentsJoinedByString:@","]);
-				
-			}
+			[(GitBuddy*)[NSApp delegate] rescanRepos:nil];
 		}];
 	}
 	
@@ -152,12 +150,14 @@
 		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [[toStage allKeys] componentsJoinedByString:@","]];
 		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
 			
-			if ([dict objectForKey:@"gitrc"] == 0) {
-				NSLog(@"Staged files %@ successfuly", [[toStage allKeys] componentsJoinedByString:@","]);
-				
-				if (commit) {
-					//FIXME: show commit window
-				}
+			NSMenuItem *i = [(GitBuddy*)[NSApp delegate] menuItemForPath:[project objectForKey:@"path"]];
+			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
+				[(ProjectBuddy*)[i representedObject] rescanWithCompletionBlock: ^{			
+					if (commit) {
+						[[(GitBuddy*)[NSApp delegate] commit] commitProject:[(ProjectBuddy*)[i representedObject] itemDict] atPath:[project objectForKey:@"path"]];
+						[[(GitBuddy*)[NSApp delegate] commit] showWindow:nil];
+					}
+				}];
 			}
 		}];
 	}
