@@ -54,7 +54,6 @@
 	}
 	
 	//commit files
-	NSArray *files = [[stagedSource data] objectForKey:@"staged"];
 	GitWrapper* wrapper = [GitWrapper sharedInstance];
 	NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
 	NSString *commitArg = [NSString stringWithFormat:@"--commit=\"%@\"", msg];
