@@ -7,14 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "ChangesSource.h"
+#import "DiffViewSource.h"
 
 @interface Preview : NSWindowController<NSTabViewDelegate> {
-	ChangesSource *changesSource;
+	DiffViewSource *changesSource;
 }
 
 //assigned from nib
-@property (assign) IBOutlet ChangesSource *changesSource;
+@property (assign) IBOutlet DiffViewSource *changesSource;
 
 //load preview of file
 - (void) loadPreviewOf:(NSString *)file inPath:(NSString*)path;

@@ -8,12 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ProjectFilesSource.h"
-#import "ChangesSource.h"
+#import "DiffViewSource.h"
 
 @interface FilesStager : NSWindowController<NSTableViewDelegate, NSWindowDelegate> {
 	ProjectFilesSource *stagedSource;
 	ProjectFilesSource *unstagedSource;
-	ChangesSource *changesSource;
+	DiffViewSource *changesSource;
 	NSDictionary *project;
 	
 	NSTableView *stagedView;
@@ -24,7 +24,7 @@
 
 //assigned from nib
 @property (assign) IBOutlet NSTextField *title;
-@property (assign) IBOutlet ChangesSource *changesSource;
+@property (assign) IBOutlet DiffViewSource *changesSource;
 @property (assign) IBOutlet ProjectFilesSource *stagedSource;
 @property (assign) IBOutlet ProjectFilesSource *unstagedSource;
 @property (assign) IBOutlet NSTableView *stagedView;
