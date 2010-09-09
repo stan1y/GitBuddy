@@ -16,10 +16,9 @@
 
 @implementation GitBuddy
 
-@synthesize addPathPanel;
-@synthesize addPathField;
+@synthesize addPathPanel, addPathField;
 @synthesize queue;
-@synthesize filesStager;
+@synthesize filesStager, preview;
 
 //	--- File System Events processing
 

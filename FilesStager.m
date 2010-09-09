@@ -8,6 +8,7 @@
 
 #import "FilesStager.h"
 #import "GitWrapper.h"
+#import "Highlight.h"
 
 @implementation FilesStager
 
@@ -253,25 +254,8 @@
 		}
 		
 	} else {
-		
 		NSString *str = [[aTableView dataSource] stringAtIndex:rowIndex];
-		if ([str length] > 0) {
-			if ( [str characterAtIndex:0] == 43 ) {
-				[aCell setTextColor:[NSColor greenColor]];
-			}
-			else if ( [str characterAtIndex:0] == 45) {
-				[aCell setTextColor:[NSColor redColor]];
-			}
-			else {
-				[aCell setTextColor:[NSColor lightGrayColor]];
-			}
-
-			return;
-		}
-		
-		//other lines
-		[aCell setTextColor:[NSColor lightGrayColor]];
-		return;
+		[Highlight highLightCell:aCell forLine:str];
 	}
 }
 

@@ -91,8 +91,11 @@
 {}
 - (IBAction) newBranch:(id)sender
 {}
-- (IBAction) resetChanges:(id)sender
-{}
+- (IBAction) showPreview:(id)sender
+{
+	[[[NSApp delegate] preview] loadPreviewOf:[sender representedObject] inPath:path];
+	[[[NSApp delegate] preview] showWindow:sender];
+}
 - (IBAction) stageSelectedFiles:(id)sender
 {
 	[[[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:NO];
@@ -202,7 +205,7 @@
 	NSMenuItem *stageSelected = [[NSMenuItem alloc] initWithTitle:@"Stage All Files" action:@selector(stageAll:) keyEquivalent:[NSString string]];
 	[stageSelected setTarget:self];
 	[changedSubMenu setInitialItems:[NSArray arrayWithObjects:stageAll, stageSelected, [NSMenuItem separatorItem], nil]];
-	[changedSubMenu setItemSelector:@selector(toggleSelectFileToStage:) target:self];
+	[changedSubMenu setItemSelector:@selector(showPreview:) target:self];
 	[changed setSubmenu:changedMenu];
 	[changedMenu setDelegate:changedSubMenu];
 	[parentMenu addItem:changed];

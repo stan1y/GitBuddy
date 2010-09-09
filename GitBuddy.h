@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "ProjectBuddy.h"
 #import "FilesStager.h"
+#import "Preview.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -30,10 +31,12 @@
 	NSArray *queuedEvents;
 	
 	FilesStager *filesStager;
+	Preview *preview;
 }
 
 //assigned from nib
 @property (assign) IBOutlet FilesStager *filesStager;
+@property (assign) IBOutlet Preview *preview;
 
 @property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addPathField;

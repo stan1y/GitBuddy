@@ -44,7 +44,7 @@
 //table view selection
 - (BOOL) tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex;
 
-//table view hightligth
+//table view highligth
 - (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
 
 //file stager window delegate
