@@ -13,6 +13,7 @@
 
 @interface ProjectFilesSource : NSObject<NSTableViewDataSource> {
 	NSMutableDictionary* data;
+	NSMutableArray *foreign;
 	NSString * path;
 }
 
@@ -25,10 +26,12 @@
 - (void)loadProjectData:(NSDictionary*)pData forPath:(NSString*)p;
 - (NSString *)fileAtIndex:(int)index;
 - (NSString *)fileAtIndex:(int)index inGroup:(NSString**)grp groupIndexOffset:(int*)offset;
+- (NSString *)fileInGroup:(NSString*)file;
 
 - (void)addFile:(NSString*)file toGroup:(NSString*)group;
 - (void)removeFile:(NSString*)file fromGroup:(NSString*)group;
 
 - (void) copyFilesFrom:(ProjectFilesSource *)source;
+- (BOOL) isForeignFile:(NSString*)file;
 
 @end

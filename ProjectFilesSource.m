@@ -41,12 +41,24 @@ static NSArray *_arrayDataKeys;
 
 - (void)loadProjectData:(NSDictionary*)pData forPath:(NSString*)p
 {
-	//copy of arrays
+	//clear data
+	if (data) {
+		[data release];
+		data = nil;
+		
+		[foreign release];
+		foreign = nil;
+	}
+	
+	//init data
 	data = [[NSMutableDictionary alloc] init];
 	for (NSString *k in [ProjectFilesSource dataKeys]) {
 		[data setObject:[[NSMutableArray alloc] initWithArray:[pData objectForKey:k] copyItems:YES] forKey:k];
 	}
 	[data setObject:[NSNumber numberWithInt:[[pData objectForKey:@"count"] intValue]] forKey:@"count"];
+	
+	//init drag & grop container
+	foreign = [[NSMutableArray alloc] init];
 
 	//copy path
 	path = [[NSString alloc] initWithString:p];
@@ -60,6 +72,8 @@ static NSArray *_arrayDataKeys;
 {
 	[data release];
 	[path release];
+	[foreign release];
+	
 	[super dealloc];
 }
 
@@ -108,6 +122,7 @@ static NSArray *_arrayDataKeys;
 	int count = [[data objectForKey:@"count"] intValue];
 	count++;
 	[data setObject:[NSNumber numberWithInt:count] forKey:@"count"];
+	[foreign addObject:file];
 }
 
 - (void)removeFile:(NSString*)file fromGroup:(NSString*)group
@@ -118,6 +133,12 @@ static NSArray *_arrayDataKeys;
 	int count = [[data objectForKey:@"count"] intValue];
 	count--;
 	[data setObject:[NSNumber numberWithInt:count] forKey:@"count"];
+	[foreign removeObject:file];
+}
+
+- (BOOL) isForeignFile:(NSString*)file
+{
+	return [foreign indexOfObject:file] != NSNotFound;
 }
 
 - (void) copyFilesFrom:(ProjectFilesSource *)source
@@ -172,7 +193,7 @@ static NSArray *_arrayDataKeys;
 	
 	//add & remove dropped files
 	for	(NSString *droppedFile in droppedFiles) {
-		NSString *grp = [[[info draggingSource] dataSource] fileInGroup:droppedFile];
+		NSString *grp = [ (ProjectFilesSource*)[[info draggingSource] dataSource] fileInGroup:droppedFile];
 		NSLog(@"Dropped file %@ (%@)", droppedFile, grp);
 		ProjectFilesSource* source = (ProjectFilesSource*)[[info draggingSource] dataSource];
 		[self addFile:droppedFile toGroup:grp];
