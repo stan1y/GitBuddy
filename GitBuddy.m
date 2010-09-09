@@ -18,7 +18,7 @@
 
 @synthesize addRepoPanel, addRepoField;
 @synthesize queue;
-@synthesize filesStager, preview;
+@synthesize filesStager, preview, commit;
 
 //	--- File System Events processing
 

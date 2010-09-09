@@ -10,6 +10,7 @@
 #import "ProjectBuddy.h"
 #import "FilesStager.h"
 #import "Preview.h"
+#import "Commit.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -34,11 +35,13 @@
 	
 	FilesStager *filesStager;
 	Preview *preview;
+	Commit *commit;
 }
 
 //assigned from nib
 @property (assign) IBOutlet FilesStager *filesStager;
 @property (assign) IBOutlet Preview *preview;
+@property (assign) IBOutlet Commit *commit;
 
 @property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addRepoField;
