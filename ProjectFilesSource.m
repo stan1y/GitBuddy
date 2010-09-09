@@ -170,13 +170,14 @@ static NSArray *_arrayDataKeys;
 	NSPasteboard* pboard = [info draggingPasteboard];
 	NSArray * droppedFiles = [NSKeyedUnarchiver unarchiveObjectWithData:[pboard dataForType:@"StageItem"]];
 	
-	//add & remove dropped file
-	NSString *grp = [[[info draggingSource] dataSource] fileInGroup:[droppedFiles objectAtIndex:row]];
-	NSLog(@"Dropped file %@ (%@)", [droppedFiles objectAtIndex:row], grp);
-	ProjectFilesSource* source = (ProjectFilesSource*)[[info draggingSource] dataSource];
-	[self addFile:[droppedFiles objectAtIndex:row] toGroup:grp];
-	[source removeFile:[droppedFiles objectAtIndex:row] fromGroup:grp];
-	
+	//add & remove dropped files
+	for	(NSString *droppedFile in droppedFiles) {
+		NSString *grp = [[[info draggingSource] dataSource] fileInGroup:droppedFile];
+		NSLog(@"Dropped file %@ (%@)", droppedFile, grp);
+		ProjectFilesSource* source = (ProjectFilesSource*)[[info draggingSource] dataSource];
+		[self addFile:droppedFile toGroup:grp];
+		[source removeFile:droppedFile fromGroup:grp];
+	}
 	NSLog(@"Project File Sources Modified");
 	NSLog(@"Receiver: %@", self);
 	NSLog(@"%@", data);
