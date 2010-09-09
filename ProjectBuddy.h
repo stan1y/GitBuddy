@@ -35,16 +35,16 @@
 	
 	NSString * path;
 	NSString * title;
+	NSString * currentBranch;
 	
 	// Project data dict
 	NSMutableDictionary * itemDict;
-	// Project properties read from dict
-	NSString * currentBranch;
+	NSLock *itemLock;
 	
 	NSMutableArray * selectedChanges;
 }
 
-@property (nonatomic, retain) NSMutableDictionary * itemDict;
+@property (nonatomic, retain, readonly) NSDictionary * itemDict;
 @property (nonatomic, retain) NSString * currentBranch;
 @property (nonatomic, retain) NSString * path;
 @property (nonatomic, retain) NSString * title;

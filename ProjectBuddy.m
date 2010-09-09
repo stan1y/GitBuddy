@@ -13,23 +13,31 @@
 @implementation ProjectBuddy
 
 @synthesize path, title, parentItem;
-@synthesize currentBranch, itemDict;
+@synthesize currentBranch;
 
 // Dictionary management
 
+- (NSDictionary*) itemDict
+{
+	[itemLock lock];
+	NSDictionary *d = [itemDict copy];
+	[itemLock unlock];
+	return d;
+	
+}
+
 - (void) mergeData:(NSDictionary *)dict
 {
-	@synchronized (self) {
-		NSEnumerator* e = [dict keyEnumerator];
-		id theKey = nil;
-		while((theKey = [e nextObject]) != nil)
-		{
-			id theObject = [dict objectForKey:theKey];
-			[[self itemDict] setObject:theObject forKey:theKey];
-		}
-		
-		[self updateMenuItems];
+	[itemLock lock];
+	NSEnumerator* e = [dict keyEnumerator];
+	id theKey = nil;
+	while((theKey = [e nextObject]) != nil)
+	{
+		id theObject = [dict objectForKey:theKey];
+		[itemDict setObject:theObject forKey:theKey];
 	}
+	[itemLock unlock];
+	[self updateMenuItems];
 }
 					
 
@@ -203,6 +211,7 @@
 	
 	//project properties
 	itemDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aPath, @"path", aTitle, @"title", nil];
+	itemLock = [[NSLock alloc] init];
 	[self setTitle:aTitle];
 	[self setPath:aPath];
 		
@@ -276,6 +285,7 @@
 
 - (void) dealloc
 {
+	[itemLock release];
 	[title release];
 	[path release];
 	[currentBranch release];
