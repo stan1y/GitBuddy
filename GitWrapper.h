@@ -14,6 +14,7 @@
 	int timeout;
 }
 
++ (GitWrapper*) sharedInstance;
 - (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock;
 
 @end

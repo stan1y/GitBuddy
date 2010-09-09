@@ -128,6 +128,10 @@ if __name__ == '__main__':
 	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
 	parser.add_option("--show", help="git show [key]")
 	parser.add_option("--diff", help="git diff [path]")
+	parser.add_option("--stage", help="git stage [path]")
+	parser.add_option("--unstage", help="git reset HEAD [path]")
+	parser.add_option("--commit", help="git commit -m [message]")
+	
 	(options, args) = parser.parse_args()
 	
 	if not options.repo:
@@ -182,6 +186,25 @@ if __name__ == '__main__':
 		
 	elif options.diff:
 		obj = b_cmd_lines(options.git, options.repo, ['diff', options.diff])
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.stage:
+		args = ['stage', '--']
+		[args.append(part) for part in options.stage.split(',') ]
+		obj = b_cmd_json(options.git, options.repo, args, {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.unstage:
+		args = ['reset', 'HEAD', '--']
+		[args.append(part) for part in options.unstage.split(',') ]
+		obj = b_cmd_json(options.git, options.repo, args, {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.commit:
+		obj = b_cmd_json(options.git, options.repo, ['commit', '-m', '"%s"' % options.commit], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		

@@ -11,7 +11,13 @@
 
 @implementation GitWrapper
 
-- (id) init
+//	- Singleton
+
+static GitWrapper *_sharedGitWrapper = nil;
+
+//	- Initialization
+
+- (GitWrapper*) _init
 {
 	if ( !(self = [super init]) ) {
 		return nil;
@@ -23,6 +29,22 @@
 	
 	return self;
 }
+
++ (GitWrapper*) sharedInstance
+{
+	if ( !_sharedGitWrapper ) {
+		_sharedGitWrapper =  [[GitWrapper alloc] _init];
+	}
+	
+	return _sharedGitWrapper;
+}
+
+- (GitWrapper*) init
+{
+	return [GitWrapper sharedInstance];
+}
+
+
 
 - (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock
 {
