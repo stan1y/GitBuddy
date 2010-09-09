@@ -237,7 +237,7 @@
 		}
 		
 	} else {
-		NSString *str = [(ChangesSource*)[aTableView dataSource] stringAtIndex:rowIndex];
+		NSString *str = [(DiffViewSource*)[aTableView dataSource] stringAtIndex:rowIndex];
 		[Highlight highLightCell:aCell forLine:str];
 	}
 }
