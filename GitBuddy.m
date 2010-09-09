@@ -16,7 +16,7 @@
 
 @implementation GitBuddy
 
-@synthesize addPathPanel, addPathField;
+@synthesize addRepoPanel, addRepoField;
 @synthesize queue;
 @synthesize filesStager, preview;
 
@@ -96,6 +96,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//processing events
 	[eventsLock lock];
 	
+	//FIXME: icon animation start
+	
 	//merge events
 	NSArray * merged = [queuedEvents arrayByAddingObjectsFromArray:paths];
 	[queuedEvents release];
@@ -108,7 +110,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		return;
 	}
 	
-	NSLog(@"Processing events %d events in queue.", [queuedEvents count]);
+	NSLog(@"Processing %d events in queue.", [queuedEvents count]);
 	NSMutableSet * foldersToRescan = [NSMutableSet set];
 	NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
 	for(NSString *p in queuedEvents) {
@@ -120,8 +122,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 				continue;
 			}
 		}
-		
-		NSLog(@"\t-%@", p);
 		NSMenuItem *folderItem = [self menuItemForPath:p];
 		if (folderItem) {
 			[foldersToRescan addObject:folderItem];
@@ -131,31 +131,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
 	for(NSMenuItem *mi in foldersToRescan) {
 		[[mi representedObject] rescanWithCompletionBlock: ^{
-			//after rescan is done
-			//set number of unstaged files to status menu
-			int totalItems = 0;
-			for (int index = MENUITEMS - 1; index < [statusMenu numberOfItems] - 1; index++) {
-				ProjectBuddy *pbuddy = [[[statusMenu itemArray] objectAtIndex:index] representedObject];
-				if (pbuddy) {
-					totalItems += [pbuddy totalChangeSetItems];
-				}
-				
-			}
-			if (totalItems) {
-				//update with number of items
-				[statusItem setTitle:[NSString stringWithFormat:@"%d", totalItems]];
-				//set alternate icon
-				[statusItem setImage: statusAltImage];
-				[statusItem setAlternateImage: statusAltImage];
-				[statusItem setToolTip:[NSString stringWithFormat:@"GitBuddy found %d unstaved changes.", totalItems]];
-			}
-			else {
-				//set normal icon & no title
-				[statusItem setTitle:@""];
-				[statusItem setImage: statusImage];
-				[statusItem setAlternateImage: statusImage];
-				[statusItem setToolTip:@"GitBuddy running."];
-			}
+			//FIXME: icon animation stop
 		}];
 	}
 
@@ -249,28 +225,34 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 }
 
-- (IBAction) browseForPath:(id)sender
+- (IBAction) browseForRepo:(id)sender
 {
 	NSOpenPanel *op = [NSOpenPanel openPanel];
 	[op setCanChooseFiles:NO];
 	[op setCanChooseDirectories:YES];
     if ([op runModal] == NSOKButton){
-		[addPathField setStringValue:[op filename]];
+		[addRepoField setStringValue:[op filename]];
     }
 }
 
-- (IBAction) addPath:(id)sender
+- (IBAction) addRepo:(id)sender
 {
-	NSString *path = [addPathField stringValue];
+	NSString *path = [addRepoField stringValue];
 	NSLog(@"Adding path: %@", path);
 	if ([self addMonitoredPath:path]) {
 		[self initializeEventForPaths:[self monitoredPathsArray]];
-		[addPathField setStringValue:@""];
-		[addPathPanel orderOut:sender];
+		[addRepoField setStringValue:@""];
+		[addRepoPanel orderOut:sender];
 	}
 	else {
 		NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor", @"Try again", nil, nil);
 	}
+}
+
+- (IBAction) rescanRepos:(id)sender
+{
+	NSLog(@"Rescaning repos...");
+	[self scanUpdatesAtPaths:[self monitoredPathsArray]];
 }
 
 //	-- Initialization
@@ -293,7 +275,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 												  
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
 {
-	NSLog(@"Starting GitBuddy version ");
+	NSLog(@"Starting GitBuddy!");
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
 	unsigned long long eventId = [[defaults objectForKey:@"lastEventId"] intValue];
@@ -306,6 +288,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//events queue
 	queuedEvents = [[NSArray alloc] init];
 	eventsLock = [[NSLock alloc] init];
+	projCounters = [[NSMutableDictionary alloc] init];
 	
 	//calls to other programs as operations
 	queue = [[NSOperationQueue alloc] init];
@@ -331,12 +314,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 - (void) dealloc
 {
+	[projCounters release];
 	[statusImage release];
 	[statusAltImage release];
 	[statusItem release];
 	[lastEventId release];
-	[addPathField release];
-	[addPathPanel release];
+	[addRepoField release];
+	[addRepoPanel release];
 	[queue release];
 	[queuedEvents release];
 
@@ -353,9 +337,38 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     FSEventStreamStop(stream);
     FSEventStreamInvalidate(stream);
 	
-	NSLog(@"Closing GitBuddy");
 	NSLog(@"Last processed event = %@", lastEventId);
+	NSLog(@"Bye...");
     return NSTerminateNow;
+}
+
+//	-- Counters
+
+- (void) setCounter:(int)changed forProject:(NSString*)path
+{
+	[projCounters setObject:[NSNumber numberWithInt:changed] forKey:path];
+	
+	//update status icon
+	
+	int totalItems = 0;
+	for (NSNumber *num in [projCounters allValues]) {
+		totalItems += [num intValue];
+	}
+	if (totalItems) {
+		//update with number of items
+		[statusItem setTitle:[NSString stringWithFormat:@" %d", totalItems]];
+		//set alternate icon
+		[statusItem setImage: statusAltImage];
+		[statusItem setAlternateImage: statusAltImage];
+		[statusItem setToolTip:[NSString stringWithFormat:@"GitBuddy found %d unstaved changes.", totalItems]];
+	}
+	else {
+		//set normal icon & no title
+		[statusItem setTitle:@""];
+		[statusItem setImage: statusImage];
+		[statusItem setAlternateImage: statusImage];
+		[statusItem setToolTip:@"GitBuddy running."];
+	}
 }
 
 @end

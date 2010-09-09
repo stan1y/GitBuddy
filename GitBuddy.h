@@ -24,12 +24,13 @@
 	NSNumber* lastEventId;
     FSEventStreamRef stream;
 	
-	NSPanel *addPathPanel;
-	NSTextField *addPathField;
+	NSPanel *addRepoPanel;
+	NSTextField *addRepoField;
 	NSOperationQueue *queue;
 	
 	NSLock *eventsLock;
 	NSArray *queuedEvents;
+	NSMutableDictionary *projCounters;
 	
 	FilesStager *filesStager;
 	Preview *preview;
@@ -40,8 +41,8 @@
 @property (assign) IBOutlet Preview *preview;
 
 @property (nonatomic, retain, readonly) NSOperationQueue *queue;
-@property (assign) IBOutlet NSTextField *addPathField;
-@property (assign) IBOutlet NSPanel *addPathPanel;
+@property (assign) IBOutlet NSTextField *addRepoField;
+@property (assign) IBOutlet NSPanel *addRepoPanel;
 
 - (void) initializeEventForPaths:(NSArray *)pathsToWatch;
 - (NSMenuItem *) menuItemForPath:(NSString *)path;
@@ -51,10 +52,14 @@
 
 - (void) scanUpdatesAtPaths:(NSArray *)paths;
 
-- (IBAction) browseForPath:(id)sender;
-- (IBAction) addPath:(id)sender;
+- (IBAction) browseForRepo:(id)sender;
+- (IBAction) addRepo:(id)sender;
 - (IBAction) showGitManual:(id)sender;
 - (IBAction) checkUpdates:(id)sender;
+- (IBAction) rescanRepos:(id)sender;
+
+//projects counters
+- (void) setCounter:(int)changed forProject:(NSString*)path;
 
 @end
 
