@@ -42,7 +42,7 @@
 	}
 }
 
-- (IBAction) rescan:(id)sender
+- (void) rescanWithCompletionBlock:(void (^)(void))codeBlock
 {
 	[changedSubMenu setPending:YES];
 	[stagedSubMenu setPending:YES];
@@ -67,6 +67,9 @@
 			[changedSubMenu setPending:NO];
 			[stagedSubMenu setPending:NO];
 			[parentMenu update];
+			
+			//call user code block
+			codeBlock();
 		}];
 	}
 	@catch (NSException * e) {
@@ -76,6 +79,11 @@
 		
 		[[NSApplication sharedApplication] presentError:[NSError errorWithDomain:@"GitBuddy failed to scan Git repo" code:-1 userInfo:[e userInfo]]];
 	}
+}
+
+- (IBAction) rescan:(id)sender
+{
+	[self rescanWithCompletionBlock: ^{}];
 }
 - (IBAction) commit:(id)sender
 {}
@@ -106,8 +114,21 @@
 	[[[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:YES];
 	[[[NSApp delegate] filesStager] showWindow:sender];
 }
+
 - (IBAction) unstageFile:(id)sender
-{}
+{
+	int rc = NSRunInformationalAlertPanel(@"Config File Unstaging", [NSString stringWithFormat:@"You are about to unstage file %@. Are you sure about it?", [sender representedObject]], @"Yes", @"No", nil);
+	if (rc == 1) {
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
+		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [sender representedObject]];
+		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
+			NSLog(@"Unstaging done...");
+			[self rescan:nil];
+		}];
+	}
+	
+}
 
 - (int) totalChangeSetItems
 {

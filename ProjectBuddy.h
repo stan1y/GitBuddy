@@ -56,8 +56,9 @@
 - (void) mergeData:(NSDictionary *)dict;
 - (void) updateMenuItems;
 
-// Selectors
+- (void) rescanWithCompletionBlock:(void (^)(void))codeBlock;
 
+// Selectors
 - (IBAction) remove:(id)sender;
 - (IBAction) rescan:(id)sender;
 - (IBAction) commit:(id)sender;

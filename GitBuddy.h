@@ -15,6 +15,7 @@
 	IBOutlet NSMenu *statusMenu;
 	
 	NSStatusItem *statusItem;
+	
 	NSImage *statusImage;
 	NSImage *statusAltImage;
 	

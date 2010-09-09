@@ -130,8 +130,35 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	
 	NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
 	for(NSMenuItem *mi in foldersToRescan) {
-		[[mi representedObject] rescan:nil];
+		[[mi representedObject] rescanWithCompletionBlock: ^{
+			//after rescan is done
+			//set number of unstaged files to status menu
+			int totalItems = 0;
+			for (int index = MENUITEMS - 1; index < [statusMenu numberOfItems] - 1; index++) {
+				ProjectBuddy *pbuddy = [[[statusMenu itemArray] objectAtIndex:index] representedObject];
+				if (pbuddy) {
+					totalItems += [pbuddy totalChangeSetItems];
+				}
+				
+			}
+			if (totalItems) {
+				//update with number of items
+				[statusItem setTitle:[NSString stringWithFormat:@"%d", totalItems]];
+				//set alternate icon
+				[statusItem setImage: statusAltImage];
+				[statusItem setAlternateImage: statusAltImage];
+				[statusItem setToolTip:[NSString stringWithFormat:@"GitBuddy found %d unstaved changes.", totalItems]];
+			}
+			else {
+				//set normal icon & no title
+				[statusItem setTitle:@""];
+				[statusItem setImage: statusImage];
+				[statusItem setAlternateImage: statusImage];
+				[statusItem setToolTip:@"GitBuddy running."];
+			}
+		}];
 	}
+
 	
 	lastUpdatedSec = now_seconds();
 	NSLog(@"Update done on: %f", lastUpdatedSec);
@@ -284,18 +311,20 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	queue = [[NSOperationQueue alloc] init];
 	
 	//status item
-	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
+	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength] retain];
 	[statusItem retain];
+	
+	//load images
 	statusImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"StatusIconBlack" ofType:@"png"]];
 	statusAltImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"StatusIconGreen" ofType:@"png"]];
 	
+	//set no changes image by default
+	[statusItem setImage: statusImage];
+	[statusItem setAlternateImage: statusImage];
+	
 	[statusItem setMenu:statusMenu];
 	[statusItem setHighlightMode:YES];	
-	[statusItem setImage: statusImage];
-	[statusItem setAlternateImage: statusAltImage];
 	[statusItem setMenu: statusMenu];
-	[statusItem setToolTip: @"GitBuddy"];
-	[statusItem setHighlightMode: YES];
 	
 	[self initMonitoredPaths:[defaults arrayForKey:@"monitoredPaths"]];
 }
