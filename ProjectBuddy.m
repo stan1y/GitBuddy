@@ -34,6 +34,7 @@
 	while((theKey = [e nextObject]) != nil)
 	{
 		id theObject = [dict objectForKey:theKey];
+		[theObject retain];
 		[itemDict setObject:theObject forKey:theKey];
 	}
 	[itemLock unlock];

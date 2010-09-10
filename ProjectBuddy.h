@@ -75,5 +75,6 @@
 - (IBAction) stageAll:(id)sender;
 - (IBAction) unstageFile:(id)sender;
 
+- (IBAction) commitLog:(id)sender;
 
 @end
