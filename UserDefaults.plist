@@ -30,7 +30,7 @@
 	<array/>
 	<key>excludedPatterns</key>
 	<array>
-		<string>\S*\.git\S*</string>
+		<string>\S*\._\S*</string>
 	</array>
 </dict>
 </plist>
