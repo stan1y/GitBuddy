@@ -213,6 +213,19 @@
 	else {
 		[[self parentItem] setTitle:[self title]];
 	}
+	
+	//disable "Set Active" if already active
+	if ([[self parentItem] state] == YES) {
+		[activate setTitle:@"Active Project"];
+		[activate setAction:nil];
+		[activate setTarget:nil];
+	}
+	else {
+		[activate setTitle:@"Set Active"];
+		[activate setAction:@selector(setActive:)];
+		[activate setTarget:self];
+	}
+
 }
 
 //	--- Initialization ---
