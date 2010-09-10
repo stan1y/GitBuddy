@@ -196,6 +196,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		NSLog(@"Initializing path %@", p);
 		[self addMonitoredPath:p];
 	}
+	
+	if ([paths count] == 1) {
+		//there is only one project, so make it active
+		[self setActiveProjectByPath:[paths objectAtIndex:0]];
+	}
 }
 
 - (NSMenuItem *) menuItemForPath:(NSString *)path
@@ -288,6 +293,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSLog(@"Adding path: %@", path);
 	if ([self addMonitoredPath:path]) {
 		[self initializeEventForPaths:[self monitoredPathsArray]];
+		//set new repo as active
+		[self setActiveProjectByPath:path];
+		
+		//close dialog
 		[addRepoField setStringValue:@""];
 		[addRepoPanel orderOut:sender];
 	}
@@ -366,6 +375,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	
 	//setup fs events
 	[self initMonitoredPaths:[defaults arrayForKey:@"monitoredPaths"]];
+	[self setActiveProjectByPath:[defaults stringForKey:@"activeProjectPath"]];
 }
 
 - (void) dealloc
@@ -388,6 +398,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:lastEventId forKey:@"lastEventId"];
 	[defaults setObject:[self monitoredPathsArray] forKey:@"monitoredPaths"];
+	ProjectBuddy *pbuddy = [self getActiveProjectBuddy];
+	if (pbuddy) {
+		[defaults setObject:[pbuddy path] forKey:@"activeProjectPath"];
+	}
+	
     [defaults synchronize];
 	
     FSEventStreamStop(stream);
@@ -440,13 +455,20 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 - (void) setActiveProjectByPath:(NSString*)path
 {
+	if ( ![path length] ) {
+		return;
+	}
+	
+	//reset current active if any
 	if (activeProject) {
 		[activeProject setState:NO];
 	}
 	
+	//set new active
 	NSMenuItem *i = [self menuItemForPath:path];
 	if (i) {
 		activeProject = i;
+		[activeProject setState:YES];
 		NSLog(@"Project %@ is active now.", [activeProject title]);
 	}
 }
