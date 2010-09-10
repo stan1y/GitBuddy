@@ -7,9 +7,13 @@
 //
 
 #import "GitBuddy.h"
+#import <Carbon/Carbon.h>
 #include <time.h>
 
-//	-- Default menu items settings
+
+#define STAGE_FILES_CMD 1
+#define COMMIT_LOG_CMD 2
+
 
 // initial number of menu items in status menu
 #define MENUITEMS 5
@@ -19,6 +23,40 @@
 @synthesize addRepoPanel, addRepoField;
 @synthesize queue;
 @synthesize filesStager, preview, commit;
+
+//	---	Keyboard Events processing
+
+- (void) processKbdEvent:(NSEvent*)event
+{
+	ProjectBuddy *pbuddy = [self getActiveProjectBuddy];
+	if ( !pbuddy ) {
+		NSRunAlertPanel(@"GitBuddy cannot process key binding", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
+		return;
+	}
+	/*
+	 enum {
+	 NSAlphaShiftKeyMask = 1 << 16,
+	 NSShiftKeyMask      = 1 << 17,
+	 NSControlKeyMask    = 1 << 18,
+	 NSAlternateKeyMask  = 1 << 19,
+	 NSCommandKeyMask    = 1 << 20,
+	 NSNumericPadKeyMask = 1 << 21,
+	 NSHelpKeyMask       = 1 << 22,
+	 NSFunctionKeyMask   = 1 << 23,
+	 NSDeviceIndependentModifierFlagsMask = 0xffff0000U
+	 };
+	 */
+	int stageFilesKeyCode = 83; // s
+	int commitLogKeyCode = 76; //l
+	if ( [event modifierFlags] & NSCommandKeyMask & NSAlternateKeyMask) {
+		if ([event keyCode] == stageFilesKeyCode) {
+			[pbuddy stageSelectedFiles:nil];
+		}
+		else if ([event keyCode] == commitLogKeyCode) {
+			[pbuddy	commitLog:nil];
+		}
+	}
+}
 
 //	--- File System Events processing
 
@@ -99,10 +137,15 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//FIXME: icon animation start
 	
 	//merge events
-	NSArray * merged = [queuedEvents arrayByAddingObjectsFromArray:[paths copy]];
-	[queuedEvents release];
-	queuedEvents = merged;
+	if (queuedEvents) {
+		//append new events
+		queuedEvents = [queuedEvents arrayByAddingObjectsFromArray:paths];
+	}
+	else {
+		queuedEvents = paths;
+	}
 	[queuedEvents retain];
+	
 	//check minimal period
 	double delta = now_seconds() - lastUpdatedSec;
 	if (lastUpdatedSec && delta < minimalUpdateTimeSec) {
@@ -127,6 +170,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			[foldersToRescan addObject:folderItem];
 		}
 	}
+	
+	//clear array
+	[queuedEvents release];
+	queuedEvents = nil;
 	
 	NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
 	for(NSMenuItem *mi in foldersToRescan) {
@@ -286,8 +333,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSLog(@"Minimal update period in seconds: %.2f", minimalUpdateTimeSec);
 	lastUpdatedSec = 0;
 	
+	//active project is none
+	activeProject = nil;
+	
 	//events queue
-	queuedEvents = [[NSArray alloc] init];
 	eventsLock = [[NSLock alloc] init];
 	projCounters = [[NSMutableDictionary alloc] init];
 	
@@ -310,6 +359,12 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem setHighlightMode:YES];	
 	[statusItem setMenu: statusMenu];
 	
+	//setup kbd events	
+	[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler: ^(NSEvent *event){
+		[self processKbdEvent:event];
+	}];
+	
+	//setup fs events
 	[self initMonitoredPaths:[defaults arrayForKey:@"monitoredPaths"]];
 }
 
@@ -369,6 +424,30 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[statusItem setImage: statusImage];
 		[statusItem setAlternateImage: statusImage];
 		[statusItem setToolTip:@"GitBuddy running."];
+	}
+}
+
+//	---	Active Project
+
+- (ProjectBuddy*) getActiveProjectBuddy
+{
+	if (activeProject) {
+		return [activeProject representedObject];
+	}
+	
+	return nil;
+}
+
+- (void) setActiveProjectByPath:(NSString*)path
+{
+	if (activeProject) {
+		[activeProject setState:NO];
+	}
+	
+	NSMenuItem *i = [self menuItemForPath:path];
+	if (i) {
+		activeProject = i;
+		NSLog(@"Project %@ is active now.", [activeProject title]);
 	}
 }
 

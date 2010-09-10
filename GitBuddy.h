@@ -36,7 +36,12 @@
 	FilesStager *filesStager;
 	Preview *preview;
 	Commit *commit;
+	
+	NSMenuItem *activeProject;
 }
+
+- (void) setActiveProjectByPath:(NSString*)path;
+- (ProjectBuddy*) getActiveProjectBuddy;
 
 //assigned from nib
 @property (assign) IBOutlet FilesStager *filesStager;
