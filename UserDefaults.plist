@@ -18,10 +18,6 @@
 	<integer>5</integer>
 	<key>lastEventId</key>
 	<integer>0</integer>
-	<key>useOpenDiff</key>
-	<false/>
-	<key>customDiffViewer</key>
-	<string></string>
 	<key>editorCmd</key>
 	<string>mate</string>
 	<key>minimalUpdateTimeSec</key>
