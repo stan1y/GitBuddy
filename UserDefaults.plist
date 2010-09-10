@@ -25,7 +25,7 @@
 	<key>editorCmd</key>
 	<string>mate</string>
 	<key>minimalUpdateTimeSec</key>
-	<string>2</string>
+	<integer>1</integer>
 	<key>monitoredPaths</key>
 	<array/>
 	<key>excludedPatterns</key>
