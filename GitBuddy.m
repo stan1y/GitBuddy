@@ -99,7 +99,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//FIXME: icon animation start
 	
 	//merge events
-	NSArray * merged = [queuedEvents arrayByAddingObjectsFromArray:paths];
+	NSArray * merged = [queuedEvents arrayByAddingObjectsFromArray:[paths copy]];
 	[queuedEvents release];
 	queuedEvents = merged;
 	[queuedEvents retain];
