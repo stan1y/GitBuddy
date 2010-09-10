@@ -141,7 +141,6 @@
 		NSLog(@"There are %d files to unstaged.", [toUnStage count]);
 		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [[toUnStage allKeys] componentsJoinedByString:@","]];
 		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
-			[(GitBuddy*)[NSApp delegate] rescanRepos:nil];
 		}];
 	}
 	
@@ -153,6 +152,9 @@
 			NSMenuItem *i = [(GitBuddy*)[NSApp delegate] menuItemForPath:[project objectForKey:@"path"]];
 			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 				[(ProjectBuddy*)[i representedObject] rescanWithCompletionBlock: ^{			
+					
+					//make sure Commit window will have 
+					//the updated status dict
 					if (commit) {
 						[[(GitBuddy*)[NSApp delegate] commit] commitProject:[(ProjectBuddy*)[i representedObject] itemDict] atPath:[project objectForKey:@"path"]];
 						[[(GitBuddy*)[NSApp delegate] commit] showWindow:nil];

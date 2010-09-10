@@ -138,7 +138,6 @@
 		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [sender representedObject]];
 		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
 			NSLog(@"Unstaging done...");
-			[self rescan:nil];
 		}];
 	}
 	 

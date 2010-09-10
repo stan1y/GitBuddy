@@ -59,7 +59,7 @@
 - (IBAction) addRepo:(id)sender;
 - (IBAction) showGitManual:(id)sender;
 - (IBAction) checkUpdates:(id)sender;
-- (IBAction) rescanRepos:(id)sender;
+//- (IBAction) rescanRepos:(id)sender;
 
 //projects counters
 - (void) setCounter:(int)changed forProject:(NSString*)path;
