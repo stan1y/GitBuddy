@@ -70,7 +70,7 @@
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangeSetItems]]];
+
 			NSLog(@"Project Status Dictionary:\n");
 			NSLog(@"%@", [self itemDict]);
 			NSLog(@"  ***");
@@ -110,6 +110,8 @@
 {}
 - (IBAction) newBranch:(id)sender
 {}
+- (IBAction) commitLog:(id)sender
+{}
 - (IBAction) commit:(id)sender
 {
 	[[(GitBuddy*)[NSApp delegate] commit] commitProject:[self itemDict] atPath:path];
@@ -142,6 +144,11 @@
 		}];
 	}
 	 
+}
+- (IBAction) setActive:(id)sender
+{
+	[ (GitBuddy*)[NSApp delegate] setActiveProjectByPath:[self path]];
+	[self updateMenuItems];
 }
 
 - (int) totalChangeSetItems
@@ -198,6 +205,14 @@
 	else {
 		[staged setTitle:@"Staged"];
 	}
+	
+	//set parent item
+	if ([self totalChangeSetItems]) {
+		[[self parentItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [self title], [self totalChangeSetItems]]];
+	}
+	else {
+		[[self parentItem] setTitle:[self title]];
+	}
 }
 
 //	--- Initialization ---
@@ -219,6 +234,12 @@
 	[self setParentItem:anItem];
 	parentMenu = [[NSMenu alloc] init];
 	[parentItem setSubmenu:parentMenu];
+	
+	//activate menu item
+	activate = [[NSMenuItem alloc] initWithTitle:@"Set Active" action:nil keyEquivalent:[NSString string]];
+	[activate setAction:@selector(setActive:)];
+	[activate setTarget:self];
+	[parentMenu addItem:activate];
 	
 	//branch menu
 	branchMenu = [[NSMenu alloc] init];

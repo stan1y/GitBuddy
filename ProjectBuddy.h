@@ -13,6 +13,7 @@
 @interface ProjectBuddy : NSObject {
 	NSMenuItem *parentItem;
 	NSMenu *parentMenu;
+	NSMenuItem *activate;
 	
 	NSMenuItem *branch;
 	NSMenu *branchMenu;
