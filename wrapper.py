@@ -8,6 +8,13 @@ import json
 import re
 from optparse import OptionParser
 
+__debug = False
+
+def log(msg):
+	global __debug
+	if __debug:
+		print 'DEBUG {%s}\n' % msg
+
 __STATUS_TOKENS = {
 	'modified'	: '(?<=modified:...)\S+',
 	'added'		: '(?<=new.file:...)\S+',
@@ -35,38 +42,48 @@ __LS_FILES_INDEX = {
 
 __ERR_USAGE = -1
 
-def cmd(command, **kwargs):
-	return subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, **kwargs)
-	
+def b_cmd(git, repo, command):
+	repo = os.path.abspath(repo)
+	cmdline = [git, '--work-tree=%s' % repo, '--git-dir=%s' % os.path.join(repo, '.git')]
+	cmdline += command
+	log('cmd %s' % ' '.join(command))
+	proc = subprocess.Popen(cmdline, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+	stdout = []
+	stderr = []
+	log('waiting for git...')
+	while proc.returncode == None:
+		stdout += proc.stdout.readlines()
+		stderr += proc.stderr.readlines()
+		proc.poll()
+	return proc.returncode, stdout, stderr
+
 def b_cmd_chdir(git, repo, command):
-	command.insert(0, git)
 	pwd = os.getcwdu()
+	log('chdir to %s' % repo)
 	os.chdir(repo)
-	proc = cmd(command)
-	proc.wait()
+	rc, err, out = b_cmd(git, repo, command)
 	os.chdir(pwd)
-	return proc
-	
+	log('chdir to %s' % pwd)
+	return rc, err, out
+
 def b_cmd_lines(git, repo, command):
-	proc = b_cmd_chdir(git, repo, command)
-	err = ''.join(proc.stderr.readlines())
-	status = {'gitrc' : proc.returncode, 'giterr' : err, 'lines' : []}
+	rc, out, err = b_cmd_chdir(git, repo, command)
+	status = {'gitrc' : rc, 'giterr' : err, 'lines' : []}
 	count = 0
-	for line in proc.stdout.readlines():
+	for line in out:
 		status['lines'].append(line.strip())
 		count += 1
 	status['count'] = count
 	return status
 	
 def b_cmd_json(git, repo, command, tokens):
-	proc = b_cmd_chdir(git, repo, command)
-	err = ''.join(proc.stderr.readlines())
-	status = {'gitrc' : proc.returncode, 'giterr' : err}
+	rc, out, err = b_cmd_chdir(git, repo, command)
+	status = {'gitrc' : rc, 'giterr' : err}
 	#init status with git info
 	for token in tokens: status[token] = []
 	#populate arrays
 	count = 0
-	for line in proc.stdout.readlines():
+	for line in out:
 		for token in tokens:
 			m = re.search(tokens[token], line.strip())
 			if m:
@@ -79,10 +96,9 @@ def b_cmd_json(git, repo, command, tokens):
 	return status
 	
 def b_cmd_json_parts(git, repo, command, token_groups):
-	proc = b_cmd_chdir(git, repo, command)
-	err = ''.join(proc.stderr.readlines())
+	rc, out, err = b_cmd_chdir(git, repo, command)
 	#init status with git info
-	status = {'gitrc' : proc.returncode, 'giterr' : err}
+	status = {'gitrc' : rc, 'giterr' : err}
 
 	#add group dicts
 	for grp in token_groups:
@@ -92,7 +108,7 @@ def b_cmd_json_parts(git, repo, command, token_groups):
 	
 	#populate arrays
 	current_group = None
-	for line in proc.stdout.readlines():
+	for line in out:
 		#is token header
 		for grp in token_groups:
 			if token_groups[grp][0] in line: 
@@ -117,7 +133,7 @@ if __name__ == '__main__':
 
 	parser = OptionParser()
 	
-	parser.add_option("--debug-request", action="store_true", default=False, help="print json view of request")
+	parser.add_option("--debug", action="store_true", default=False, help="Enable debug outout, not valid json output.")
 	parser.add_option("--repo", help="path to git repository")
 	parser.add_option("--git", help="path to git binary, default is /opt/local/bin/git")
 	parser.add_option("--status", action="store_true", default=False, help="git status")
@@ -134,7 +150,7 @@ if __name__ == '__main__':
 	parser.add_option("--clone", help="git clone [url]. --repo is used to specify PARENT folder of new repo.")
 	
 	(options, args) = parser.parse_args()
-	
+
 	if not options.repo:
 		sys.stderr.write('--repo is required argument\n')
 		parser.print_help()
@@ -143,8 +159,10 @@ if __name__ == '__main__':
 	if not options.git:
 		options.git = "/opt/local/bin/git"
 	
-	if options.debug_request:
-		sys.stderr.write('request: %s\n' % repr(options));
+	if options.debug:
+		__debug = True
+		log('input %s' % repr(options));
+		
 	
 	if options.status:
 		obj = b_cmd_json_parts(options.git, options.repo, ['status'], {
@@ -210,7 +228,7 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 		
 	elif options.clone:
-		obj = b_cmd_json(options.git, options.repo, ['clone', options.clone], {});
+		obj = b_cmd_chdir(options.git, options.repo, ['clone', options.clone]);
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		

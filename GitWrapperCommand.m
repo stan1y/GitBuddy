@@ -62,6 +62,7 @@
 	[gitWrapper launch];
 	jsonResult = nil;
 	
+	NSString * totalOutput = [NSString string];
 	while (YES) {
 		if (totalSlept >= timeout) {
 			[gitWrapper terminate];
@@ -69,6 +70,10 @@
 			return;
 		}
 		sleep(1);
+		
+		//read output and parse 
+		NSString * thisOutput = [[[NSString alloc] initWithData:[[stdoutPipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding] autorelease];
+		totalOutput = [totalOutput stringByAppendingString:thisOutput];
 		
 		if ( ![gitWrapper isRunning] ) {
 			break;
@@ -94,10 +99,9 @@
 			[[NSApplication sharedApplication] terminate:nil];
 		}
 		else {
-			//read output and parse 
-			NSString * output = [[[NSString alloc] initWithData:[[stdoutPipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding] autorelease];
+			
 			NSError * err = nil;
-			id jsonObj = [parser objectWithString:output error:&err];
+			id jsonObj = [parser objectWithString:totalOutput error:&err];
 			if (err) {
 				NSLog(@"Git error: %@", err);
 				[[NSApplication sharedApplication] presentError:err];
@@ -107,7 +111,7 @@
 				[self setJsonResult:jsonObj];
 				
 				//check json answer
-				if ([[jsonObj objectForKey:@"giterr"] length] > 0 ){
+				if ([[jsonObj objectForKey:@"giterr"] count] > 0 ){
 					NSLog(@"Git error: %@", [jsonObj objectForKey:@"giterr"]);
 					int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [jsonObj objectForKey:@"giterr"]], @"Terminate", @"Continue", nil);
 					
