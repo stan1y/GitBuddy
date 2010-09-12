@@ -29,6 +29,7 @@
 	NSTextField *addRepoField;
 	NSOperationQueue *queue;
 	
+	NSThread *eventsThread;
 	NSLock *eventsLock;
 	NSArray *queuedEvents;
 	NSMutableDictionary *projCounters;
@@ -39,6 +40,9 @@
 	
 	NSMenuItem *activeProject;
 }
+
+//Events thread implementation
+- (void) processEvents;
 
 - (void) setActiveProjectByPath:(NSString*)path;
 - (ProjectBuddy*) getActiveProjectBuddy;
@@ -58,7 +62,7 @@
 - (BOOL) addMonitoredPath:(NSString *)path;
 - (NSArray *) monitoredPathsArray;
 
-- (void) scanUpdatesAtPaths:(NSArray *)paths;
+- (void) scanFsEventsAtPaths:(NSArray *)paths;
 
 - (IBAction) browseForRepo:(id)sender;
 - (IBAction) addRepo:(id)sender;

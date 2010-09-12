@@ -62,9 +62,7 @@
 
 -(unsigned long long)lastEventId
 {
-	@synchronized (self) {
-		return [lastEventId unsignedLongLongValue];
-	}
+	return [lastEventId unsignedLongLongValue];
 }
 
 - (void)setLastEventId:(unsigned long long)eventId
@@ -88,13 +86,14 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		if (eventIds[i] > [buddy lastEventId]) {
 			NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
 			if ([paths isKindOfClass:[NSArray class]]) {
-				[buddy scanUpdatesAtPaths:(NSArray *)paths];
+				[buddy scanFsEventsAtPaths:(NSArray *)paths];
 			}
 			else {
-				[buddy scanUpdatesAtPaths:[NSArray arrayWithObject:paths]];
+				[buddy scanFsEventsAtPaths:[NSArray arrayWithObject:paths]];
 			}
 		}
 		[buddy setLastEventId:eventIds[i]];
+		NSLog(@"Processed event %d.", eventIds[i]);
     }
 }
 
@@ -129,13 +128,64 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 //	--- Changes scanning
 
-- (void) scanUpdatesAtPaths:(NSArray *)paths
+- (void) processEvents
+{
+	while(YES) {
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		
+		//processing events
+		[eventsLock lock];
+		if ([queuedEvents count]) {
+			
+			
+			NSLog(@"Processing %d events in queue.", [queuedEvents count]);
+			NSMutableSet * foldersToRescan = [NSMutableSet set];
+			NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
+			for(NSString *p in queuedEvents) {
+				//check if path is excluded
+				for(int i=0; i< [excludedPatterns count]; i++) {
+					NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self matches %@", [excludedPatterns objectAtIndex:i]];
+					if ([predicate evaluateWithObject:p]) {
+						//path is excluded
+						continue;
+					}
+				}
+				NSMenuItem *folderItem = [self menuItemForPath:p];
+				if (folderItem) {
+					[foldersToRescan addObject:folderItem];
+				}
+			}
+			
+			//clear array
+			[queuedEvents release];
+			queuedEvents = nil;
+			
+			//FIXME: icon animation start
+			
+			NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
+			for(NSMenuItem *mi in foldersToRescan) {
+				[[mi representedObject] rescanWithCompletionBlock: ^{
+					//FIXME: icon animation stop
+				}];
+			}
+			
+		}
+				
+		lastUpdatedSec = now_seconds();
+		
+		//unlock events
+		[eventsLock unlock];
+		[pool release];
+		
+		//sleep thread
+		sleep(minimalUpdateTimeSec);
+	}
+}
+
+- (void) scanFsEventsAtPaths:(NSArray *)paths
 {
 	//processing events
 	[eventsLock lock];
-	
-	//FIXME: icon animation start
-	
 	//merge events
 	if (queuedEvents) {
 		//append new events
@@ -144,47 +194,9 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	else {
 		queuedEvents = paths;
 	}
+	
+	NSLog(@"Totaly %d events queued.", [queuedEvents count]);
 	[queuedEvents retain];
-	
-	//check minimal period
-	double delta = now_seconds() - lastUpdatedSec;
-	if (lastUpdatedSec && delta < minimalUpdateTimeSec) {
-		[eventsLock unlock];
-		return;
-	}
-	
-	NSLog(@"Processing %d events in queue.", [queuedEvents count]);
-	NSMutableSet * foldersToRescan = [NSMutableSet set];
-	NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
-	for(NSString *p in queuedEvents) {
-		//check if path is excluded
-		for(int i=0; i< [excludedPatterns count]; i++) {
-			NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self matches %@", [excludedPatterns objectAtIndex:i]];
-			if ([predicate evaluateWithObject:p]) {
-				//path is excluded
-				continue;
-			}
-		}
-		NSMenuItem *folderItem = [self menuItemForPath:p];
-		if (folderItem) {
-			[foldersToRescan addObject:folderItem];
-		}
-	}
-	
-	//clear array
-	[queuedEvents release];
-	queuedEvents = nil;
-	
-	NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
-	for(NSMenuItem *mi in foldersToRescan) {
-		[[mi representedObject] rescanWithCompletionBlock: ^{
-			//FIXME: icon animation stop
-		}];
-	}
-
-	
-	lastUpdatedSec = now_seconds();
-	NSLog(@"Update done on: %f", lastUpdatedSec);
 	[eventsLock unlock];
 }
 
@@ -256,7 +268,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		//add new monitored path
 		[self newMenuItem:path withPath:[path stringByExpandingTildeInPath]];
 		//scan for changes after repo was added
-		[self scanUpdatesAtPaths:[self monitoredPathsArray]];
+		[self scanFsEventsAtPaths:[self monitoredPathsArray]];
 		//restart events with new repo
 		[self initializeEventForPaths:[self monitoredPathsArray]];
 	}
@@ -309,7 +321,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 {
 	lastUpdatedSec = 0;
 	NSLog(@"Rescaning repos...");
-	[self scanUpdatesAtPaths:[self monitoredPathsArray]];
+	[self scanFsEventsAtPaths:[self monitoredPathsArray]];
 }
 
 //	-- Initialization
@@ -338,9 +350,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	unsigned long long eventId = [[defaults objectForKey:@"lastEventId"] intValue];
 	[self setLastEventId:eventId];
 	NSLog(@"Last event id: %d", [lastEventId unsignedLongLongValue]);
+	
+	//setup fs events
 	minimalUpdateTimeSec = [defaults doubleForKey:@"minimalUpdateTimeSec"];
 	NSLog(@"Minimal update period in seconds: %.2f", minimalUpdateTimeSec);
 	lastUpdatedSec = 0;
+	eventsThread = [[NSThread alloc] initWithTarget:self selector:@selector(processEvents) object:nil];
+	[eventsThread start];
 	
 	//active project is none
 	activeProject = nil;
@@ -368,12 +384,12 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem setHighlightMode:YES];	
 	[statusItem setMenu: statusMenu];
 	
-	//setup kbd events	
-	[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler: ^(NSEvent *event){
+	//subscribe on kbd events	
+	[[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler: ^(NSEvent *event){
 		[self processKbdEvent:event];
-	}];
+	}] retain];
 	
-	//setup fs events
+	//subscribe on fs events
 	[self initMonitoredPaths:[defaults arrayForKey:@"monitoredPaths"]];
 	[self setActiveProjectByPath:[defaults stringForKey:@"activeProjectPath"]];
 }
