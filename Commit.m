@@ -37,6 +37,7 @@
 
 - (IBAction) showPreview:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	[[(GitBuddy*)[NSApp delegate] preview] loadPreviewOf:[self selectedFile] inPath:[self projectPath]];
 	[[(GitBuddy*)[NSApp delegate] preview] showWindow:sender];
 }
