@@ -156,6 +156,7 @@
 					//make sure Commit window will have 
 					//the updated status dict
 					if (commit) {
+						[NSApp activateIgnoringOtherApps:YES];
 						[[(GitBuddy*)[NSApp delegate] commit] commitProject:[(ProjectBuddy*)[i representedObject] itemDict] atPath:[project objectForKey:@"path"]];
 						[[(GitBuddy*)[NSApp delegate] commit] showWindow:nil];
 					}

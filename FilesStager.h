@@ -16,6 +16,7 @@
 	DiffViewSource *changesSource;
 	NSDictionary *project;
 	
+	NSTextField *title;
 	NSTableView *stagedView;
 	NSTableView *unstagedView;
 	
