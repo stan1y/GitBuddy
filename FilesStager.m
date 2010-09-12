@@ -144,7 +144,7 @@
 		}];
 	}
 	
-	if ([toStage count]) {
+	if ([toStage count]) { 
 		NSLog(@"There are %d files to stage.", [toStage count]);
 		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [[toStage allKeys] componentsJoinedByString:@","]];
 		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
