@@ -16,6 +16,14 @@
 	<string>/opt/local/bin/git</string>
 	<key>gitTimeout</key>
 	<integer>5</integer>
+	<key>stageFilesKeyCode</key>
+	<integer>1</integer>
+	<key>commitLogKeyCode</key>
+	<integer>37</integer>
+	<key>rescanKeyCode</key>
+	<integer>15</integer>
+	<key>gitCloneTimeout</key>
+	<integer>300</integer>
 	<key>lastEventId</key>
 	<integer>0</integer>
 	<key>activeProjectPath</key>
@@ -23,7 +31,7 @@
 	<key>editorCmd</key>
 	<string>mate</string>
 	<key>minimalUpdateTimeSec</key>
-	<integer>1</integer>
+	<integer>2</integer>
 	<key>monitoredPaths</key>
 	<array/>
 	<key>excludedPatterns</key>

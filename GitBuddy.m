@@ -33,27 +33,28 @@
 		NSRunAlertPanel(@"GitBuddy cannot process key binding", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 		return;
 	}
-	/*
-	 enum {
-	 NSAlphaShiftKeyMask = 1 << 16,
-	 NSShiftKeyMask      = 1 << 17,
-	 NSControlKeyMask    = 1 << 18,
-	 NSAlternateKeyMask  = 1 << 19,
-	 NSCommandKeyMask    = 1 << 20,
-	 NSNumericPadKeyMask = 1 << 21,
-	 NSHelpKeyMask       = 1 << 22,
-	 NSFunctionKeyMask   = 1 << 23,
-	 NSDeviceIndependentModifierFlagsMask = 0xffff0000U
-	 };
-	 */
-	int stageFilesKeyCode = 83; // s
-	int commitLogKeyCode = 76; //l
-	if ( [event modifierFlags] & NSCommandKeyMask & NSAlternateKeyMask) {
-		if ([event keyCode] == stageFilesKeyCode) {
+	
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	int stageFilesKeyCode = [defaults integerForKey:@"stageFilesKeyCode"]; // "S" is 1 by default
+	int commitLogKeyCode = [defaults integerForKey:@"commitLogKeyCode"]; // "L" is 45 by default
+	int rescanKeyCode = [defaults integerForKey:@"rescanKeyCode"]; // "R" is 17 by default
+	NSLog(@"Defined Keys:");
+	NSLog(@"  %d - stage files", stageFilesKeyCode);
+	NSLog(@"  %d - commit log", commitLogKeyCode);
+	NSLog(@"  %d - rescan", rescanKeyCode);
+	
+	NSUInteger flags = [event modifierFlags];
+	unsigned short keyCode = [event keyCode];
+	NSLog(@"Key %d, flags %o was pressed", keyCode, flags);
+	if ( (flags & NSCommandKeyMask) && (flags & NSAlternateKeyMask) ) {
+		if ( keyCode == stageFilesKeyCode) {
 			[pbuddy stageSelectedFiles:nil];
 		}
-		else if ([event keyCode] == commitLogKeyCode) {
+		else if (keyCode == commitLogKeyCode) {
 			[pbuddy	commitLog:nil];
+		}
+		else if (keyCode == rescanKeyCode) {
+			[pbuddy rescan:nil];
 		}
 	}
 }
@@ -384,10 +385,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem setHighlightMode:YES];	
 	[statusItem setMenu: statusMenu];
 	
-	//subscribe on kbd events	
-	[[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler: ^(NSEvent *event){
+	//subscribe on kbd events
+	//works only if "Enable Access for Assistive Devices" enabled in
+	//"Universal Access" of System Preferences
+	// or need to implement AXMakeProcessTrusted and stuff
+	[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler: ^(NSEvent *event){
 		[self processKbdEvent:event];
-	}] retain];
+	}];
 	
 	//subscribe on fs events
 	[self initMonitoredPaths:[defaults arrayForKey:@"monitoredPaths"]];
