@@ -131,6 +131,7 @@ if __name__ == '__main__':
 	parser.add_option("--stage", help="git stage [path]")
 	parser.add_option("--unstage", help="git reset HEAD [path]")
 	parser.add_option("--commit", help="git commit -m [message]")
+	parser.add_option("--clone", help="git clone [url]. --repo is used to specify PARENT folder of new repo.")
 	
 	(options, args) = parser.parse_args()
 	
@@ -205,6 +206,11 @@ if __name__ == '__main__':
 		
 	elif options.commit:
 		obj = b_cmd_json(options.git, options.repo, ['commit', '-m', '%s' % options.commit], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.clone:
+		obj = b_cmd_json(options.git, options.repo, ['clone', options.clone], {});
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		

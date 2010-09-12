@@ -73,28 +73,34 @@
 	[msg setHidden:NO];
 	[msg setStringValue:[NSString stringWithFormat:@"Cloning %@...", repoPath]];
 	
-	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, cloneArg, nil] withCompletionBlock:^ (NSDictionary *dict){
+	int cloneTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitCloneTimeout"];
+	NSLog(@"Cloning repo with timeout %d seconds", cloneTimeout);
+	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, cloneArg, nil] timeoutAfter:cloneTimeout withCompletionBlock:^ (NSDictionary *dict){
 		[indicator stopAnimation:sender];
 		[indicator setHidden:YES];
 		[msg setHidden:YES];
-
 		
-		GitBuddy *buddy = (GitBuddy*)[NSApp delegate];
-		
-		if ([buddy addMonitoredPath:repoPath]) {
-			[buddy initializeEventForPaths:[buddy monitoredPathsArray]];
-			//set new repo as active
-			[buddy setActiveProjectByPath:repoPath];
+		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			
-			NSRunInformationalAlertPanel(@"GitBuddy successfully cloned repository.", [NSString stringWithFormat:@"New repository was cloned to %@ and set as Active Project.", repoPath], @"Continue", nil, nil);
+			
+			GitBuddy *buddy = (GitBuddy*)[NSApp delegate];
+			
+			if ([buddy addMonitoredPath:repoPath]) {
+				[buddy initializeEventForPaths:[buddy monitoredPathsArray]];
+				//set new repo as active
+				[buddy setActiveProjectByPath:repoPath];
+				
+				NSRunInformationalAlertPanel(@"GitBuddy successfully cloned repository.", [NSString stringWithFormat:@"New repository was cloned to %@ and set as Active Project.", repoPath], @"Continue", nil, nil);
+			}
+			else {
+				NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor. Cloning failed someway.", @"Continue", nil, nil);
+			}
 		}
-		else {
-			NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor. Cloning failed someway.", @"Continue", nil, nil);
-		}
+		
+		//close dialog
+		[[self window] performClose:sender];
 	}];
-	
-	//close dialog
-	[[self window] performClose:sender];
+
 }
 
 //text edit delegate to react on changes in url field
