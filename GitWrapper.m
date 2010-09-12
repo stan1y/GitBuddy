@@ -48,10 +48,10 @@ static GitWrapper *_sharedGitWrapper = nil;
 - (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock
 {
 	int tsecs = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitTimeout"];
-	[self executeGit:args withCompletionBlock:codeBlock timeoutAfter:tsecs];
+	[self executeGit:args timeoutAfter:tsecs withCompletionBlock:codeBlock];
 }
 
-- (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock timeoutAfter:(int)tsecs
+- (void) executeGit:(NSArray *)args timeoutAfter:(int)tsecs withCompletionBlock:(void (^)(NSDictionary*))codeBlock
 {
 	GitWrapperCommand *cmd = [GitWrapperCommand gitCommand:wrapperPath withArgs:args andTimeout:tsecs];
 	[cmd setCompletionBlock: ^{
