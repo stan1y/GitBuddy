@@ -20,7 +20,7 @@
 - (NSDictionary*) itemDict
 {
 	[itemLock lock];
-	NSDictionary *d = [itemDict copy];
+	NSDictionary *d = [[NSDictionary alloc] initWithDictionary:itemDict copyItems:YES];
 	[itemLock unlock];
 	return d;
 	
@@ -37,8 +37,8 @@
 		[theObject retain];
 		[itemDict setObject:theObject forKey:theKey];
 	}
+	
 	[itemLock unlock];
-	[self updateMenuItems];
 }
 					
 
@@ -54,9 +54,6 @@
 
 - (void) rescanWithCompletionBlock:(void (^)(void))codeBlock
 {
-	[changedSubMenu setPending:YES];
-	[stagedSubMenu setPending:YES];
-	
 	@try {
 		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 		NSLog(@"Quering repo at %@...", path);
@@ -74,8 +71,8 @@
 			NSLog(@"Project Status Dictionary:\n");
 			NSLog(@"%@", [self itemDict]);
 			NSLog(@"  ***");
-			[changedSubMenu setPending:NO];
-			[stagedSubMenu setPending:NO];
+			
+			[self updateMenuItems];
 			[parentMenu update];
 			
 			//set counter for project
@@ -114,21 +111,25 @@
 {}
 - (IBAction) commit:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	[[(GitBuddy*)[NSApp delegate] commit] commitProject:[self itemDict] atPath:path];
 	[[(GitBuddy*)[NSApp delegate] commit] showWindow:sender];
 }
 - (IBAction) showPreview:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	[[(GitBuddy*)[NSApp delegate] preview] loadPreviewOf:[sender representedObject] inPath:path];
 	[[(GitBuddy*)[NSApp delegate] preview] showWindow:sender];
 }
 - (IBAction) stageSelectedFiles:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	[[(GitBuddy*)[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:NO];
 	[[(GitBuddy*)[NSApp delegate] filesStager] showWindow:sender];
 }
 - (IBAction) stageAll:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	[[(GitBuddy*)[NSApp delegate] filesStager] setProject:[self itemDict] stageAll:YES];
 	[[(GitBuddy*)[NSApp delegate] filesStager] showWindow:sender];
 }
@@ -162,30 +163,24 @@
 	[changedSubMenu setData:[[self itemDict] objectForKey:@"unstaged"]];
 	[stagedSubMenu setData:[[self itemDict] objectForKey:@"staged"]];
 	
-	//update branch list
-	[branchMenu removeAllItems];
-	//new branch
-	NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch" action:@selector(newBranch:) keyEquivalent:[NSString string]];
-	[newBranch setTarget:self];
-	[branchMenu addItem:newBranch];
-	//separator
-	[branchMenu addItem:[NSMenuItem separatorItem]];
 	//branch list
+	if ([[branchMenu itemArray] count] > 2) {
+		for(int i=2; i<[[branchMenu itemArray] count]; i++) {
+			[branchMenu removeItemAtIndex:i];
+		}
+	}
 	for(NSString * br in [[self itemDict] objectForKey:@"branches"]) {
 		NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:br action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
 		[b setTarget:self];
 		[branchMenu addItem:b];
 	}
 	
-	//update remote list
-	[remoteMenu removeAllItems];
-	//new remote
-	NSMenuItem *newRemote = [[NSMenuItem alloc] initWithTitle:@"Add Remote Branch" action:@selector(newSource:) keyEquivalent:[NSString string]];
-	[newRemote setTarget:self];
-	[remoteMenu addItem:newRemote];
-	//separator
-	[remoteMenu addItem:[NSMenuItem separatorItem]];
 	//remote branch list
+	if ([[remoteMenu itemArray] count] > 2) {
+		for(int i=2; i<[[remoteMenu itemArray] count]; i++) {
+			[remoteMenu removeItemAtIndex:i];
+		}
+	}
 	for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
 		NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
 		[r setTarget:self];
@@ -225,7 +220,6 @@
 		[activate setAction:@selector(setActive:)];
 		[activate setTarget:self];
 	}
-
 }
 
 //	--- Initialization ---
@@ -235,7 +229,6 @@
 	if ( !(self = [super init])) {
 		return nil;
 	}
-
 	
 	//project properties
 	itemDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aPath, @"path", aTitle, @"title", nil];
@@ -259,12 +252,24 @@
 	branch = [[NSMenuItem alloc] initWithTitle:@"Branch" action:nil keyEquivalent:[NSString string]];
 	[branch setSubmenu:branchMenu];
 	[parentMenu addItem:branch];
+	//new branch
+	NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch" action:@selector(newBranch:) keyEquivalent:[NSString string]];
+	[newBranch setTarget:self];
+	[branchMenu addItem:newBranch];
+	//separator
+	[branchMenu addItem:[NSMenuItem separatorItem]];
 	
 	//remote menu
 	remoteMenu = [[NSMenu alloc] init];
 	remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
 	[remote setSubmenu:remoteMenu];
 	[parentMenu addItem:remote];
+	//new remote
+	NSMenuItem *newRemote = [[NSMenuItem alloc] initWithTitle:@"Add Remote Branch" action:@selector(newSource:) keyEquivalent:[NSString string]];
+	[newRemote setTarget:self];
+	[remoteMenu addItem:newRemote];
+	//separator
+	[remoteMenu addItem:[NSMenuItem separatorItem]];	
 	
 	//changed menu
 	changedMenu = [[NSMenu alloc] init];
