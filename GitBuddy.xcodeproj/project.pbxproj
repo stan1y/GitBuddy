@@ -10,6 +10,7 @@
 		1DDD58160DA1D0A300B32029 /* GitBuddy.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* GitBuddy.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* GitBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* GitBuddy.m */; };
 		76310F7D123A5CA60090CBFE /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76310F7C123A5CA60090CBFE /* Carbon.framework */; };
+		763110E4123A79D60090CBFE /* Clone.m in Sources */ = {isa = PBXBuildFile; fileRef = 763110E3123A79D60090CBFE /* Clone.m */; };
 		765C8F98123697AD00FCFF42 /* ProjectSubMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */; };
 		766B541A12324605008738D4 /* Git_72x25.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541412324605008738D4 /* Git_72x25.png */; };
 		766B541B12324605008738D4 /* GitBuddy.icns in Resources */ = {isa = PBXBuildFile; fileRef = 766B541512324605008738D4 /* GitBuddy.icns */; };
@@ -64,6 +65,8 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		76310F7C123A5CA60090CBFE /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		763110E2123A79D60090CBFE /* Clone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clone.h; sourceTree = "<group>"; };
+		763110E3123A79D60090CBFE /* Clone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Clone.m; sourceTree = "<group>"; };
 		765C8F96123697AD00FCFF42 /* ProjectSubMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectSubMenu.h; sourceTree = "<group>"; };
 		765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectSubMenu.m; sourceTree = "<group>"; };
 		766B541412324605008738D4 /* Git_72x25.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Git_72x25.png; path = Images/Git_72x25.png; sourceTree = "<group>"; };
@@ -151,6 +154,8 @@
 				769C1D641239103E006B127D /* Highlight.m */,
 				769C1F2912395774006B127D /* Commit.h */,
 				769C1F2A12395774006B127D /* Commit.m */,
+				763110E2123A79D60090CBFE /* Clone.h */,
+				763110E3123A79D60090CBFE /* Clone.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -340,6 +345,7 @@
 				769C1D4712390D1E006B127D /* Preview.m in Sources */,
 				769C1D651239103E006B127D /* Highlight.m in Sources */,
 				769C1F2B12395774006B127D /* Commit.m in Sources */,
+				763110E4123A79D60090CBFE /* Clone.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
