@@ -17,11 +17,7 @@
 	
 	SEL itemSelector;
 	id itemTarget;
-	
-	BOOL pending;
 }
-
-@property (assign) BOOL pending;
 
 - (id) initProject:(NSString*)project withDict:(NSDictionary*)dict forMenu:(NSMenu *)aMenu;
 - (void) setData:(NSDictionary*)dict;

@@ -10,8 +10,6 @@
 
 @implementation ProjectSubMenu
 
-@synthesize pending;
-
 - (void) dealloc
 {
 	[data release];
@@ -25,7 +23,6 @@
 		return nil;
 	}
 	
-	[self setPending:NO];
 	project = prj;
 	[project retain];
 	itemsInitially = 0;
@@ -75,54 +72,47 @@
 
 - (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
 {
-	if (pending) {
-		[item setTitle:@"Pending..."];
-		return YES;
-	}
-	else {
-
-		if (index >= itemsInitially) {
-			NSArray *modified = [data objectForKey:@"modified"];
-			NSArray *added = [data objectForKey:@"added"];
-			NSArray *removed = [data objectForKey:@"removed"];
-			NSArray *renamed = [data objectForKey:@"renamed"];
-			NSString *itemPath = @"";
-			
-			if ([modified count] && index - itemsInitially < [modified count]) {
-				//modified files list
-				itemPath = [modified objectAtIndex:(index - itemsInitially)];
-				[item setTitle:[NSString stringWithFormat:@"%@ (changed)", itemPath]];
-			}
-			if ([added count] && index - itemsInitially >= [modified count]) { 
-				//added files list
-				itemPath = [added objectAtIndex:(index - itemsInitially  - [modified count])];
-				[item setTitle:[NSString stringWithFormat:@"%@ (added)", itemPath]];
-			}
-			if ([removed count] && index - itemsInitially >= [modified count] + [added count]) { 
-				//removed files list
-				itemPath = [removed objectAtIndex:(index - itemsInitially  - [modified count] - [added count])];
-				[item setTitle:[NSString stringWithFormat:@"%@ (removed)", itemPath]];
-			}
-			if ([renamed count] && index - itemsInitially >= [modified count] + [added count] + [removed count]) { 
-				//renamed files list
-				itemPath = [renamed objectAtIndex:(index - itemsInitially  - [modified count] - [added count] - [removed count])];
-				[item setTitle:[NSString stringWithFormat:@"%@ (renamed)", itemPath]];
-			}
-			
-			[item setRepresentedObject:itemPath];
-			[item setAction:itemSelector];
-			[item setTarget:itemTarget];
-			
-			//set icon
-			[item setState:YES];
-			NSString * filePath = [project stringByAppendingPathComponent:itemPath];
-			NSImage *img = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
-			[img setSize:NSMakeSize(16, 16)];
-			[item setOnStateImage:img];
+	if (index >= itemsInitially) {
+		NSArray *modified = [data objectForKey:@"modified"];
+		NSArray *added = [data objectForKey:@"added"];
+		NSArray *removed = [data objectForKey:@"removed"];
+		NSArray *renamed = [data objectForKey:@"renamed"];
+		NSString *itemPath = @"";
+		
+		if ([modified count] && index - itemsInitially < [modified count]) {
+			//modified files list
+			itemPath = [modified objectAtIndex:(index - itemsInitially)];
+			[item setTitle:[NSString stringWithFormat:@"%@ (changed)", itemPath]];
+		}
+		if ([added count] && index - itemsInitially >= [modified count]) { 
+			//added files list
+			itemPath = [added objectAtIndex:(index - itemsInitially  - [modified count])];
+			[item setTitle:[NSString stringWithFormat:@"%@ (added)", itemPath]];
+		}
+		if ([removed count] && index - itemsInitially >= [modified count] + [added count]) { 
+			//removed files list
+			itemPath = [removed objectAtIndex:(index - itemsInitially  - [modified count] - [added count])];
+			[item setTitle:[NSString stringWithFormat:@"%@ (removed)", itemPath]];
+		}
+		if ([renamed count] && index - itemsInitially >= [modified count] + [added count] + [removed count]) { 
+			//renamed files list
+			itemPath = [renamed objectAtIndex:(index - itemsInitially  - [modified count] - [added count] - [removed count])];
+			[item setTitle:[NSString stringWithFormat:@"%@ (renamed)", itemPath]];
 		}
 		
-		return YES;
+		[item setRepresentedObject:itemPath];
+		[item setAction:itemSelector];
+		[item setTarget:itemTarget];
+		
+		//set icon
+		[item setState:YES];
+		NSString * filePath = [project stringByAppendingPathComponent:itemPath];
+		NSImage *img = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
+		[img setSize:NSMakeSize(16, 16)];
+		[item setOnStateImage:img];
 	}
+	
+	return YES;
 }
 
 - (int) totalNumberOfFiles
@@ -132,13 +122,7 @@
 
 - (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
 {
-	//return "Pending..." when ProjectBuddy tells isPending == YES
-	if (pending) {
-		return 1;
-	}
-	else {
-		return itemsInitially + [self totalNumberOfFiles];
-	}
+	return itemsInitially + [self totalNumberOfFiles];
 }
 
 
