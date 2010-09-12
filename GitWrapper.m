@@ -45,8 +45,6 @@ static GitWrapper *_sharedGitWrapper = nil;
 	return [GitWrapper sharedInstance];
 }
 
-
-
 - (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock
 {
 	int tsecs = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitTimeout"];
