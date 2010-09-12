@@ -23,6 +23,6 @@
 @property (nonatomic, retain, readonly) NSTask *gitWrapper;
 @property (nonatomic, retain) NSDictionary * jsonResult;
 - (id) init;
-+ (GitWrapperCommand*) gitCommand:(NSString*)wrapperPath withArgs:(NSArray *)args;
++ (GitWrapperCommand*) gitCommand:(NSString*)wrapperPath withArgs:(NSArray *)args andTimeout:(int)tsecs;
 
 @end

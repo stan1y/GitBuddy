@@ -44,11 +44,11 @@
 	return self;
 }
 
-+ (GitWrapperCommand*) gitCommand:(NSString*)wrapperPath withArgs:(NSArray *)args
++ (GitWrapperCommand*) gitCommand:(NSString*)wrapperPath withArgs:(NSArray *)args andTimeout:(int)tsecs
 {
 	GitWrapperCommand *cmd = [[GitWrapperCommand alloc] init];
 	NSMutableArray * _args = [NSMutableArray arrayWithArray:args];
-	[cmd setTimeout:[[NSUserDefaults standardUserDefaults] integerForKey:@"gitTimeout"]];
+	[cmd setTimeout:tsecs];
 	[_args insertObject:wrapperPath atIndex:0];
 	[_args insertObject:[NSString stringWithFormat:@"--git=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"gitPath"]] atIndex:1];
 	[[cmd gitWrapper] setArguments:_args];
