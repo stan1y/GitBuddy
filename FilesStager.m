@@ -198,17 +198,29 @@
 	NSLog(@"Unstaged Files:");
 	NSLog(@"%@", unstagedGroup);
 	NSLog(@" *** ");
-	if ( [aTableView isEqual:stagedView] && 
-		[stagedGroup indexOfObject:file] != NSNotFound &&
-		![(ProjectFilesSource*)[stagedView dataSource] isForeignFile:file]) {
-		//belongs to staged.group.file
-		[changesSource updateWithChangeset:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+	if ( [aTableView isEqual:stagedView]) {
+		//stage list clicked
+		
+		if ([stagedGroup indexOfObject:file] != NSNotFound && ![(ProjectFilesSource*)[stagedView dataSource] isForeignFile:file]) {
+			//belongs to staged
+			[changesSource updateWithChangeset:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+		}
+		else {
+			//belongs to unstaged
+			[changesSource updateWithFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+		}
+
 	}
-	else if ( [aTableView isEqual:unstagedView] && 
-			 [unstagedGroup indexOfObject:file] != NSNotFound &&
-			 ![(ProjectFilesSource*)[unstagedView dataSource] isForeignFile:file]){
-		//belongs to unstaged.group.file
-		[changesSource updateWithFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+	else if ( [aTableView isEqual:unstagedView]) {
+		//unstaged list clicked
+		if ([unstagedGroup indexOfObject:file] != NSNotFound && ![(ProjectFilesSource*)[unstagedView dataSource] isForeignFile:file]){
+			//belongs to unstaged.group.file
+			[changesSource updateWithFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+		}
+		else {
+			[changesSource updateWithChangeset:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+		}
+
 	}
 	else {
 		return NO;
