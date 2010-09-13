@@ -29,6 +29,10 @@
 	NSMenu *stagedMenu;
 	ProjectSubMenu *stagedSubMenu;
 	
+	NSMenuItem *untracked;
+	NSMenu *untrackedMenu;
+	ProjectSubMenu *untrackedSubMenu;
+	
 	NSMenuItem *pull;
 	NSMenuItem *push;
 	NSMenuItem *rescan;
@@ -60,6 +64,7 @@
 - (void) rescanWithCompletionBlock:(void (^)(void))codeBlock;
 
 // Selectors
+- (IBAction) addFile:(id)sender;
 - (IBAction) remove:(id)sender;
 - (IBAction) rescan:(id)sender;
 - (IBAction) commit:(id)sender;

@@ -135,7 +135,7 @@
 }
 - (IBAction) unstageFile:(id)sender
 {
-	int rc = NSRunInformationalAlertPanel(@"Config File Unstaging", [NSString stringWithFormat:@"You are about to unstage file %@. Are you sure about it?", [sender representedObject]], @"Yes", @"No", nil);
+	int rc = NSRunInformationalAlertPanel(@"Confirmation required.", [NSString stringWithFormat:@"You are about to unstage file %@. Are you sure about it?", [sender representedObject]], @"Yes", @"No", nil);
 	if (rc == 1) {
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
@@ -148,8 +148,20 @@
 }
 - (IBAction) setActive:(id)sender
 {
-	[ (GitBuddy*)[NSApp delegate] setActiveProjectByPath:[self path]];
+	[(GitBuddy*)[NSApp delegate] setActiveProjectByPath:[self path]];
 	[self updateMenuItems];
+}
+- (IBAction) addFile:(id)sender
+{
+	int rc = NSRunInformationalAlertPanel(@"Confirmation required.", [NSString stringWithFormat:@"You are about to add file %@ to repo. Are you sure about it?", [sender representedObject]], @"Yes", @"No", nil);
+	if (rc == 1) {
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
+		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [sender representedObject]];
+		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
+			NSLog(@"Adding file done...");
+		}];
+	}
 }
 
 - (int) totalChangeSetItems
@@ -162,6 +174,7 @@
 	//update dynamic menus
 	[changedSubMenu setData:[[self itemDict] objectForKey:@"unstaged"]];
 	[stagedSubMenu setData:[[self itemDict] objectForKey:@"staged"]];
+	[untrackedSubMenu setData:[[self itemDict] objectForKey:@"untracked"]];
 	
 	//branch list
 	if ([[branchMenu itemArray] count] > 2) {
@@ -199,6 +212,14 @@
 	}
 	else {
 		[staged setTitle:@"Staged"];
+	}
+	
+	//set number of untracjed files
+	if ([untrackedSubMenu totalNumberOfFiles]) {
+		[untracked setTitle:[NSString stringWithFormat:@"Untracked (%d)", [untrackedSubMenu totalNumberOfFiles] ]];
+	}
+	else {
+		[untracked setTitle:@"Untracked"];
 	}
 	
 	//set parent item
@@ -298,7 +319,16 @@
 	[staged setSubmenu:stagedMenu];
 	[stagedMenu setDelegate:stagedSubMenu];
 	[parentMenu addItem:staged];
-					  
+	
+	//untracked
+	untrackedMenu = [[NSMenu alloc] init];
+	untrackedSubMenu = [[ProjectSubMenu alloc] initProject:aPath withDict:[[self itemDict] objectForKey:@"untracked"] forMenu:untrackedMenu];
+	untracked = [[NSMenuItem alloc] initWithTitle:@"Untracked" action:nil keyEquivalent:[NSString string]];
+	[untrackedSubMenu setInitialItems:[NSArray array]];
+	[untrackedSubMenu setItemSelector:@selector(addFile:) target:self];
+	[untracked setSubmenu:untrackedMenu];
+	[untrackedMenu setDelegate:untrackedSubMenu];
+	[parentMenu addItem:untracked];
 					  
 	//push
 	push = [[NSMenuItem alloc] initWithTitle:@"Push" action:@selector(push:) keyEquivalent:[NSString string]];

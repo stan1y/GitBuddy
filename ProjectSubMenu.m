@@ -73,33 +73,40 @@
 - (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
 {
 	if (index >= itemsInitially) {
-		NSArray *modified = [data objectForKey:@"modified"];
-		NSArray *added = [data objectForKey:@"added"];
-		NSArray *removed = [data objectForKey:@"removed"];
-		NSArray *renamed = [data objectForKey:@"renamed"];
 		NSString *itemPath = @"";
 		
-		if ([modified count] && index - itemsInitially < [modified count]) {
-			//modified files list
-			itemPath = [modified objectAtIndex:(index - itemsInitially)];
-			[item setTitle:[NSString stringWithFormat:@"%@ (changed)", itemPath]];
+		//whenever we read files from staged/unstaged of from untracked
+		if ([data objectForKey:@"files"]) {
+			itemPath = [[data objectForKey:@"files"] objectAtIndex:(index - itemsInitially)];
+			[item setTitle:[NSString stringWithFormat:@"%@", itemPath]];
 		}
-		if ([added count] && index - itemsInitially >= [modified count]) { 
-			//added files list
-			itemPath = [added objectAtIndex:(index - itemsInitially  - [modified count])];
-			[item setTitle:[NSString stringWithFormat:@"%@ (added)", itemPath]];
+		else {
+			NSArray *modified = [data objectForKey:@"modified"];
+			NSArray *added = [data objectForKey:@"added"];
+			NSArray *removed = [data objectForKey:@"removed"];
+			NSArray *renamed = [data objectForKey:@"renamed"];
+			
+			if ([modified count] && index - itemsInitially < [modified count]) {
+				//modified files list
+				itemPath = [modified objectAtIndex:(index - itemsInitially)];
+				[item setTitle:[NSString stringWithFormat:@"%@ (changed)", itemPath]];
+			}
+			if ([added count] && index - itemsInitially >= [modified count]) { 
+				//added files list
+				itemPath = [added objectAtIndex:(index - itemsInitially  - [modified count])];
+				[item setTitle:[NSString stringWithFormat:@"%@ (added)", itemPath]];
+			}
+			if ([removed count] && index - itemsInitially >= [modified count] + [added count]) { 
+				//removed files list
+				itemPath = [removed objectAtIndex:(index - itemsInitially  - [modified count] - [added count])];
+				[item setTitle:[NSString stringWithFormat:@"%@ (removed)", itemPath]];
+			}
+			if ([renamed count] && index - itemsInitially >= [modified count] + [added count] + [removed count]) { 
+				//renamed files list
+				itemPath = [renamed objectAtIndex:(index - itemsInitially  - [modified count] - [added count] - [removed count])];
+				[item setTitle:[NSString stringWithFormat:@"%@ (renamed)", itemPath]];
+			}
 		}
-		if ([removed count] && index - itemsInitially >= [modified count] + [added count]) { 
-			//removed files list
-			itemPath = [removed objectAtIndex:(index - itemsInitially  - [modified count] - [added count])];
-			[item setTitle:[NSString stringWithFormat:@"%@ (removed)", itemPath]];
-		}
-		if ([renamed count] && index - itemsInitially >= [modified count] + [added count] + [removed count]) { 
-			//renamed files list
-			itemPath = [renamed objectAtIndex:(index - itemsInitially  - [modified count] - [added count] - [removed count])];
-			[item setTitle:[NSString stringWithFormat:@"%@ (renamed)", itemPath]];
-		}
-		
 		[item setRepresentedObject:itemPath];
 		[item setAction:itemSelector];
 		[item setTarget:itemTarget];
