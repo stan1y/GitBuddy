@@ -42,9 +42,13 @@ __LS_FILES_INDEX = {
 
 __ERR_USAGE = -1
 
-def b_cmd(git, repo, command):
+def b_cmd(git, repo, command, gitspec = True):
 	repo = os.path.abspath(repo)
-	cmdline = [git, '--work-tree=%s' % repo, '--git-dir=%s' % os.path.join(repo, '.git')]
+	if gitspec:
+		cmdline = [git, '--work-tree=%s' % repo, '--git-dir=%s' % os.path.join(repo, '.git')]
+	else:
+		cmdline = [git]
+		
 	cmdline += command
 	log('cmd %s' % ' '.join(command))
 	proc = subprocess.Popen(cmdline, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
@@ -57,11 +61,11 @@ def b_cmd(git, repo, command):
 		proc.poll()
 	return proc.returncode, stdout, stderr
 
-def b_cmd_chdir(git, repo, command):
+def b_cmd_chdir(git, repo, command, gitspec = True):
 	pwd = os.getcwdu()
 	log('chdir to %s' % repo)
 	os.chdir(repo)
-	rc, err, out = b_cmd(git, repo, command)
+	rc, err, out = b_cmd(git, repo, command, gitspec)
 	os.chdir(pwd)
 	log('chdir to %s' % pwd)
 	return rc, err, out
@@ -228,9 +232,9 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 		
 	elif options.clone:
-		obj = b_cmd_chdir(options.git, options.repo, ['clone', options.clone]);
-		sys.stdout.write('%s\n' % json.dumps(obj))
-		sys.exit(obj['gitrc'])
+		rc, out, err = b_cmd_chdir(options.git, options.repo, ['clone', options.clone], gitspec = False);
+		sys.stdout.write(json.dumps({ 'gitrc' : rc, 'giterr' : err}))
+		sys.exit(rc)
 		
 	else:
 		parser.print_help()
