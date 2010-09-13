@@ -49,7 +49,7 @@
 				<string key="NSWindowContentMaxSize">{310, 294}</string>
 				<string key="NSWindowContentMinSize">{310, 294}</string>
 				<object class="NSView" key="NSWindowView" id="825089901">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -70,6 +70,7 @@
 							</object>
 							<string key="NSFrame">{{20, 209}, {116, 65}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="903409773">
 								<int key="NSCellFlags">130560</int>
@@ -90,11 +91,12 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 131}, {276, 80}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="407930656">
 								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">GitBuddy your friend. Copyright Stanislav Yudin  2010. All rights reserved. This application is protected by international laws of copyright. </string>
+								<int key="NSCellFlags2">138412032</int>
+								<string key="NSContents">GitBuddy your friend. Copyright © 2010 Stanislav Yudin. All rights reserved.  This application is protected by international laws </string>
 								<object class="NSFont" key="NSSupport" id="253803484">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">12</double>
@@ -126,12 +128,17 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 65}, {276, 38}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="39940098">
 								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">This copy is licenced to</string>
-								<reference key="NSSupport" ref="253803484"/>
+								<int key="NSCellFlags2">138412032</int>
+								<string key="NSContents">This is BETA version of GitBuddy. For preview &amp; testing purposes only</string>
+								<object class="NSFont" key="NSSupport" id="29">
+									<string key="NSName">LucidaGrande-Bold</string>
+									<double key="NSSize">12</double>
+									<int key="NSfFlags">16</int>
+								</object>
 								<reference key="NSControlView" ref="764299852"/>
 								<reference key="NSBackgroundColor" ref="733216611"/>
 								<reference key="NSTextColor" ref="90455656"/>
@@ -142,6 +149,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{188, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="916131331">
 								<int key="NSCellFlags">67239424</int>
@@ -166,6 +174,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{14, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="85348378">
 								<int key="NSCellFlags">67239424</int>
@@ -186,6 +195,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 111}, {276, 17}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="46694165">
 								<int key="NSCellFlags">68288064</int>
@@ -208,13 +218,14 @@
 						<object class="NSTextField" id="341463159">
 							<reference key="NSNextResponder" ref="825089901"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{141, 209}, {152, 57}}</string>
+							<string key="NSFrame">{{141, 209}, {152, 65}}</string>
 							<reference key="NSSuperview" ref="825089901"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="1044932238">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">138412032</int>
-								<string key="NSContents">Git Buddy by Endless Insomnia</string>
+								<string key="NSContents">Git-Powered Development.  Mac way.</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande-Bold</string>
 									<double key="NSSize">15</double>
@@ -227,6 +238,8 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{310, 294}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{310, 316}</string>
@@ -999,7 +1012,7 @@
 				<string key="NSWindowContentMaxSize">{856, 150}</string>
 				<string key="NSWindowContentMinSize">{456, 150}</string>
 				<object class="NSView" key="NSWindowView" id="127769294">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1008,7 +1021,6 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{141, 102}, {295, 19}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="785422995">
 								<int key="NSCellFlags">-1804468671</int>
@@ -1027,7 +1039,6 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{138, 128}, {301, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="489681876">
 								<int key="NSCellFlags">68288064</int>
@@ -1044,7 +1055,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 128}, {119, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="969228951">
 								<int key="NSCellFlags">68288064</int>
@@ -1061,7 +1071,6 @@
 							<int key="NSvFlags">-2147483380</int>
 							<string key="NSFrame">{{150, 20}, {186, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="307212665">
 								<int key="NSCellFlags">68288064</int>
@@ -1078,7 +1087,6 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{17, 78}, {422, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="925600989">
 								<int key="NSCellFlags">68288064</int>
@@ -1095,7 +1103,6 @@
 							<int key="NSvFlags">266</int>
 							<string key="NSFrame">{{20, 51}, {374, 19}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="354797174">
 								<int key="NSCellFlags">-1804468671</int>
@@ -1114,7 +1121,6 @@
 							<int key="NSvFlags">297</int>
 							<string key="NSFrame">{{402, 50}, {34, 20}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="386810801">
 								<int key="NSCellFlags">67239424</int>
@@ -1136,17 +1142,12 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{20, 100}, {48, 19}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="456089041">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">134217728</int>
 								<string key="NSContents">SSH</string>
-								<object class="NSFont" key="NSSupport" id="29">
-									<string key="NSName">LucidaGrande-Bold</string>
-									<double key="NSSize">12</double>
-									<int key="NSfFlags">16</int>
-								</object>
+								<reference key="NSSupport" ref="29"/>
 								<reference key="NSControlView" ref="625417430"/>
 								<int key="NSButtonFlags">-1229176577</int>
 								<int key="NSButtonFlags2">45</int>
@@ -1161,7 +1162,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{76, 100}, {57, 19}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="569489753">
 								<int key="NSCellFlags">67239424</int>
@@ -1182,7 +1182,6 @@
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{340, 19}, {97, 18}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="725298854">
 								<int key="NSCellFlags">-1543373312</int>
@@ -1207,7 +1206,6 @@
 							<int key="NSvFlags">292</int>
 							<string key="NSFrame">{{19, 19}, {97, 18}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="439400856">
 								<int key="NSCellFlags">-2080244224</int>
@@ -1233,14 +1231,11 @@
 							<object class="NSPSMatrix" key="NSDrawMatrix"/>
 							<string key="NSFrame">{{123, 20}, {16, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
-							<reference key="NSWindow"/>
 							<int key="NSpiFlags">20746</int>
 							<double key="NSMaxValue">100</double>
 						</object>
 					</object>
 					<string key="NSFrameSize">{456, 150}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{456, 169}</string>
@@ -4671,9 +4666,9 @@
 					<string>{375, 270}</string>
 					<string>{375, 270}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{575, 111}, {310, 294}}</string>
+					<string>{{593, 258}, {310, 294}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{575, 111}, {310, 294}}</string>
+					<string>{{593, 258}, {310, 294}}</string>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
