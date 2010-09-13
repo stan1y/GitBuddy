@@ -13,6 +13,7 @@
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="886"/>
+			<integer value="892"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1012,7 +1013,7 @@
 				<string key="NSWindowContentMaxSize">{856, 150}</string>
 				<string key="NSWindowContentMinSize">{456, 150}</string>
 				<object class="NSView" key="NSWindowView" id="127769294">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1068,13 +1069,13 @@
 						</object>
 						<object class="NSTextField" id="255968494">
 							<reference key="NSNextResponder" ref="127769294"/>
-							<int key="NSvFlags">-2147483380</int>
-							<string key="NSFrame">{{150, 20}, {186, 16}}</string>
+							<int key="NSvFlags">-2147483358</int>
+							<string key="NSFrame">{{144, 20}, {192, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="307212665">
 								<int key="NSCellFlags">68288064</int>
-								<int key="NSCellFlags2">4195328</int>
+								<int key="NSCellFlags2">138413056</int>
 								<string key="NSContents">Clonning Repo...</string>
 								<reference key="NSSupport" ref="253803484"/>
 								<reference key="NSControlView" ref="255968494"/>
@@ -1227,7 +1228,7 @@
 						</object>
 						<object class="NSProgressIndicator" id="294786695">
 							<reference key="NSNextResponder" ref="127769294"/>
-							<int key="NSvFlags">-2147482356</int>
+							<int key="NSvFlags">-2147482332</int>
 							<object class="NSPSMatrix" key="NSDrawMatrix"/>
 							<string key="NSFrame">{{123, 20}, {16, 16}}</string>
 							<reference key="NSSuperview" ref="127769294"/>
@@ -1236,6 +1237,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{456, 150}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{456, 169}</string>
@@ -4835,9 +4837,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{600, 612}, {456, 150}}</string>
+					<string>{{448, 541}, {456, 150}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{600, 612}, {456, 150}}</string>
+					<string>{{448, 541}, {456, 150}}</string>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
