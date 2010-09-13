@@ -19,6 +19,12 @@
 	[changesSource updateWithFileDiff:file inPath:path];
 }
 
+- (void) loadChangeSetOf:(NSString *)file inPath:(NSString*)path
+{
+	[changesSource rebuildIndex:path withCompletionBlock: ^{
+		[changesSource updateWithChangeset:file inPath:path];
+	}];
+}
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	NSString *str = [changesSource stringAtIndex:rowIndex];

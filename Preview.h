@@ -19,6 +19,9 @@
 //load preview of file
 - (void) loadPreviewOf:(NSString *)file inPath:(NSString*)path;
 
+//load preview of changeset
+- (void) loadChangeSetOf:(NSString *)file inPath:(NSString*)path;
+
 //table view highligth
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
 
