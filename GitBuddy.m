@@ -63,15 +63,12 @@
 
 -(unsigned long long)lastEventId
 {
-	return [lastEventId unsignedLongLongValue];
+	return lastEventId;
 }
 
 - (void)setLastEventId:(unsigned long long)eventId
 {
-	@synchronized(self){
-		lastEventId = [NSNumber numberWithUnsignedLongLong:eventId];
-		[lastEventId retain];
-	}
+	lastEventId = eventId;
 }
 
 void fsevents_callback(ConstFSEventStreamRef streamRef,
@@ -84,7 +81,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     GitBuddy *buddy = (GitBuddy *)userData;
 	size_t i;
     for(i=0; i < numEvents; i++){
+		NSLog(@"Received event %d, last %d", eventIds[i], [buddy lastEventId]);
 		if (eventIds[i] > [buddy lastEventId]) {
+			
+			[buddy setLastEventId:eventIds[i]];
 			NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
 			if ([paths isKindOfClass:[NSArray class]]) {
 				[buddy scanFsEventsAtPaths:(NSArray *)paths];
@@ -93,8 +93,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 				[buddy scanFsEventsAtPaths:[NSArray arrayWithObject:paths]];
 			}
 		}
-		[buddy setLastEventId:eventIds[i]];
-		NSLog(@"Processed event %d.", eventIds[i]);
+		else {
+			NSLog(@"Skipping event %d", eventIds[i]);
+		}
+
     }
 }
 
@@ -116,7 +118,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
                                  &fsevents_callback,
                                  &context,
                                  (CFArrayRef) pathsToWatch,
-                                 [lastEventId unsignedLongLongValue],
+                                 lastEventId,
                                  (CFAbsoluteTime) latency,
                                  kFSEventStreamCreateFlagUseCFTypes
 								 );
@@ -179,7 +181,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[pool release];
 		
 		//sleep thread
-		sleep(minimalUpdateTimeSec);
+		sleep(eventsRescanDelay);
 	}
 }
 
@@ -195,7 +197,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	else {
 		queuedEvents = paths;
 	}
-	
+	NSLog(@"FS Event paths: '%@'", [paths componentsJoinedByString:@", "]);
 	NSLog(@"Totaly %d events queued.", [queuedEvents count]);
 	[queuedEvents retain];
 	[eventsLock unlock];
@@ -348,13 +350,12 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSLog(@"Starting GitBuddy!");
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-	unsigned long long eventId = [[defaults objectForKey:@"lastEventId"] intValue];
-	[self setLastEventId:eventId];
-	NSLog(@"Last event id: %d", [lastEventId unsignedLongLongValue]);
+	[self setLastEventId:[[defaults objectForKey:@"lastEventId"] unsignedLongLongValue]];
+	NSLog(@"Last event id: %d", lastEventId);
 	
 	//setup fs events
-	minimalUpdateTimeSec = [defaults doubleForKey:@"minimalUpdateTimeSec"];
-	NSLog(@"Minimal update period in seconds: %.2f", minimalUpdateTimeSec);
+	eventsRescanDelay = [defaults doubleForKey:@"eventsRescanDelay"];
+	NSLog(@"Events rescan delay: %.2f", eventsRescanDelay);
 	lastUpdatedSec = 0;
 	eventsThread = [[NSThread alloc] initWithTarget:self selector:@selector(processEvents) object:nil];
 	[eventsThread start];
@@ -404,7 +405,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusImage release];
 	[statusAltImage release];
 	[statusItem release];
-	[lastEventId release];
 	[addRepoField release];
 	[addRepoPanel release];
 	[queue release];
@@ -416,7 +416,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 - (NSApplicationTerminateReply)applicationShouldTerminate: (NSApplication *)app
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:lastEventId forKey:@"lastEventId"];
+    [defaults setObject:[NSNumber numberWithUnsignedLongLong:lastEventId] forKey:@"lastEventId"];
 	[defaults setObject:[self monitoredPathsArray] forKey:@"monitoredPaths"];
 	ProjectBuddy *pbuddy = [self getActiveProjectBuddy];
 	if (pbuddy) {
@@ -428,7 +428,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     FSEventStreamStop(stream);
     FSEventStreamInvalidate(stream);
 	
-	NSLog(@"Last processed event = %@", lastEventId);
+	NSLog(@"Last processed event = %d", lastEventId);
 	NSLog(@"Bye...");
     return NSTerminateNow;
 }

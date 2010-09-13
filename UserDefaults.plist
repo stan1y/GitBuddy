@@ -30,8 +30,8 @@
 	<string></string>
 	<key>editorCmd</key>
 	<string>mate</string>
-	<key>minimalUpdateTimeSec</key>
-	<integer>2</integer>
+	<key>eventsRescanDelay</key>
+	<integer>5</integer>
 	<key>monitoredPaths</key>
 	<array/>
 	<key>excludedPatterns</key>

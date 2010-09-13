@@ -20,9 +20,9 @@
 	NSImage *statusImage;
 	NSImage *statusAltImage;
 	
-	double minimalUpdateTimeSec;
+	double eventsRescanDelay;
 	double lastUpdatedSec;
-	NSNumber* lastEventId;
+	unsigned long long lastEventId;
     FSEventStreamRef stream;
 	
 	NSPanel *addRepoPanel;
