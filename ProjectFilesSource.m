@@ -103,12 +103,14 @@ static NSArray *_arrayDataKeys;
 - (NSString *)fileAtIndex:(int)index inGroup:(NSString**)grp groupIndexOffset:(int*)offset
 {
 	*offset = 0;
+	int prevGroupCount = 0;
 	for(NSString *k in [ProjectFilesSource dataKeys]) {
 		*offset += [[data objectForKey:k] count];
 		if ( index < *offset ) {
 			*grp = k;
-			return [[data objectForKey:k] objectAtIndex:index];
-		}		
+			return [[data objectForKey:k] objectAtIndex:index - prevGroupCount];
+		}
+		prevGroupCount = [[data objectForKey:k] count];
 	}
 		
 	return nil;
@@ -157,7 +159,8 @@ static NSArray *_arrayDataKeys;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return [[data objectForKey:@"count"] intValue];
+	int rows = [[data objectForKey:@"count"] intValue];
+	return rows;
 }
 
 
