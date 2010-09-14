@@ -34,6 +34,12 @@
 		769C1D4712390D1E006B127D /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D4612390D1E006B127D /* Preview.m */; };
 		769C1D651239103E006B127D /* Highlight.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D641239103E006B127D /* Highlight.m */; };
 		769C1F2B12395774006B127D /* Commit.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1F2A12395774006B127D /* Commit.m */; };
+		76D5266B123F6AA7009094CC /* GitSettingsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52667123F6AA7009094CC /* GitSettingsIcon.png */; };
+		76D5266C123F6AA7009094CC /* GlobalKeysIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52668123F6AA7009094CC /* GlobalKeysIcon.png */; };
+		76D5266D123F6AA7009094CC /* MonitoringIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52669123F6AA7009094CC /* MonitoringIcon.png */; };
+		76D5266E123F6AA7009094CC /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D5266A123F6AA7009094CC /* UpdatesIcon.png */; };
+		76D526EF123F71BC009094CC /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76D526EE123F71BC009094CC /* ShortcutRecorder.framework */; };
+		76D526FF123F7578009094CC /* ShortcutRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 76D526EE123F71BC009094CC /* ShortcutRecorder.framework */; };
 		76FADB701235596F0075EAC0 /* GitWrapperCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */; };
 		76FC45CF1236D67600C314A0 /* ProjectFilesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */; };
 		76FC45F21236E74700C314A0 /* FilesStager.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45F11236E74700C314A0 /* FilesStager.m */; };
@@ -47,8 +53,9 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 7;
+			dstSubfolderSpec = 10;
 			files = (
+				76D526FF123F7578009094CC /* ShortcutRecorder.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +113,11 @@
 		769C1D641239103E006B127D /* Highlight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Highlight.m; sourceTree = "<group>"; };
 		769C1F2912395774006B127D /* Commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commit.h; sourceTree = "<group>"; };
 		769C1F2A12395774006B127D /* Commit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Commit.m; sourceTree = "<group>"; };
+		76D52667123F6AA7009094CC /* GitSettingsIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitSettingsIcon.png; path = Images/Preferences/GitSettingsIcon.png; sourceTree = "<group>"; };
+		76D52668123F6AA7009094CC /* GlobalKeysIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GlobalKeysIcon.png; path = Images/Preferences/GlobalKeysIcon.png; sourceTree = "<group>"; };
+		76D52669123F6AA7009094CC /* MonitoringIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MonitoringIcon.png; path = Images/Preferences/MonitoringIcon.png; sourceTree = "<group>"; };
+		76D5266A123F6AA7009094CC /* UpdatesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpdatesIcon.png; path = Images/Preferences/UpdatesIcon.png; sourceTree = "<group>"; };
+		76D526EE123F71BC009094CC /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = "../shortcutrecorder-read-only/build/Release/ShortcutRecorder.framework"; sourceTree = SOURCE_ROOT; };
 		76FADB6E1235596F0075EAC0 /* GitWrapperCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitWrapperCommand.h; sourceTree = "<group>"; };
 		76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GitWrapperCommand.m; sourceTree = "<group>"; };
 		76FC45CD1236D67600C314A0 /* ProjectFilesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectFilesSource.h; sourceTree = "<group>"; };
@@ -123,6 +135,7 @@
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				76310F7D123A5CA60090CBFE /* Carbon.framework in Frameworks */,
+				76D526EF123F71BC009094CC /* ShortcutRecorder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,6 +181,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				76D526EE123F71BC009094CC /* ShortcutRecorder.framework */,
 				76310F7C123A5CA60090CBFE /* Carbon.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
@@ -238,6 +252,7 @@
 		766B5413123245F8008738D4 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				76D52666123F6A95009094CC /* Preferences */,
 				766B542C123246B5008738D4 /* GitBuddyLogoWide.png */,
 				766B541412324605008738D4 /* Git_72x25.png */,
 				766B541512324605008738D4 /* GitBuddy.icns */,
@@ -265,6 +280,17 @@
 				766B547212325E43008738D4 /* SBJsonWriter.m */,
 			);
 			path = JSON;
+			sourceTree = "<group>";
+		};
+		76D52666123F6A95009094CC /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				76D52667123F6AA7009094CC /* GitSettingsIcon.png */,
+				76D52668123F6AA7009094CC /* GlobalKeysIcon.png */,
+				76D52669123F6AA7009094CC /* MonitoringIcon.png */,
+				76D5266A123F6AA7009094CC /* UpdatesIcon.png */,
+			);
+			name = Preferences;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -322,6 +348,10 @@
 				766B542D123246B5008738D4 /* GitBuddyLogoWide.png in Resources */,
 				766B543B12325CCD008738D4 /* wrapper.py in Resources */,
 				766B55C912328322008738D4 /* UserDefaults.plist in Resources */,
+				76D5266B123F6AA7009094CC /* GitSettingsIcon.png in Resources */,
+				76D5266C123F6AA7009094CC /* GlobalKeysIcon.png in Resources */,
+				76D5266D123F6AA7009094CC /* MonitoringIcon.png in Resources */,
+				76D5266E123F6AA7009094CC /* UpdatesIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,6 +412,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../shortcutrecorder-read-only/build/Release\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -400,6 +434,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../shortcutrecorder-read-only/build/Release\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = GitBuddy_Prefix.pch;
