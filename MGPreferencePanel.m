@@ -23,7 +23,7 @@ NSString * const updatesIdentifier = @"Updates";
 NSString * const updatesIcon = @"UpdatesIcon";
 
 NSString * const keysIdentifier = @"Global Keys";
-NSString * const keysIcon = @"KeysIcon";
+NSString * const keysIcon = @"GlobalKeysIcon";
 
 
 
