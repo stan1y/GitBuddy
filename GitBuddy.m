@@ -21,28 +21,6 @@
 
 //	---	Keyboard Events processing
 
-- (NSUInteger)convertModifiers:(NSUInteger)mods
-{
-	static NSUInteger modToChar[4][2] =
-	{
-		{ cmdKey, 		NSCommandKeyMask },
-		{ optionKey,	NSAlternateKeyMask },
-		{ controlKey,	NSControlKeyMask },
-		{ shiftKey,		NSShiftKeyMask }
-	};
-	
-    NSUInteger i, ret = 0;
-	
-    for ( i = 0; i < 4; i++ )
-    {
-        if ( mods & modToChar[i][0] ) {
-            ret |= modToChar[i][1];
-        }
-    }
-	
-    return ret;
-}
-
 - (void) processKbdEvent:(NSEvent*)event
 {
 	ProjectBuddy *pbuddy = [self getActiveProjectBuddy];
@@ -51,11 +29,12 @@
 	NSDictionary* commitLogKey = [defaults dictionaryForKey:@"commitLogShortcut"]; 
 	NSDictionary* rescanKey = [defaults dictionaryForKey:@"rescanShortcut"];
 	
-	NSUInteger flags = [self convertModifiers:[event modifierFlags]];
+	NSUInteger flags = [event modifierFlags];
 	unsigned short keyCode = [event keyCode];
-	NSLog(@"Key %d, flags %d was pressed", keyCode, flags);
+	NSLog(@"Key %d, flags %X was pressed", keyCode, flags);
+	NSLog(@"stage flags: %X", [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue]);
 	
-	if ( (flags & [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue]) && (keyCode == [[stageFilesKey valueForKey:@"keyCode"] unsignedIntegerValue]) ) {
+	if ( ([[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[stageFilesKey valueForKey:@"keyCode"] unsignedIntegerValue]) ) {
 		if ( !pbuddy ) {
 			NSRunAlertPanel(@"GitBuddy cannot Stage Changed Files.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
@@ -63,7 +42,7 @@
 		[pbuddy stageSelectedFiles:nil];
 	}
 	
-	if ( (flags & [[commitLogKey objectForKey:@"modifierFlags"] unsignedIntValue]) && (keyCode == [[commitLogKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+	if ( ([[commitLogKey objectForKey:@"modifierFlags"] unsignedIntValue] == (flags & [[commitLogKey objectForKey:@"modifierFlags"] unsignedIntValue])) && (keyCode == [[commitLogKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
 		if ( !pbuddy ) {
 			NSRunAlertPanel(@"GitBuddy cannot display Commit Log.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
@@ -71,7 +50,7 @@
 		[pbuddy commitLog:nil];
 	}
 	
-	if ( (flags & [[rescanKey objectForKey:@"modifierFlags"] unsignedIntValue]) && (keyCode == [[rescanKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+	if ( ([[rescanKey objectForKey:@"modifierFlags"] unsignedIntValue] == (flags & [[rescanKey objectForKey:@"modifierFlags"] unsignedIntValue])) && (keyCode == [[rescanKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
 		if ( !pbuddy ) {
 			NSRunAlertPanel(@"GitBuddy cannot Rescan Project.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
