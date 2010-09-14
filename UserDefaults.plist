@@ -16,12 +16,51 @@
 	<string>/opt/local/bin/git</string>
 	<key>gitTimeout</key>
 	<integer>5</integer>
-	<key>stageFilesKeyCode</key>
-	<integer>1</integer>
-	<key>commitLogKeyCode</key>
-	<integer>37</integer>
-	<key>rescanKeyCode</key>
-	<integer>15</integer>
+	<key>commitLogShortcut</key>
+	<dict>
+		<key>characters</key>
+		<string>L</string>
+		<key>keyCode</key>
+		<integer>37</integer>
+		<key>modifierFlags</key>
+		<integer>1572864</integer>
+	</dict>
+	<key>stageFilesShortcut</key>
+	<dict>
+		<key>characters</key>
+		<string>S</string>
+		<key>keyCode</key>
+		<integer>1</integer>
+		<key>modifierFlags</key>
+		<integer>1572864</integer>
+	</dict>
+	<key>rescanShortcut</key>
+	<dict>
+		<key>characters</key>
+		<string>R</string>
+		<key>keyCode</key>
+		<integer>15</integer>
+		<key>modifierFlags</key>
+		<integer>1572864</integer>
+	</dict>
+	<key>addRepoShortcut</key>
+	<dict>
+		<key>characters</key>
+		<string>N</string>
+		<key>keyCode</key>
+		<integer>45</integer>
+		<key>modifierFlags</key>
+		<integer>1572864</integer>
+	</dict>
+	<key>cloneRepoShortcut</key>
+	<dict>
+		<key>characters</key>
+		<string>C</string>
+		<key>keyCode</key>
+		<integer>8</integer>
+		<key>modifierFlags</key>
+		<integer>1572864</integer>
+	</dict>
 	<key>gitCloneTimeout</key>
 	<integer>300</integer>
 	<key>lastEventId</key>
