@@ -10,11 +10,6 @@
 #import <Carbon/Carbon.h>
 #include <time.h>
 
-
-#define STAGE_FILES_CMD 1
-#define COMMIT_LOG_CMD 2
-
-
 // initial number of menu items in status menu
 #define MENUITEMS 5
 
@@ -32,7 +27,7 @@
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSDictionary* stageFilesKey = [defaults dictionaryForKey:@"stageFilesShortcut"];
 	NSDictionary* commitLogKey = [defaults dictionaryForKey:@"commitLogShortcut"]; 
-	NSDictionary* rescanKey = [defaults dictionaryForKey:@"rescanShortcut"]; u
+	NSDictionary* rescanKey = [defaults dictionaryForKey:@"rescanShortcut"];
 	
 	NSUInteger flags = [event modifierFlags];
 	unsigned short keyCode = [event keyCode];
