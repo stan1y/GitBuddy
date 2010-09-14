@@ -11,6 +11,7 @@
 #import "FilesStager.h"
 #import "Preview.h"
 #import "Commit.h"
+#import "Clone.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -37,6 +38,7 @@
 	FilesStager *filesStager;
 	Preview *preview;
 	Commit *commit;
+	Clone *clone;
 	
 	NSMenuItem *activeProject;
 }
@@ -48,6 +50,7 @@
 - (ProjectBuddy*) getActiveProjectBuddy;
 
 //assigned from nib
+@property (assign) IBOutlet Clone *clone;
 @property (assign) IBOutlet FilesStager *filesStager;
 @property (assign) IBOutlet Preview *preview;
 @property (assign) IBOutlet Commit *commit;

@@ -17,7 +17,7 @@
 
 @synthesize addRepoPanel, addRepoField;
 @synthesize queue;
-@synthesize filesStager, preview, commit;
+@synthesize filesStager, preview, commit, clone;
 
 //	---	Keyboard Events processing
 
@@ -28,13 +28,14 @@
 	NSDictionary* stageFilesKey = [defaults dictionaryForKey:@"stageFilesShortcut"];
 	NSDictionary* commitLogKey = [defaults dictionaryForKey:@"commitLogShortcut"]; 
 	NSDictionary* rescanKey = [defaults dictionaryForKey:@"rescanShortcut"];
+	NSDictionary* addRepoKey = [defaults dictionaryForKey:@"addRepoShortcut"];
+	NSDictionary* cloneRepoKey = [defaults dictionaryForKey:@"cloneRepoShortcut"];
 	
 	NSUInteger flags = [event modifierFlags];
 	unsigned short keyCode = [event keyCode];
 	NSLog(@"Key %d, flags %X was pressed", keyCode, flags);
-	NSLog(@"stage flags: %X", [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue]);
 	
-	if ( ([[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[stageFilesKey valueForKey:@"keyCode"] unsignedIntegerValue]) ) {
+	if ( ([[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[stageFilesKey valueForKey:@"keyCode"] unsignedShortValue]) ) {
 		if ( !pbuddy ) {
 			NSRunAlertPanel(@"GitBuddy cannot Stage Changed Files.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
@@ -42,7 +43,7 @@
 		[pbuddy stageSelectedFiles:nil];
 	}
 	
-	if ( ([[commitLogKey objectForKey:@"modifierFlags"] unsignedIntValue] == (flags & [[commitLogKey objectForKey:@"modifierFlags"] unsignedIntValue])) && (keyCode == [[commitLogKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+	if ( ([[commitLogKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[commitLogKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[commitLogKey valueForKey:@"keyCode"] unsignedShortValue]) ) {
 		if ( !pbuddy ) {
 			NSRunAlertPanel(@"GitBuddy cannot display Commit Log.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
@@ -50,12 +51,20 @@
 		[pbuddy commitLog:nil];
 	}
 	
-	if ( ([[rescanKey objectForKey:@"modifierFlags"] unsignedIntValue] == (flags & [[rescanKey objectForKey:@"modifierFlags"] unsignedIntValue])) && (keyCode == [[rescanKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+	if ( ([[rescanKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[rescanKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[rescanKey valueForKey:@"keyCode"] unsignedShortValue]) ) {
 		if ( !pbuddy ) {
 			NSRunAlertPanel(@"GitBuddy cannot Rescan Project.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
 		}
 		[pbuddy rescan:nil];
+	}
+	
+	if ( ([[addRepoKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[addRepoKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[addRepoKey valueForKey:@"keyCode"] unsignedShortValue]) ) {
+		[addRepoPanel orderFront:self];
+	}
+	
+	if ( ([[cloneRepoKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[cloneRepoKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[cloneRepoKey valueForKey:@"keyCode"] unsignedShortValue]) ) {
+		[[self clone] showWindow:self];
 	}
 }
 
