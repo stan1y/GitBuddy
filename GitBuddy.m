@@ -30,39 +30,36 @@
 {
 	ProjectBuddy *pbuddy = [self getActiveProjectBuddy];
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	int stageFilesKeyCode = [defaults integerForKey:@"stageFilesKeyCode"]; // "S" is 1 by default
-	int commitLogKeyCode = [defaults integerForKey:@"commitLogKeyCode"]; // "L" is 45 by default
-	int rescanKeyCode = [defaults integerForKey:@"rescanKeyCode"]; // "R" is 17 by default
-	NSLog(@"Defined Keys:");
-	NSLog(@"  %d - stage files", stageFilesKeyCode);
-	NSLog(@"  %d - commit log", commitLogKeyCode);
-	NSLog(@"  %d - rescan", rescanKeyCode);
+	NSDictionary* stageFilesKey = [defaults dictionaryForKey:@"stageFilesShortcut"];
+	NSDictionary* commitLogKey = [defaults dictionaryForKey:@"commitLogShortcut"]; 
+	NSDictionary* rescanKey = [defaults dictionaryForKey:@"rescanShortcut"]; u
 	
 	NSUInteger flags = [event modifierFlags];
 	unsigned short keyCode = [event keyCode];
 	NSLog(@"Key %d, flags %o was pressed", keyCode, flags);
-	if ( (flags & NSCommandKeyMask) && (flags & NSAlternateKeyMask) ) {
-		if ( keyCode == stageFilesKeyCode) {
-			if ( !pbuddy ) {
-				NSRunAlertPanel(@"GitBuddy cannot stage files.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
-				return;
-			}
-			[pbuddy stageSelectedFiles:nil];
+	
+	if ( (flags & [[stageFilesKey objectForKey:@"modifierFlags"] unsignedIntValue]) && (keyCode == [[stageFilesKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+		if ( !pbuddy ) {
+			NSRunAlertPanel(@"GitBuddy cannot Stage Changed Files.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
+			return;
 		}
-		else if (keyCode == commitLogKeyCode) {
-			if ( !pbuddy ) {
-				NSRunAlertPanel(@"GitBuddy cannot display commits log.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
-				return;
-			}
-			[pbuddy	commitLog:nil];
+		[pbuddy stageSelectedFiles:nil];
+	}
+	
+	if ( (flags & [[commitLogKey objectForKey:@"modifierFlags"] unsignedIntValue]) && (keyCode == [[commitLogKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+		if ( !pbuddy ) {
+			NSRunAlertPanel(@"GitBuddy cannot display Commit Log.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
+			return;
 		}
-		else if (keyCode == rescanKeyCode) {
-			if ( !pbuddy ) {
-				NSRunAlertPanel(@"GitBuddy cannot rescan repository.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
-				return;
-			}
-			[pbuddy rescan:nil];
+		[pbuddy commitLog:nil];
+	}
+	
+	if ( (flags & [[rescanKey objectForKey:@"modifierFlags"] unsignedIntValue]) && (keyCode == [[rescanKey objectForKey:@"keyCode"] unsignedShortValue]) ) {
+		if ( !pbuddy ) {
+			NSRunAlertPanel(@"GitBuddy cannot Rescan Project.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
+			return;
 		}
+		[pbuddy rescan:nil];
 	}
 }
 
