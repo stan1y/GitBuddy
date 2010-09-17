@@ -123,23 +123,49 @@
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 	NSString * pushArg = [NSString stringWithFormat:@"--push=%@", targetRemoteSource];
+	NSString * branchArg = [NSString stringWithFormat:@"--branch=%@", [self currentBranch]];
 	
 	int pushTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitPushTimeout"];
 	NSLog(@"Pushing changes with timeout %d seconds", pushTimeout);
 	
 	//show operation panel
-	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pushing commits in branch %@ to remote %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
+	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pushing commits in branch %@ to %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
 	
-	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pushArg, nil] timeoutAfter:pushTimeout withCompletionBlock:^ (NSDictionary *dict){
+	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pushArg, branchArg, nil] timeoutAfter:pushTimeout withCompletionBlock:^ (NSDictionary *dict){
+		[dict retain];
 		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
-			NSRunInformationalAlertPanel(@"Pushing commits finished", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
+			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
 		}
+		[dict release];
 	}];
 }
 - (IBAction) pull:(id)sender
-{}
+{
+	NSString *targetRemoteSource = [self getTargetRemoteSourceFor:@"push"];
+	
+	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+	NSString * pullArg = [NSString stringWithFormat:@"--pull=%@", targetRemoteSource];
+	NSString * branchArg = [NSString stringWithFormat:@"--branch=%@", [self currentBranch]];
+	
+	int pullTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitPullTimeout"];
+	NSLog(@"Pullinh changes with timeout %d seconds", pullTimeout);
+	
+	//show operation panel
+	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pulling changes in branch %@ from %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
+	
+	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pullArg, branchArg, nil] timeoutAfter:pullTimeout withCompletionBlock:^ (NSDictionary *dict){
+		[dict retain];
+		[ (GitBuddy*)[NSApp delegate] finishOperation];
+		
+		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
+			NSRunInformationalAlertPanel(@"Pull operation complete.", [NSString stringWithFormat:@"Changed in branch %@ were successfully pulled from %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
+		}
+		[dict release];
+	}];
+}
 - (IBAction) switchToSource:(id)sender
 {}
 - (IBAction) newSource:(id)sender

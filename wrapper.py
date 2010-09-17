@@ -163,8 +163,9 @@ if __name__ == '__main__':
 	parser.add_option("--commit", help="git commit -m [message]")
 	parser.add_option("--reset", help="git checkout [path]")
 	parser.add_option("--clone", help="git clone [url]\n --repo is used to specify PARENT folder of new repo.")
-	parser.add_option("--push", help="git push [remote]")
-	parser.add_option("--pull", help="git pull [remote]")
+	parser.add_option("--push", help="git push [remote] [branch]. Branch must specified with --branch=[name].")
+	parser.add_option("--pull", help="git pull [remote] [branch]. Branch must specified with --branch=[name].")
+	parser.add_option("--branch", help="Specify branch name for --push & --pull.")
 	
 	(options, args) = parser.parse_args()
 
@@ -250,12 +251,22 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 		
 	elif options.push:
-		obj = b_cmd_json(options.git, options.repo, ['push', options.push], {})
+		if not options.branch:
+			sys.stderr.write('--branch is required argument\n')
+			parser.print_help()
+			sys.exit(__ERR_USAGE)
+			
+		obj = b_cmd_json(options.git, options.repo, ['push', options.push, options.branch], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
 	elif options.pull:
-		obj = b_cmd_json(options.git, options.repo, ['pull', options.pull], {})
+		if not options.branch:
+			sys.stderr.write('--branch is required argument\n')
+			parser.print_help()
+			sys.exit(__ERR_USAGE)
+			
+		obj = b_cmd_json(options.git, options.repo, ['pull', options.pull, options.branch], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
