@@ -113,7 +113,7 @@
 				//check json answer
 				if ([[jsonObj objectForKey:@"giterr"] count] > 0 ){
 					NSLog(@"Git error: %@", [jsonObj objectForKey:@"giterr"]);
-					int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [jsonObj objectForKey:@"giterr"]], @"Terminate", @"Continue", nil);
+					int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [[jsonObj objectForKey:@"giterr"] componentsJoinedByString:@" "]], @"Terminate", @"Continue", nil);
 					
 					//terminate
 					if (rc == 1) {
