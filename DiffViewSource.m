@@ -63,17 +63,17 @@
 	}];
 }
 
-- (void) updateWithChangeset:(NSString *)filePath inPath:(NSString *)projectPath
+- (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath
 {
-	//scan remote, branch and changes
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
-	NSString * showArg = [NSString stringWithFormat:@"--show=%@", [gitObjectsIndex objectForKey:filePath] ];
+	NSString * diffArg = [NSString stringWithFormat:@"--diff=%@", filePath];
 	
 	[tableView setEnabled:NO];
 	[indicator setHidden:NO];
 	[indicator startAnimation:nil];
+	
 	GitWrapper * wrapper = [GitWrapper sharedInstance];
-	[wrapper executeGit:[NSArray arrayWithObjects:showArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 		if (currentSource) {
 			[currentSource release];
 		}
@@ -82,17 +82,18 @@
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
 		
-		NSLog(@"Reloading changes with changeset");
+		NSLog(@"Reloading changes with file diff");
 		currentSource = dict;
 		[currentSource retain];
 		[tableView reloadData];
 	}];
+	
 }
 
-- (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath
+- (void) updateWithCachedFileDiff:(NSString *)filePath inPath:(NSString *)projectPath
 {
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
-	NSString * diffArg = [NSString stringWithFormat:@"--diff=%@", filePath];
+	NSString * diffArg = [NSString stringWithFormat:@"--cached-diff=%@", filePath];
 	
 	[tableView setEnabled:NO];
 	[indicator setHidden:NO];

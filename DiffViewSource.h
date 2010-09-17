@@ -10,12 +10,12 @@
 
 //	Class implements table view source with
 //	diff contents either from:
-//	 * git show KEY
 //	 * git diff /repo/file/path
+//	 * git diff --cache /repo/file/path
+
 @interface DiffViewSource :  NSObject<NSTableViewDataSource> {
-	NSMutableDictionary *gitObjectsIndex;
 	NSDictionary *currentSource;
-	
+	NSMutableDictionary *gitObjectsIndex;
 	NSTableView *tableView;
 	NSProgressIndicator *indicator;
 }
@@ -24,10 +24,12 @@
 @property (assign) IBOutlet NSTableView *tableView;
 @property (assign) IBOutlet NSProgressIndicator *indicator;
 @property (retain, readonly) NSMutableDictionary *gitObjectsIndex;
+
+
 - (void) rebuildIndex:(NSString *)projectPath withCompletionBlock:(void (^)(void))codeBlock;
 
-- (void) updateWithChangeset:(NSString *)filePath inPath:(NSString *)projectPath;
 - (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath;
+- (void) updateWithCachedFileDiff:(NSString *)filePath inPath:(NSString *)projectPath;
 
 - (NSString *) stringAtIndex:(int)index;
 @end
