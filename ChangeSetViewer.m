@@ -11,29 +11,41 @@
 
 @implementation ChangeSetViewer
 
-@synthesize original, changed;
+@synthesize original, changed, projectPath;
 
-+ viewModified:(NSString *)original diffTo:(NSString *)changed
+- (void) dealloc
+{
+	[original release];
+	[changed release];
+	[projectPath release];
+	
+	[super dealloc];
+}
+
++ viewModified:(NSString *)original diffTo:(NSString *)changed project:(NSString*)project
 {
 	ChangeSetViewer * viewer = [[ChangeSetViewer alloc] init];
 	[viewer setOriginal:original];
 	[viewer setChanged:changed];
+	[viewer setProjectPath:project];
 	return viewer;
 }
 
-+ viewAdded:(NSString *)added
++ viewAdded:(NSString *)added project:(NSString*)project
 {
 	ChangeSetViewer * viewer = [[ChangeSetViewer alloc] init];
 	[viewer setOriginal:@"/dev/null"];
 	[viewer setChanged:added];
+	[viewer setProjectPath:project];
 	return viewer;
 }
 
-+ viewRemoved:(NSString *)removed
++ viewRemoved:(NSString *)removed project:(NSString*)project
 {
 	ChangeSetViewer * viewer = [[ChangeSetViewer alloc] init];
 	[viewer setOriginal:removed];
-	[viewer setChanged:removed];
+	[viewer setChanged:@"/dev/null"];
+	[viewer setProjectPath:project];
 	return viewer;
 }
 
@@ -45,6 +57,7 @@
 	[diffTask setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
 	[diffTask setStandardError:stderrPipe];
 	[diffTask setStandardOutput:stdoutPipe];
+	[diffTask setCurrentDirectoryPath:[self projectPath]];
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	
@@ -55,7 +68,7 @@
 		NSFileManager *fm = [NSFileManager defaultManager];
 		if (![fm fileExistsAtPath:@"/Developer/Applications/Utilities/FileMerge.app/Contents/MacOS/FileMerge"]) {
 			//FIXME: open prefs window
-			NSRunAlertPanel(@"X Code FileMerge tool not found.", @"Please specify custom diff & merge viewer in Git preferences, or install X Code from a Developer CD or developer.apple.com", @"Open Preferences", @"Continue", nil);
+			NSRunAlertPanel(@"X Code FileMerge tool not found.", @"Please specify custom diff & merge viewer in Git preferences, or install XCode from a Developer CD or download it from www.apple.com", @"Continue", nil, nil);
 			return;
 		}
 		
@@ -80,10 +93,13 @@
 		}
 	}
 	
-	NSLog(@"view changeset: %@ %@", [diffTask launchPath], [[diffTask arguments] componentsJoinedByString:@" "]);
+	NSLog(@"Launch external diff viewer: %@ %@", [diffTask launchPath], [[diffTask arguments] componentsJoinedByString:@" "]);
 	
 	[diffTask launch];
 	[diffTask waitUntilExit];
+	
+	NSLog(@"External diff viewer quited.");
+	
 	[diffTask release];
 }
 

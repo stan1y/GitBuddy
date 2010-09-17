@@ -11,7 +11,13 @@
 
 @interface Preview : NSWindowController<NSTabViewDelegate> {
 	DiffViewSource *changesSource;
+	
+	NSString *filePath;
+	NSString *projectPath;
 }
+
+@property (nonatomic, retain) NSString *filePath;
+@property (nonatomic, retain) NSString *projectPath;
 
 //assigned from nib
 @property (assign) IBOutlet DiffViewSource *changesSource;
@@ -24,5 +30,8 @@
 
 //table view highligth
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
+
+- (IBAction) showInExternalViewer:(id)sender;
+- (IBAction) resetChanges:(id)sender;
 
 @end

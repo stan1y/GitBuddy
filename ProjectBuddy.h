@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "ChangeSetViewer.h"
 #import "ProjectSubMenu.h"
 
 @interface ProjectBuddy : NSObject {

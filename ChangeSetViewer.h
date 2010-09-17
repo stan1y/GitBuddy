@@ -11,8 +11,10 @@
 @interface ChangeSetViewer : NSOperation {
 	NSString * original;
 	NSString * changed;
+	NSString * projectPath;
 }
 
+@property (nonatomic, retain) NSString * projectPath;
 @property (nonatomic, retain) NSString * original;
 @property (nonatomic, retain) NSString * changed;
 
@@ -20,14 +22,14 @@
 
 // original is a path to file that before edit
 // compared to file in current state
-+ viewModified:(NSString *)original diffTo:(NSString *)changed;
++ viewModified:(NSString *)original diffTo:(NSString *)changed project:(NSString*)project;
 
 // added is a path to file that was added
 // compared with /dev/null
-+ viewAdded:(NSString *)added;
++ viewAdded:(NSString *)added project:(NSString*)project;
 
 // removed is a path to file that was removed
 // compared with /dev/null
-+ viewRemoved:(NSString *)removed;
++ viewRemoved:(NSString *)removed project:(NSString*)project;
 
 @end
