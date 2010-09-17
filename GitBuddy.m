@@ -90,22 +90,16 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     GitBuddy *buddy = (GitBuddy *)userData;
 	size_t i;
     for(i=0; i < numEvents; i++){
-		NSLog(@"Received event %d, last %d", eventIds[i], [buddy lastEventId]);
-		if (eventIds[i] > [buddy lastEventId]) {
-			
-			[buddy setLastEventId:eventIds[i]];
-			NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
-			if ([paths isKindOfClass:[NSArray class]]) {
-				[buddy scanFsEventsAtPaths:(NSArray *)paths];
-			}
-			else {
-				[buddy scanFsEventsAtPaths:[NSArray arrayWithObject:paths]];
-			}
+		NSLog(@"Received event %d", eventIds[i]);
+		
+		[buddy setLastEventId:eventIds[i]];
+		NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
+		if ([paths isKindOfClass:[NSArray class]]) {
+			[buddy scanFsEventsAtPaths:(NSArray *)paths];
 		}
 		else {
-			NSLog(@"Skipping event %d", eventIds[i]);
+			[buddy scanFsEventsAtPaths:[NSArray arrayWithObject:paths]];
 		}
-
     }
 }
 
