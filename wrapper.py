@@ -154,7 +154,7 @@ if __name__ == '__main__':
 	parser.add_option("--branch-list", action="store_true", default=False, help="git branch")
 	parser.add_option("--branch-rm", help="git branch [name]")
 	parser.add_option("--branch-add", help="git branch -d [name]")
-	parser.add_option("--remote-list", action="store_true", default=False, help="git branch -r")
+	parser.add_option("--remote-list", action="store_true", default=False, help="git remote")
 	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
 	parser.add_option("--cached-diff", help="git diff --cached [path]")
 	parser.add_option("--diff", help="git diff [path]")
@@ -162,7 +162,9 @@ if __name__ == '__main__':
 	parser.add_option("--unstage", help="git reset HEAD [path]")
 	parser.add_option("--commit", help="git commit -m [message]")
 	parser.add_option("--reset", help="git checkout [path]")
-	parser.add_option("--clone", help="git clone [url]. --repo is used to specify PARENT folder of new repo.")
+	parser.add_option("--clone", help="git clone [url]\n --repo is used to specify PARENT folder of new repo.")
+	parser.add_option("--push", help="git push [remote]")
+	parser.add_option("--pull", help="git pull [remote]")
 	
 	(options, args) = parser.parse_args()
 
@@ -204,7 +206,7 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 	
 	elif options.remote_list:
-		obj = b_cmd_json(options.git, options.repo, ['branch', '-r'], __REMOTE_LIST_TOKENS)
+		obj = b_cmd_json(options.git, options.repo, ['remote'], __REMOTE_LIST_TOKENS)
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
@@ -244,6 +246,16 @@ if __name__ == '__main__':
 		
 	elif options.reset:
 		obj = b_cmd_json(options.git, options.repo, ['checkout', options.reset], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.push:
+		obj = b_cmd_json(options.git, options.repo, ['push', options.push], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.pull:
+		obj = b_cmd_json(options.git, options.repo, ['pull', options.pull], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
