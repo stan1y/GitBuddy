@@ -13,7 +13,7 @@
 @implementation ProjectBuddy
 
 @synthesize path, title, parentItem;
-@synthesize currentBranch;
+@synthesize currentBranch, currentRemote;
 
 // Dictionary management
 
@@ -40,6 +40,16 @@
 	
 	[itemLock unlock];
 }
+
+- (NSString*) getTargetRemoteSourceFor:(NSString*)opName
+{
+	if ([self currentRemote]) {
+		return [self currentRemote];
+	}
+	
+	//FIXME ask user to pick remote source for operation
+	return [self currentRemote];
+}
 					
 
 // Selectors
@@ -61,9 +71,19 @@
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
+			[self setCurrentBranch:[[[self itemDict] objectForKey:@"current_branch"] objectAtIndex:0]];
+			NSLog(@"Current branch is %@", [self currentBranch]);
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
+			if ([[[self itemDict] objectForKey:@"remote"] count] == 1) {
+				[self setCurrentRemote:[[[self itemDict] objectForKey:@"remote"] objectAtIndex:0]];
+				NSLog(@"Current remote source is %@", [self currentRemote]);
+			}
+			else {
+				[self setCurrentRemote:nil];
+			}
+
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
@@ -95,8 +115,30 @@
 {
 	[self rescanWithCompletionBlock: ^{}];
 }
+
 - (IBAction) push:(id)sender
-{}
+{
+	NSString *targetRemoteSource = [self getTargetRemoteSourceFor:@"push"];
+	
+	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+	NSString * pushArg = [NSString stringWithFormat:@"--push=%@", targetRemoteSource];
+	
+	
+	int pushTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitPushTimeout"];
+	NSLog(@"Pushing changes with timeout %d seconds", pushTimeout);
+	
+	//show operation panel
+	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pushing commits in branch %@ to remote %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
+	
+	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pushArg, nil] timeoutAfter:pushTimeout withCompletionBlock:^ (NSDictionary *dict){
+		[ (GitBuddy*)[NSApp delegate] finishOperation];
+		
+		if ([[dict valueForKey:@"gitrc"] intValue] == 0) {
+			NSRunInformationalAlertPanel(@"Pushing commits finished", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
+		}
+	}];
+}
 - (IBAction) pull:(id)sender
 {}
 - (IBAction) switchToSource:(id)sender

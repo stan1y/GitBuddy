@@ -39,7 +39,9 @@
 	
 	NSString * path;
 	NSString * title;
+	
 	NSString * currentBranch;
+	NSString * currentRemote;
 	
 	// Project data dict
 	NSMutableDictionary * itemDict;
@@ -50,6 +52,7 @@
 
 @property (nonatomic, retain, readonly) NSDictionary * itemDict;
 @property (nonatomic, retain) NSString * currentBranch;
+@property (nonatomic, retain) NSString * currentRemote;
 @property (nonatomic, retain) NSString * path;
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) NSMenuItem * parentItem;
