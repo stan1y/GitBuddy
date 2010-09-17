@@ -15,15 +15,14 @@
 
 - (void) loadPreviewOf:(NSString *)file inPath:(NSString*)path
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"Preview of %@", [path stringByAppendingPathComponent:file]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Changes in %@", [path stringByAppendingPathComponent:file]]];
 	[changesSource updateWithFileDiff:file inPath:path];
 }
 
 - (void) loadChangeSetOf:(NSString *)file inPath:(NSString*)path
 {
-	[changesSource rebuildIndex:path withCompletionBlock: ^{
-		[changesSource updateWithChangeset:file inPath:path];
-	}];
+	[[self window] setTitle:[NSString stringWithFormat:@"Staged changes in %@", [path stringByAppendingPathComponent:file]]];
+	[changesSource updateWithCachedFileDiff:file inPath:path];
 }
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
