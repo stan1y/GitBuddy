@@ -124,7 +124,6 @@
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 	NSString * pushArg = [NSString stringWithFormat:@"--push=%@", targetRemoteSource];
 	
-	
 	int pushTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitPushTimeout"];
 	NSLog(@"Pushing changes with timeout %d seconds", pushTimeout);
 	
@@ -134,7 +133,7 @@
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pushArg, nil] timeoutAfter:pushTimeout withCompletionBlock:^ (NSDictionary *dict){
 		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
-		if ([[dict valueForKey:@"gitrc"] intValue] == 0) {
+		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			NSRunInformationalAlertPanel(@"Pushing commits finished", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
 		}
 	}];

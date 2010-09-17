@@ -34,7 +34,6 @@
 	stdoutPipe = [[NSPipe alloc] init];
 	stderrPipe = [[NSPipe alloc] init];
 	gitWrapper = [[NSTask alloc] init];
-	[gitWrapper setEnvironment:[NSDictionary dictionary]];
 	
 	[gitWrapper setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
 	[gitWrapper setStandardError:stderrPipe];
@@ -111,7 +110,7 @@
 				[self setJsonResult:jsonObj];
 				
 				//check json answer
-				if ([[jsonObj objectForKey:@"giterr"] count] > 0 ){
+				if ([[jsonObj objectForKey:@"giterr"] count] > 0 && [[jsonObj objectForKey:@"gitrc"] intValue] != 0 ){
 					NSLog(@"Git error: %@", [jsonObj objectForKey:@"giterr"]);
 					int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[jsonObj objectForKey:@"gitrc"] intValue], [[jsonObj objectForKey:@"giterr"] componentsJoinedByString:@" "]], @"Terminate", @"Continue", nil);
 					
