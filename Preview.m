@@ -57,20 +57,29 @@
 - (IBAction) showInExternalViewer:(id)sender
 {
 	//FIXME : won't work for anything except git difftool
+	
 	ChangeSetViewer *viewer = [ChangeSetViewer viewModified:@"/dev/null" diffTo:[self filePath] project:[self projectPath]];
 	[[(GitBuddy*)[NSApp delegate] queue] addOperation:viewer];
 	[viewer release];
+	
+	[[self window] performClose:sender];
 }
 
 - (IBAction) resetChanges:(id)sender
 {
-	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	int rc = NSRunAlertPanel(@"Resetting changes in file", [NSString stringWithFormat:@"You are about to dismiss all changes you've made to %@. Are you sure about it?", [self filePath]] , @"Yes", @"No", nil);
 	
-	NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [self projectPath]];
-	NSString *resetArg = [NSString stringWithFormat:@"--reset=%@", [self filePath]];
-	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, resetArg, nil] withCompletionBlock:^(NSDictionary *dict){
-		NSLog(@"File %@ was reset to HEAD", [self filePath]);
-	}];
+	if (rc == 1) {
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
+		
+		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [self projectPath]];
+		NSString *resetArg = [NSString stringWithFormat:@"--reset=%@", [self filePath]];
+		[wrapper executeGit:[NSArray arrayWithObjects:repoArg, resetArg, nil] withCompletionBlock:^(NSDictionary *dict){
+			NSLog(@"File %@ was reset to HEAD", [self filePath]);
+		}];
+		
+		[[self window] performClose:sender];
+	}
 }
 
 @end
