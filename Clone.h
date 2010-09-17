@@ -20,15 +20,10 @@ enum RepoProtocolType {
 	NSButton *httpBtn;
 	NSButton *cloneBtn;
 	
-	NSProgressIndicator *indicator;
-	NSTextField *msg;
-	
 	int repoType;
 }
 
 //assigned from nib
-@property (assign) IBOutlet NSProgressIndicator *indicator;
-@property (assign) IBOutlet NSTextField *msg;
 @property (assign) IBOutlet NSButton *cloneBtn;
 @property (assign) IBOutlet NSButton *sshBtn;
 @property (assign) IBOutlet NSButton *httpBtn;

@@ -18,6 +18,7 @@
 @synthesize addRepoPanel, addRepoField;
 @synthesize queue;
 @synthesize filesStager, preview, commit, clone;
+@synthesize operationPanel, operationDescription, operationIndicator;
 
 //	---	Keyboard Events processing
 
@@ -412,6 +413,9 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[addRepoPanel release];
 	[queue release];
 	[queuedEvents release];
+	[operationPanel release];
+	[operationDescription release];
+	[operationIndicator release];
 
 	[super dealloc];
 }
@@ -494,6 +498,22 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[activeProject setState:YES];
 		NSLog(@"Project %@ is active now.", [activeProject title]);
 	}
+}
+
+//	-- Operation Panel
+
+- (void) startOperation:(NSString*)description
+{
+	[operationDescription setStringValue:description];
+	[operationIndicator startAnimation:nil];
+	[operationPanel orderFront:nil];
+}
+
+- (void) finishOperation
+{
+	[operationDescription setStringValue:@""];
+	[operationIndicator stopAnimation:nil];
+	[operationPanel orderOut:nil];
 }
 
 @end

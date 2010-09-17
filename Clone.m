@@ -14,7 +14,6 @@
 
 @synthesize repoUrl, repoLocalPath;
 @synthesize sshBtn, httpBtn, cloneBtn;
-@synthesize indicator, msg;
 
 - (void) awakeFromNib
 {
@@ -61,27 +60,28 @@
 }
 
 - (IBAction) cloneRepo:(id)sender
-{
+{	
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", [repoLocalPath stringValue]];
 	NSString * cloneArg = [NSString stringWithFormat:@"--clone=%@", [repoUrl stringValue]];
 	NSArray * urlParts = [[NSURL URLWithString:[repoUrl stringValue]] pathComponents];
 	NSString * repoPath = [[repoLocalPath stringValue] stringByAppendingPathComponent:[[urlParts objectAtIndex:[urlParts count] - 1] stringByDeletingPathExtension]];
 	
-	[indicator setHidden:NO];
-	[indicator startAnimation:sender];
-	[msg setHidden:NO];
-	[msg setStringValue:[NSString stringWithFormat:@"Cloning %@...", repoPath]];
-	
 	int cloneTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitCloneTimeout"];
 	NSLog(@"Cloning repo with timeout %d seconds", cloneTimeout);
+	
+	//close dialog
+	[[self window] performClose:sender];
+	
+	//show operation panel
+	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Cloning %@. It may take a while, please wait...", [repoUrl stringValue]]];
+	
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, cloneArg, nil] timeoutAfter:cloneTimeout withCompletionBlock:^ (NSDictionary *dict){
-		[indicator stopAnimation:sender];
-		[indicator setHidden:YES];
-		[msg setHidden:YES];
+		
+		//hide operation panel
+		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
-			
 			
 			GitBuddy *buddy = (GitBuddy*)[NSApp delegate];
 			
@@ -93,12 +93,9 @@
 				NSRunInformationalAlertPanel(@"GitBuddy successfully cloned repository.", [NSString stringWithFormat:@"New repository was cloned to %@ and set as Active Project.", repoPath], @"Continue", nil, nil);
 			}
 			else {
-				NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor. Cloning failed someway.", @"Continue", nil, nil);
+				NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor. Cloning failed in some way.", @"Continue", nil, nil);
 			}
 		}
-		
-		//close dialog
-		[[self window] performClose:sender];
 	}];
 
 }

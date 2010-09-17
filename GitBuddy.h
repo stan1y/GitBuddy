@@ -40,6 +40,10 @@
 	Commit *commit;
 	Clone *clone;
 	
+	NSPanel *operationPanel;
+	NSTextField *operationDescription;
+	NSProgressIndicator *operationIndicator;
+	
 	NSMenuItem *activeProject;
 }
 
@@ -54,6 +58,10 @@
 @property (assign) IBOutlet FilesStager *filesStager;
 @property (assign) IBOutlet Preview *preview;
 @property (assign) IBOutlet Commit *commit;
+
+@property (assign) IBOutlet NSPanel *operationPanel;
+@property (assign) IBOutlet NSTextField *operationDescription;
+@property (assign) IBOutlet NSProgressIndicator *operationIndicator;
 
 @property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addRepoField;
@@ -71,7 +79,9 @@
 - (IBAction) addRepo:(id)sender;
 - (IBAction) showGitManual:(id)sender;
 - (IBAction) checkUpdates:(id)sender;
-//- (IBAction) rescanRepos:(id)sender;
+
+- (void) startOperation:(NSString*)description;
+- (void) finishOperation;
 
 //projects counters
 - (void) setCounter:(int)changed forProject:(NSString*)path;
