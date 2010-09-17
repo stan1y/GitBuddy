@@ -146,7 +146,7 @@ if __name__ == '__main__':
 	parser.add_option("--branch-add", help="git branch -d [name]")
 	parser.add_option("--remote-list", action="store_true", default=False, help="git branch -r")
 	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
-	parser.add_option("--show", help="git show [key]")
+	parser.add_option("--cached-diff", help="git diff --cached [path]")
 	parser.add_option("--diff", help="git diff [path]")
 	parser.add_option("--stage", help="git stage [path]")
 	parser.add_option("--unstage", help="git reset HEAD [path]")
@@ -202,13 +202,13 @@ if __name__ == '__main__':
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
-	elif options.show:
-		obj = b_cmd_lines(options.git, options.repo, ['show', options.show])
+	elif options.diff:
+		obj = b_cmd_lines(options.git, options.repo, ['diff', options.diff])
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
-	elif options.diff:
-		obj = b_cmd_lines(options.git, options.repo, ['diff', options.diff])
+	elif options.cached_diff:
+		obj = b_cmd_lines(options.git, options.repo, ['diff', '--cached', options.cached_diff])
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
