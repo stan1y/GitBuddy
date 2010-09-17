@@ -50,40 +50,38 @@
 	[stagedView registerForDraggedTypes:[NSArray arrayWithObject:@"StageItem"]];
 	[unstagedView registerForDraggedTypes:[NSArray arrayWithObject:@"StageItem"]];
 	
-	[changesSource rebuildIndex:[project objectForKey:@"path"] withCompletionBlock: ^{
-		[stagedView setEnabled:YES];
-		[unstagedView setEnabled:YES];
+	//load project files to table views
+	[stagedSource loadProjectData:[project objectForKey:@"staged"] forPath:[project objectForKey:@"path"]];
+	[unstagedSource loadProjectData:[project objectForKey:@"unstaged"] forPath:[project objectForKey:@"path"]];
+	
+	if ([[[project objectForKey:@"unstaged"] objectForKey:@"count"] intValue] > 0) {
 		
-		//load project files to table views
-		[stagedSource loadProjectData:[project objectForKey:@"staged"] forPath:[project objectForKey:@"path"]];
-		[unstagedSource loadProjectData:[project objectForKey:@"unstaged"] forPath:[project objectForKey:@"path"]];
-
-		if ([[[project objectForKey:@"unstaged"] objectForKey:@"count"] intValue] > 0) {
+		//copy unstaged file
+		if (stage) {
+			[stagedSource copyFilesFrom:unstagedSource];
 			
-			//copy unstaged file
-			if (stage) {
-				[stagedSource copyFilesFrom:unstagedSource];
-				
-				//select file in staged, since all is copied
-				[stagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-				[self tableView:stagedView shouldSelectRow:0];
-			}
-			else {
-				//select in unstaged
-				[unstagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-				[self tableView:unstagedView shouldSelectRow:0];
-			}
-		}
-		else if ([[[project objectForKey:@"staged"] objectForKey:@"count"] intValue] > 0) {
-			
-			//no unstaged, select in staged
+			//select file in staged, since all is copied
 			[stagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 			[self tableView:stagedView shouldSelectRow:0];
 		}
+		else {
+			//select in unstaged
+			[unstagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+			[self tableView:unstagedView shouldSelectRow:0];
+		}
+	}
+	else if ([[[project objectForKey:@"staged"] objectForKey:@"count"] intValue] > 0) {
 		
-		[stagedView reloadData];
-		[unstagedView reloadData];
-	}];
+		//no unstaged, select in staged
+		[stagedView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+		[self tableView:stagedView shouldSelectRow:0];
+	}
+	
+	[stagedView setEnabled:YES];
+	[unstagedView setEnabled:YES];
+	
+	[stagedView reloadData];
+	[unstagedView reloadData];
 }
 
 - (NSDictionary *) filesToStage
@@ -203,7 +201,7 @@
 		
 		if ([stagedGroup indexOfObject:file] != NSNotFound && ![(ProjectFilesSource*)[stagedView dataSource] isForeignFile:file]) {
 			//belongs to staged
-			[changesSource updateWithChangeset:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+			[changesSource updateWithCachedFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
 		}
 		else {
 			//belongs to unstaged
@@ -218,7 +216,7 @@
 			[changesSource updateWithFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
 		}
 		else {
-			[changesSource updateWithChangeset:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
+			[changesSource updateWithCachedFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
 		}
 
 	}
