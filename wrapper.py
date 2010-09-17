@@ -6,6 +6,7 @@ import inspect
 import subprocess
 import json
 import re
+import time
 from optparse import OptionParser
 
 __debug = False
@@ -44,6 +45,15 @@ __ERR_USAGE = -1
 
 def b_cmd(git, repo, command, gitspec = True):
 	repo = os.path.abspath(repo)
+	
+	while True:
+		if os.path.exists(os.path.join(repo, '.git', 'index.lock')):
+			log('index is locked, waiting...')
+			time.sleep(1)
+		else:
+			log('index is not locked')
+			break
+	
 	if gitspec:
 		cmdline = [git, '--work-tree=%s' % repo, '--git-dir=%s' % os.path.join(repo, '.git')]
 	else:
@@ -151,6 +161,7 @@ if __name__ == '__main__':
 	parser.add_option("--stage", help="git stage [path]")
 	parser.add_option("--unstage", help="git reset HEAD [path]")
 	parser.add_option("--commit", help="git commit -m [message]")
+	parser.add_option("--reset", help="git checkout [path]")
 	parser.add_option("--clone", help="git clone [url]. --repo is used to specify PARENT folder of new repo.")
 	
 	(options, args) = parser.parse_args()
@@ -228,6 +239,11 @@ if __name__ == '__main__':
 		
 	elif options.commit:
 		obj = b_cmd_json(options.git, options.repo, ['commit', '-m', '%s' % options.commit], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.reset:
+		obj = b_cmd_json(options.git, options.repo, ['checkout', options.reset], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
