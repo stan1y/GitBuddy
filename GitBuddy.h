@@ -44,6 +44,15 @@
 	NSTextField *operationDescription;
 	NSProgressIndicator *operationIndicator;
 	
+	NSPanel *newBranchPanel;
+	NSTextField *newBranchName;
+	ProjectBuddy *newBranchProject;
+	
+	NSPanel *newRemotePanel;
+	NSTextField *newRemoteName;
+	NSTextField *newRemoteURL;
+	ProjectBuddy *newRemoteProject;
+	
 	NSMenuItem *activeProject;
 }
 
@@ -63,6 +72,13 @@
 @property (assign) IBOutlet NSTextField *operationDescription;
 @property (assign) IBOutlet NSProgressIndicator *operationIndicator;
 
+@property (assign) IBOutlet NSPanel *newBranchPanel;
+@property (assign) IBOutlet NSTextField *newBranchName;
+
+@property (assign) IBOutlet NSPanel *newRemotePanel;
+@property (assign) IBOutlet NSTextField *newRemoteURL;
+@property (assign) IBOutlet NSTextField *newRemoteName;
+
 @property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addRepoField;
 @property (assign) IBOutlet NSPanel *addRepoPanel;
@@ -79,6 +95,12 @@
 - (IBAction) addRepo:(id)sender;
 - (IBAction) showGitManual:(id)sender;
 - (IBAction) checkUpdates:(id)sender;
+
+- (void) createBranchFor:(ProjectBuddy*)buddy;
+- (void) createRemoteFor:(ProjectBuddy*)buddy;
+
+- (IBAction) createBranch:(id)sender;
+- (IBAction) createRemote:(id)sender;
 
 - (void) startOperation:(NSString*)description;
 - (void) finishOperation;

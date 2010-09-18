@@ -7,6 +7,7 @@
 //
 
 #import "GitBuddy.h"
+#import "GitWrapper.h"
 #import <Carbon/Carbon.h>
 #include <time.h>
 
@@ -19,6 +20,8 @@
 @synthesize queue;
 @synthesize filesStager, preview, commit, clone;
 @synthesize operationPanel, operationDescription, operationIndicator;
+@synthesize newRemotePanel, newRemoteName, newRemoteURL;
+@synthesize newBranchPanel, newBranchName;
 
 //	---	Keyboard Events processing
 
@@ -282,7 +285,60 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	return validPath;
 }
 
+//	--- Branches & Remotes
+
+- (void) createBranchFor:(ProjectBuddy*)buddy
+{
+	newBranchProject = buddy;
+	[newBranchPanel orderFront:self];
+}
+
+- (void) createRemoteFor:(ProjectBuddy*)buddy
+{
+	newRemoteProject = buddy;
+	[newRemotePanel orderFront:self];
+}
+
 //	--- UI Callbacks
+
+- (IBAction) createBranch:(id)sender
+{
+	if (newBranchProject && [[newBranchName stringValue] length]) {
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
+		
+		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [newBranchProject path]];
+		NSString *branchArg = [NSString stringWithFormat:@"--branch-add=%@", [newBranchName stringValue]];
+		[wrapper executeGit:[NSArray arrayWithObjects:repoArg, branchArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+			
+			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
+				NSRunInformationalAlertPanel(@"New Branch Created.", [NSString stringWithFormat:@"A New branch %@ was created as set as current branch for project %@", [newBranchName stringValue], [newBranchProject path]], @"All Right", nil, nil);
+			}
+			
+			//done with project
+			newBranchProject = nil;
+		}];
+	}
+}
+
+- (IBAction) createRemote:(id)sender
+{
+	if (newRemoteProject && [[newRemoteName stringValue] length] && [[newRemoteURL stringValue] length]) {
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
+		
+		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [newRemoteProject path]];
+		NSString *remoteArg = [NSString stringWithFormat:@"--remote-add=%@", [newRemoteName stringValue]];
+		NSString *urlArg = [NSString stringWithFormat:@"--url=%@", [newRemoteURL stringValue]];
+		[wrapper executeGit:[NSArray arrayWithObjects:repoArg, remoteArg, urlArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+			
+			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
+				NSRunInformationalAlertPanel(@"New Remote Source Configured.", [NSString stringWithFormat:@"A New remote source %@ was added with name %@ to project %@", [newRemoteURL stringValue], [newRemoteName stringValue], [newBranchProject path]], @"All Right", nil, nil);
+			}
+			
+			//done with project
+			newRemoteProject = nil;
+		}];
+	}
+}
 
 - (IBAction) checkUpdates:(id)sender
 {
@@ -413,9 +469,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[addRepoPanel release];
 	[queue release];
 	[queuedEvents release];
+	
 	[operationPanel release];
 	[operationDescription release];
 	[operationIndicator release];
+	
+	[newBranchPanel release];
+	[newBranchName release];
 
 	[super dealloc];
 }
