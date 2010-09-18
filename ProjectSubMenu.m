@@ -72,15 +72,42 @@
 
 - (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel
 {
-	if (index >= itemsInitially) {
+	if (index >= itemsInitially && index < itemsInitially + [self totalNumberOfFiles]) {
 		NSString *itemPath = @"";
+		BOOL isFile = NO;
 		
-		//whenever we read files from staged/unstaged of from untracked
-		if ([data objectForKey:@"files"]) {
+		NSLog(@"Data: %@", data);
+		
+		// Check what are we going to list here
+		// whenever we read files from staged/unstaged, untracked, branch list or remote list
+		if ( [data objectForKey:@"branch"] ) {
+			
+			// Branches list
+			
+			itemPath = [[data objectForKey:@"branch"] objectAtIndex:(index - itemsInitially)];
+			[item setTitle:itemPath];
+		}
+		else if ( [data objectForKey:@"source"] ) {
+			
+			// Remotes list
+			
+			itemPath = [[data objectForKey:@"source"] objectAtIndex:(index - itemsInitially)];
+			[item setTitle:itemPath];
+			
+		}
+		else if ([data objectForKey:@"files"]) {
+			
+			// Untracked files list
+			isFile = YES;
+			
 			itemPath = [[data objectForKey:@"files"] objectAtIndex:(index - itemsInitially)];
 			[item setTitle:[NSString stringWithFormat:@"%@", itemPath]];
 		}
 		else {
+			
+			//Changed files list with groups
+			isFile = YES;
+			
 			NSArray *modified = [data objectForKey:@"modified"];
 			NSArray *added = [data objectForKey:@"added"];
 			NSArray *removed = [data objectForKey:@"removed"];
@@ -112,11 +139,13 @@
 		[item setTarget:itemTarget];
 		
 		//set icon
-		[item setState:YES];
-		NSString * filePath = [project stringByAppendingPathComponent:itemPath];
-		NSImage *img = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
-		[img setSize:NSMakeSize(16, 16)];
-		[item setOnStateImage:img];
+		if (isFile) {
+			[item setState:YES];
+			NSString * filePath = [project stringByAppendingPathComponent:itemPath];
+			NSImage *img = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
+			[img setSize:NSMakeSize(16, 16)];
+			[item setOnStateImage:img];
+		}
 	}
 	
 	return YES;
