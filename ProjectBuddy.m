@@ -15,6 +15,7 @@
 @synthesize path, title, parentItem;
 @synthesize currentBranch, currentRemote;
 
+
 // Dictionary management
 
 - (NSDictionary*) itemDict
@@ -71,13 +72,13 @@
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			[self setCurrentBranch:[[[self itemDict] objectForKey:@"current_branch"] objectAtIndex:0]];
+			[self setCurrentBranch:[[[[self itemDict] objectForKey:@"branches"] objectForKey:@"current_branch"] objectAtIndex:0]];
 			NSLog(@"Current branch is %@", [self currentBranch]);
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			if ([[[self itemDict] objectForKey:@"remote"] count] == 1) {
-				[self setCurrentRemote:[[[self itemDict] objectForKey:@"remote"] objectAtIndex:0]];
+			if ([[[[self itemDict] objectForKey:@"sources"] objectForKey:@"count"] intValue] == 1) {
+				[self setCurrentRemote:[[[[self itemDict] objectForKey:@"sources"] objectForKey:@"source"] objectAtIndex:0]];
 				NSLog(@"Current remote source is %@", [self currentRemote]);
 			}
 			else {
@@ -169,11 +170,15 @@
 - (IBAction) switchToSource:(id)sender
 {}
 - (IBAction) newSource:(id)sender
-{}
+{
+	[ (GitBuddy*)[NSApp delegate] createRemoteFor:self];
+}
 - (IBAction) switchToBranch:(id)sender
 {}
 - (IBAction) newBranch:(id)sender
-{}
+{
+	[ (GitBuddy*)[NSApp delegate] createBranchFor:self];
+}
 - (IBAction) commitLog:(id)sender
 {}
 - (IBAction) commit:(id)sender
@@ -242,31 +247,9 @@
 	[changedSubMenu setData:[[self itemDict] objectForKey:@"unstaged"]];
 	[stagedSubMenu setData:[[self itemDict] objectForKey:@"staged"]];
 	[untrackedSubMenu setData:[[self itemDict] objectForKey:@"untracked"]];
-	
-	//branch list
-	if ([[branchMenu itemArray] count] > 2) {
-		for(int i=2; i<[[branchMenu itemArray] count]; i++) {
-			[branchMenu removeItemAtIndex:i];
-		}
-	}
-	for(NSString * br in [[self itemDict] objectForKey:@"branches"]) {
-		NSMenuItem *b = [[NSMenuItem alloc] initWithTitle:br action:@selector(switchToBranch:) keyEquivalent:[NSString string]];
-		[b setTarget:self];
-		[branchMenu addItem:b];
-	}
-	
-	//remote branch list
-	if ([[remoteMenu itemArray] count] > 2) {
-		for(int i=2; i<[[remoteMenu itemArray] count]; i++) {
-			[remoteMenu removeItemAtIndex:i];
-		}
-	}
-	for(NSString * rt in [[self itemDict] objectForKey:@"remote"]) {
-		NSMenuItem *r = [[NSMenuItem alloc] initWithTitle:rt action:@selector(switchToSource:) keyEquivalent:[NSString string]];
-		[r setTarget:self];
-		[remoteMenu addItem:r];
-	}
-	
+	[branchSubMenu setData:[[self itemDict] objectForKey:@"branches"]];
+	[remoteSubMenu setData:[[self itemDict] objectForKey:@"sources"]];
+		
 	//set number of modified and staged files
 	if ([changedSubMenu totalNumberOfFiles]) {
 		[changed setTitle:[NSString stringWithFormat:@"Changed (%d)", [changedSubMenu totalNumberOfFiles] ]];
@@ -337,27 +320,27 @@
 	
 	//branch menu
 	branchMenu = [[NSMenu alloc] init];
+	branchSubMenu = [[ProjectSubMenu alloc] initProject:aPath withDict:[[self itemDict] objectForKey:@"branches"] forMenu:branchMenu];
 	branch = [[NSMenuItem alloc] initWithTitle:@"Branch" action:nil keyEquivalent:[NSString string]];
-	[branch setSubmenu:branchMenu];
-	[parentMenu addItem:branch];
-	//new branch
 	NSMenuItem *newBranch = [[NSMenuItem alloc] initWithTitle:@"New Branch" action:@selector(newBranch:) keyEquivalent:[NSString string]];
 	[newBranch setTarget:self];
-	[branchMenu addItem:newBranch];
-	//separator
-	[branchMenu addItem:[NSMenuItem separatorItem]];
+	[branchSubMenu setInitialItems:[NSArray arrayWithObjects:newBranch, [NSMenuItem separatorItem], nil]];
+	[branchSubMenu setItemSelector:@selector(switchToBranch:) target:self];
+	[branch setSubmenu:branchMenu];
+	[branchMenu setDelegate:branchSubMenu];
+	[parentMenu addItem:branch];
 	
 	//remote menu
 	remoteMenu = [[NSMenu alloc] init];
+	remoteSubMenu = [[ProjectSubMenu alloc] initProject:aPath withDict:[[self itemDict] objectForKey:@"sources"] forMenu:remoteMenu];
 	remote = [[NSMenuItem alloc] initWithTitle:@"Remote" action:nil keyEquivalent:[NSString string]];
-	[remote setSubmenu:remoteMenu];
-	[parentMenu addItem:remote];
-	//new remote
-	NSMenuItem *newRemote = [[NSMenuItem alloc] initWithTitle:@"Add Remote Branch" action:@selector(newSource:) keyEquivalent:[NSString string]];
+	NSMenuItem *newRemote = [[NSMenuItem alloc] initWithTitle:@"Add Source" action:@selector(newSource:) keyEquivalent:[NSString string]];
 	[newRemote setTarget:self];
-	[remoteMenu addItem:newRemote];
-	//separator
-	[remoteMenu addItem:[NSMenuItem separatorItem]];	
+	[remoteSubMenu setInitialItems:[NSArray arrayWithObjects:newRemote, [NSMenuItem separatorItem], nil]];
+	[remoteSubMenu setItemSelector:@selector(switchToSource:) target:self];
+	[remote setSubmenu:remoteMenu];
+	[remoteMenu setDelegate:remoteSubMenu];
+	[parentMenu addItem:remote];
 	
 	//changed menu
 	changedMenu = [[NSMenu alloc] init];
@@ -412,6 +395,7 @@
 	[rescan setTarget:self];
 	[parentMenu addItem:rescan];
 	
+	//remote repo
 	remove = [[NSMenuItem alloc] initWithTitle:@"Remove Repo" action:@selector(remove:) keyEquivalent:[NSString string]];
 	[remove setTarget:self];
 	[parentMenu addItem:remove];

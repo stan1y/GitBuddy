@@ -16,9 +16,11 @@
 	
 	NSMenuItem *branch;
 	NSMenu *branchMenu;
+	ProjectSubMenu *branchSubMenu;
 	
 	NSMenuItem *remote;
 	NSMenu *remoteMenu;
+	ProjectSubMenu *remoteSubMenu;
 	
 	NSMenuItem *changed;
 	NSMenu *changedMenu;
