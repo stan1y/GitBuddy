@@ -29,11 +29,11 @@ __UNTRACKED_STATUS = {
 
 __BRANCH_LIST_TOKENS = {
 	'current_branch'	: '(?<=\*\s)\S+',
-	'branches'			: '(?:.\S+)\S+'
+	'branch'			: '(?:.\S+)\S+'
 }
 
 __REMOTE_LIST_TOKENS = {
-	'remote'			: '(?:.\S+)\S+'
+	'source'			: '(?:.\S+)\S+'
 }
 
 __LS_FILES_INDEX = {
@@ -151,18 +151,29 @@ if __name__ == '__main__':
 	parser.add_option("--repo", help="path to git repository")
 	parser.add_option("--git", help="path to git binary, default is /opt/local/bin/git")
 	parser.add_option("--status", action="store_true", default=False, help="git status")
+	
 	parser.add_option("--branch-list", action="store_true", default=False, help="git branch")
-	parser.add_option("--branch-rm", help="git branch [name]")
-	parser.add_option("--branch-add", help="git branch -d [name]")
+	parser.add_option("--branch-rm", help="git branch -d [name]")
+	parser.add_option("--branch-add", help="git branch [name]")
+	
 	parser.add_option("--remote-list", action="store_true", default=False, help="git remote")
+	parser.add_option("--remote-add", help="git remote add [name] [url]")
+	parser.add_option("--remote-rm", help="git remote rm [name]")
+	parser.add_option("--url", help="A URL for remote source, used in --remote-add")
+	
 	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
+	
 	parser.add_option("--cached-diff", help="git diff --cached [path]")
 	parser.add_option("--diff", help="git diff [path]")
+	
 	parser.add_option("--stage", help="git stage [path]")
 	parser.add_option("--unstage", help="git reset HEAD [path]")
+	
 	parser.add_option("--commit", help="git commit -m [message]")
 	parser.add_option("--reset", help="git checkout [path]")
+	
 	parser.add_option("--clone", help="git clone [url]\n --repo is used to specify PARENT folder of new repo.")
+	
 	parser.add_option("--push", help="git push [remote] [branch]. Branch must specified with --branch=[name].")
 	parser.add_option("--pull", help="git pull [remote] [branch]. Branch must specified with --branch=[name].")
 	parser.add_option("--branch", help="Specify branch name for --push & --pull.")
@@ -170,9 +181,7 @@ if __name__ == '__main__':
 	(options, args) = parser.parse_args()
 
 	if not options.repo:
-		sys.stderr.write('--repo is required argument\n')
-		parser.print_help()
-		sys.exit(__ERR_USAGE)
+		options.repo = "."
 	
 	if not options.git:
 		options.git = "/opt/local/bin/git"
@@ -192,7 +201,12 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 	
 	elif options.branch_list:
-		obj = b_cmd_json(options.git, options.repo, ['branch'], __BRANCH_LIST_TOKENS)
+		obj = b_cmd_json_parts(options.git, options.repo, ['branch'], {
+			'branches'	: ['',	__BRANCH_LIST_TOKENS]
+		})
+		#there is one item "current_branch" which
+		#should not affect total items count
+		obj['branches']['count'] -= 1
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 			
@@ -207,7 +221,24 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 	
 	elif options.remote_list:
-		obj = b_cmd_json(options.git, options.repo, ['remote'], __REMOTE_LIST_TOKENS)
+		obj = b_cmd_json_parts(options.git, options.repo, ['remote'], {
+			'sources'	: ['',	__REMOTE_LIST_TOKENS]
+		})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.remote_add:
+		if not options.url:
+			parser.print_help()
+			sys.stderr.write('--url is required argument\n')
+			sys.exit(__ERR_USAGE)
+		
+		obj = b_cmd_json(options.git, options.repo, ['remote', 'add', options.remote_add, options.url], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.remote_rm:
+		obj = b_cmd_json(options.git, options.repo, ['remote', 'rm', options.remote_rm], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
@@ -252,8 +283,8 @@ if __name__ == '__main__':
 		
 	elif options.push:
 		if not options.branch:
-			sys.stderr.write('--branch is required argument\n')
 			parser.print_help()
+			sys.stderr.write('--branch is required argument\n')
 			sys.exit(__ERR_USAGE)
 			
 		obj = b_cmd_json(options.git, options.repo, ['push', options.push, options.branch], {})
@@ -262,8 +293,8 @@ if __name__ == '__main__':
 		
 	elif options.pull:
 		if not options.branch:
-			sys.stderr.write('--branch is required argument\n')
 			parser.print_help()
+			sys.stderr.write('--branch is required argument\n')
 			sys.exit(__ERR_USAGE)
 			
 		obj = b_cmd_json(options.git, options.repo, ['pull', options.pull, options.branch], {})
@@ -277,4 +308,4 @@ if __name__ == '__main__':
 		
 	else:
 		parser.print_help()
-		sys.exit(1)
+		sys.exit(0)
