@@ -22,6 +22,7 @@
 @synthesize operationPanel, operationDescription, operationIndicator;
 @synthesize newRemotePanel, newRemoteName, newRemoteURL;
 @synthesize newBranchPanel, newBranchName;
+@synthesize lastUpdatedOn, appVersion, updater;
 
 //	---	Keyboard Events processing
 
@@ -344,10 +345,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 }
 
-- (IBAction) checkUpdates:(id)sender
-{
-}
-
 - (IBAction) showGitManual:(id)sender
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -413,6 +410,18 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 {
 	NSLog(@"Starting GitBuddy!");
 	
+	//set updates info
+	NSDate *date = [updater lastUpdateCheckDate];
+	if (date) {
+		[[self lastUpdatedOn] setStringValue:[NSString stringWithFormat:@"Last updated on %@", [date description] ]];
+	}
+	else {
+		[[self lastUpdatedOn] setStringValue:@"Never updated."];
+	}
+	
+	//set version
+	[[self appVersion] setStringValue:@"Current version is 1.0.0 Beta 1"];
+
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
 	[self setLastEventId:[[defaults objectForKey:@"lastEventId"] unsignedLongLongValue]];
 	NSLog(@"Last event id: %d", lastEventId);
