@@ -45,6 +45,10 @@ __LS_FILES_INDEX = {
 	'files'		: '(?:\t\S*)$'
 }
 
+__LOG_TOKENS = {
+	'author'	: '(?<=Author: )\w+'
+}
+
 __ERR_USAGE = -1
 
 def b_cmd(git, repo, command, gitspec = True):
@@ -184,6 +188,8 @@ if __name__ == '__main__':
 	parser.add_option("--pull", help="git pull [remote] [branch]. Branch must specified with --branch=[name].")
 	parser.add_option("--branch", help="Specify branch name for --push & --pull.")
 	
+	parser.add_option("--log", help="git log [branch name]")
+	
 	(options, args) = parser.parse_args()
 
 	if not options.repo:
@@ -321,6 +327,11 @@ if __name__ == '__main__':
 		rc, out, err = b_cmd_chdir(options.git, options.repo, ['clone', options.clone], gitspec = False);
 		sys.stdout.write(json.dumps({ 'gitrc' : rc, 'giterr' : err}))
 		sys.exit(rc)
+		
+	elif options.log:
+		obj = b_cmd_json(options.git, options.repo, ['log', options.log], __LOG_TOKENS)
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
 		
 	else:
 		parser.print_help()
