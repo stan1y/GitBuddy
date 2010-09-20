@@ -43,7 +43,6 @@
 	NSString * title;
 	
 	NSString * currentBranch;
-	NSString * currentRemote;
 	
 	// Project data dict
 	NSMutableDictionary * itemDict;
@@ -54,7 +53,6 @@
 
 @property (nonatomic, retain, readonly) NSDictionary * itemDict;
 @property (nonatomic, retain) NSString * currentBranch;
-@property (nonatomic, retain) NSString * currentRemote;
 @property (nonatomic, retain) NSString * path;
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) NSMenuItem * parentItem;
@@ -67,6 +65,9 @@
 
 - (void) rescanWithCompletionBlock:(void (^)(void))codeBlock;
 
+//push commits
+- (void) pushToNamedSource:(NSString*)source;
+
 // Selectors
 - (IBAction) addFile:(id)sender;
 - (IBAction) remove:(id)sender;
@@ -78,7 +79,7 @@
 - (IBAction) switchToBranch:(id)sender;
 - (IBAction) newBranch:(id)sender;
 
-- (IBAction) switchToSource:(id)sender;
+- (IBAction) pushToSource:(id)sender;
 - (IBAction) newSource:(id)sender;
 
 - (IBAction) stageSelectedFiles:(id)sender;

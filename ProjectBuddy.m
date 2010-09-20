@@ -13,7 +13,7 @@
 @implementation ProjectBuddy
 
 @synthesize path, title, parentItem;
-@synthesize currentBranch, currentRemote;
+@synthesize currentBranch;
 
 
 // Dictionary management
@@ -42,14 +42,16 @@
 	[itemLock unlock];
 }
 
-- (NSString*) getTargetRemoteSourceFor:(NSString*)opName
+- (NSString*) getSourceForBranch:(NSString*)branchName
 {
-	if ([self currentRemote]) {
-		return [self currentRemote];
+	for (NSString *rbranch in [[self itemDict] objectForKey:@"rbranch"]) {
+		if ([rbranch hasSuffix:branchName]) {
+			NSRange r = [rbranch rangeOfString:@"/"];
+			NSString *source = [rbranch substringToIndex:r.location];
+			return source;
+		}
 	}
-	
-	//FIXME ask user to pick remote source for operation
-	return [self currentRemote];
+	return nil;
 }
 					
 
@@ -77,14 +79,9 @@
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			if ([[[[self itemDict] objectForKey:@"sources"] objectForKey:@"count"] intValue] == 1) {
-				[self setCurrentRemote:[[[[self itemDict] objectForKey:@"sources"] objectForKey:@"source"] objectAtIndex:0]];
-				NSLog(@"Current remote source is %@", [self currentRemote]);
-			}
-			else {
-				[self setCurrentRemote:nil];
-			}
-
+		}];
+		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			[self mergeData:dict];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
@@ -117,34 +114,47 @@
 	[self rescanWithCompletionBlock: ^{}];
 }
 
-- (IBAction) push:(id)sender
+- (void) pushToNamedSource:(NSString*)source
 {
-	NSString *targetRemoteSource = [self getTargetRemoteSourceFor:@"push"];
-	
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
-	NSString * pushArg = [NSString stringWithFormat:@"--push=%@", targetRemoteSource];
+	NSString * pushArg = [NSString stringWithFormat:@"--push=%@", source];
 	NSString * branchArg = [NSString stringWithFormat:@"--branch=%@", [self currentBranch]];
 	
 	int pushTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitPushTimeout"];
 	NSLog(@"Pushing changes with timeout %d seconds", pushTimeout);
 	
 	//show operation panel
-	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pushing commits in branch %@ to %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
+	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pushing commits in branch %@ to %@. It may take a while, please wait...", [self currentBranch], source]];
 	
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pushArg, branchArg, nil] timeoutAfter:pushTimeout withCompletionBlock:^ (NSDictionary *dict){
 		[dict retain];
 		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
-			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
+			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], source] , @"All right", nil, nil);
 		}
 		[dict release];
 	}];
 }
+
+- (IBAction) push:(id)sender
+{
+	NSString *targetRemoteSource = [self getSourceForBranch:[self currentBranch]];
+	if ( !targetRemoteSource) {
+		NSRunAlertPanel(@"No destination known.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to push too. You need to add a remote source with target branch", [self currentBranch]], @"Ok", nil, nil);
+		return;
+	}
+	
+	[self pushToNamedSource:targetRemoteSource];
+}
 - (IBAction) pull:(id)sender
 {
-	NSString *targetRemoteSource = [self getTargetRemoteSourceFor:@"push"];
+	NSString *targetRemoteSource = [self getSourceForBranch:[self currentBranch]];
+	if ( !targetRemoteSource) {
+		NSRunAlertPanel(@"No destination known.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to pull from. You need to add a remote source with target branch.", [self currentBranch]], @"Ok", nil, nil);
+		return;
+	}
 	
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
@@ -152,7 +162,7 @@
 	NSString * branchArg = [NSString stringWithFormat:@"--branch=%@", [self currentBranch]];
 	
 	int pullTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitPullTimeout"];
-	NSLog(@"Pullinh changes with timeout %d seconds", pullTimeout);
+	NSLog(@"Pulling changes with timeout %d seconds", pullTimeout);
 	
 	//show operation panel
 	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pulling changes in branch %@ from %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
@@ -167,14 +177,32 @@
 		[dict release];
 	}];
 }
-- (IBAction) switchToSource:(id)sender
-{}
+- (IBAction) pushToSource:(id)sender
+{
+	NSString *source = [sender representedObject];
+	int rc = NSRunInformationalAlertPanel([NSString stringWithFormat:@"Push %@ to %@", [self currentBranch], source], [NSString stringWithFormat:@"You are about to push your commits in branch %@ to remote source %@. Are you sure about it?", [self currentBranch], source], @"Yes", @"No", nil);
+	
+	if (rc == 1) {
+		[self pushToNamedSource:source];
+	}
+}
+
 - (IBAction) newSource:(id)sender
 {
 	[ (GitBuddy*)[NSApp delegate] createRemoteFor:self];
 }
 - (IBAction) switchToBranch:(id)sender
-{}
+{
+	NSString *b = [sender representedObject];
+	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
+	NSString * switchArg = [NSString stringWithFormat:@"--branch-switch=%@", b];
+	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, switchArg, nil] withCompletionBlock:^(NSDictionary *dict){
+		
+		[self setCurrentBranch:b];
+		NSLog(@"Switched to branch %@", b);
+	}];
+}
 - (IBAction) newBranch:(id)sender
 {
 	[ (GitBuddy*)[NSApp delegate] createBranchFor:self];
@@ -249,7 +277,12 @@
 	[untrackedSubMenu setData:[[self itemDict] objectForKey:@"untracked"]];
 	[branchSubMenu setData:[[self itemDict] objectForKey:@"branches"]];
 	[remoteSubMenu setData:[[self itemDict] objectForKey:@"sources"]];
-		
+	
+	//set current branch
+	if ([self currentBranch]) {
+		[branchSubMenu setCheckedItems:[NSArray arrayWithObject:[self currentBranch]]];
+	}
+	
 	//set number of modified and staged files
 	if ([changedSubMenu totalNumberOfFiles]) {
 		[changed setTitle:[NSString stringWithFormat:@"Changed (%d)", [changedSubMenu totalNumberOfFiles] ]];
@@ -337,7 +370,7 @@
 	NSMenuItem *newRemote = [[NSMenuItem alloc] initWithTitle:@"Add Source" action:@selector(newSource:) keyEquivalent:[NSString string]];
 	[newRemote setTarget:self];
 	[remoteSubMenu setInitialItems:[NSArray arrayWithObjects:newRemote, [NSMenuItem separatorItem], nil]];
-	[remoteSubMenu setItemSelector:@selector(switchToSource:) target:self];
+	[remoteSubMenu setItemSelector:@selector(pushToSource:) target:self];
 	[remote setSubmenu:remoteMenu];
 	[remoteMenu setDelegate:remoteSubMenu];
 	[parentMenu addItem:remote];
