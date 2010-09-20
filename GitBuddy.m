@@ -420,7 +420,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 	
 	//set version
-	[[self appVersion] setStringValue:@"Current version is 1.0.0 Beta 1"];
+	[[self appVersion] setStringValue:[NSString stringWithFormat:@"Your version is %@ (%@)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]];
 
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
 	[self setLastEventId:[[defaults objectForKey:@"lastEventId"] unsignedLongLongValue]];
