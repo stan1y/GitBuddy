@@ -304,8 +304,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 - (IBAction) createBranch:(id)sender
 {
 	if (newBranchProject && [[newBranchName stringValue] length]) {
-		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		
+		[newBranchPanel orderOut:sender];
+		
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [newBranchProject path]];
 		NSString *branchArg = [NSString stringWithFormat:@"--branch-add=%@", [newBranchName stringValue]];
 		[wrapper executeGit:[NSArray arrayWithObjects:repoArg, branchArg, nil] withCompletionBlock:^(NSDictionary *dict) {
@@ -323,8 +325,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 - (IBAction) createRemote:(id)sender
 {
 	if (newRemoteProject && [[newRemoteName stringValue] length] && [[newRemoteURL stringValue] length]) {
-		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		
+		[newRemotePanel orderOut:sender];
+		
+		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [newRemoteProject path]];
 		NSString *remoteArg = [NSString stringWithFormat:@"--remote-add=%@", [newRemoteName stringValue]];
 		NSString *urlArg = [NSString stringWithFormat:@"--url=%@", [newRemoteURL stringValue]];
