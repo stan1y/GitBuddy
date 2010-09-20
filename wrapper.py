@@ -36,6 +36,10 @@ __REMOTE_LIST_TOKENS = {
 	'source'			: '(?:.\S+)\S+'
 }
 
+__REMOTE_BRANCH_TOKENS = {
+	'rbranch'			: '(?:.\S+)\S+'
+}
+
 __LS_FILES_INDEX = {
 	'keys'		: '(?:\s\S*)\s',
 	'files'		: '(?:\t\S*)$'
@@ -155,7 +159,9 @@ if __name__ == '__main__':
 	parser.add_option("--branch-list", action="store_true", default=False, help="git branch")
 	parser.add_option("--branch-rm", help="git branch -d [name]")
 	parser.add_option("--branch-add", help="git branch [name]")
+	parser.add_option("--branch-switch", help="git checkout [name]")
 	
+	parser.add_option("--remote-branch-list", action="store_true", default=False, help="git branch -r")
 	parser.add_option("--remote-list", action="store_true", default=False, help="git remote")
 	parser.add_option("--remote-add", help="git remote add [name] [url]")
 	parser.add_option("--remote-rm", help="git remote rm [name]")
@@ -217,6 +223,16 @@ if __name__ == '__main__':
 	
 	elif options.branch_add:
 		obj = b_cmd_json(options.git, options.repo, ['branch', options.branch_add], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.branch_switch:
+		obj = b_cmd_json(options.git, options.repo, ['checkout', options.branch_switch], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+	
+	elif options.remote_branch_list:
+		obj = b_cmd_json(options.git, options.repo, ['branch', '-r'], __REMOTE_BRANCH_TOKENS)
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 	
