@@ -54,6 +54,10 @@
 	ProjectBuddy *newRemoteProject;
 	
 	NSMenuItem *activeProject;
+	
+	NSTextField *lastUpdatedOn;
+	NSTextField *appVersion;
+	id updater;
 }
 
 //Events thread implementation
@@ -63,6 +67,9 @@
 - (ProjectBuddy*) getActiveProjectBuddy;
 
 //assigned from nib
+@property (assign) IBOutlet id updater;
+@property (assign) IBOutlet NSTextField *lastUpdatedOn;
+@property (assign) IBOutlet NSTextField *appVersion;
 @property (assign) IBOutlet Clone *clone;
 @property (assign) IBOutlet FilesStager *filesStager;
 @property (assign) IBOutlet Preview *preview;
@@ -94,7 +101,6 @@
 - (IBAction) browseForRepo:(id)sender;
 - (IBAction) addRepo:(id)sender;
 - (IBAction) showGitManual:(id)sender;
-- (IBAction) checkUpdates:(id)sender;
 
 - (void) createBranchFor:(ProjectBuddy*)buddy;
 - (void) createRemoteFor:(ProjectBuddy*)buddy;
