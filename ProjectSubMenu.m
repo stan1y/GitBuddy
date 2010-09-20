@@ -34,6 +34,11 @@
 	return self;
 }
 
+- (void) setCheckedItems:(NSArray*)items
+{
+	checkedItems = [items copy];
+}
+
 - (void) setData:(NSDictionary *)dict
 {
 	if (data) {
@@ -138,7 +143,7 @@
 		[item setAction:itemSelector];
 		[item setTarget:itemTarget];
 		
-		//set icon
+		//file with icon or checked item?
 		if (isFile) {
 			[item setState:YES];
 			NSString * filePath = [project stringByAppendingPathComponent:itemPath];
@@ -146,6 +151,13 @@
 			[img setSize:NSMakeSize(16, 16)];
 			[item setOnStateImage:img];
 		}
+		else if ([checkedItems count] && [checkedItems indexOfObject:itemPath] != NSNotFound) {
+			[item setState:YES];
+		}
+		else {
+			[item setState:NO];
+		}
+
 	}
 	
 	return YES;
