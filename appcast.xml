@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>GitBuddy Changelog</title>
+      <link>http://www.endlessinsomnia.com/updates/GitBuddy/appcast.xml</link>
+      <description>Most recent changes with links to updates.</description>
+      <language>en</language>
+         <item>
+			<title>GitBuddy Beta 1 Release!</title>
+			<sparkle:releaseNotesLink>http://www.endlessinsomnia.com/updates/gitbuddy/ReleaseNotes.html#version-90</sparkle:releaseNotesLink>
+			<pubDate>Mon, 20 Sep 2010 23:25:14 +0530</pubDate>
+			<enclosure
+				url="http://www.endlessinsomnia.com/updates/gitbuddy/GitBuddy Beta 1.zip"
+				sparkle:version="Beta 1"
+				type="application/octet-stream"
+				length="928352"
+				sparkle:dsaSignature="MC0CFQCyLBzebUUe0NlPi8+PQyMmPh5UrgIUd1GMP6MpfqpvioRAWlIrVn8HZqg="
+			/>
+		</item>
+   </channel>
+</rss>
+
+
+
