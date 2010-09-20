@@ -31,6 +31,57 @@
 		766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
 		766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
 		767E35191237CD2A009AB7D6 /* DiffViewSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767E35181237CD2A009AB7D6 /* DiffViewSource.m */; };
+		768D9FF41247D1A2008D71AF /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF31247D1A2008D71AF /* appcast.xml */; };
+		768D9FF61247D1C4008D71AF /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF51247D1C4008D71AF /* dsa_pub.pem */; };
+		768D9FF81247D1CF008D71AF /* ReleaseNotes.html in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF71247D1CF008D71AF /* ReleaseNotes.html */; };
+		768DA02E1247D6CB008D71AF /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */; };
+		768DA0391247D6CF008D71AF /* ShortcutRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */; };
+		768DA04D1247D8DF008D71AF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		768DA04E1247D8DF008D71AF /* GitBuddy.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* GitBuddy.xib */; };
+		768DA04F1247D8DF008D71AF /* Git_72x25.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541412324605008738D4 /* Git_72x25.png */; };
+		768DA0501247D8DF008D71AF /* GitBuddy.icns in Resources */ = {isa = PBXBuildFile; fileRef = 766B541512324605008738D4 /* GitBuddy.icns */; };
+		768DA0511247D8DF008D71AF /* GitBuddyLogo_512.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541612324605008738D4 /* GitBuddyLogo_512.png */; };
+		768DA0521247D8DF008D71AF /* GitBuddyLogo_512.psd in Resources */ = {isa = PBXBuildFile; fileRef = 766B541712324605008738D4 /* GitBuddyLogo_512.psd */; };
+		768DA0531247D8DF008D71AF /* StatusIconBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541812324605008738D4 /* StatusIconBlack.png */; };
+		768DA0541247D8DF008D71AF /* StatusIconGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541912324605008738D4 /* StatusIconGreen.png */; };
+		768DA0551247D8DF008D71AF /* GitBuddyLogoWide.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B542C123246B5008738D4 /* GitBuddyLogoWide.png */; };
+		768DA0561247D8DF008D71AF /* wrapper.py in Resources */ = {isa = PBXBuildFile; fileRef = 766B543A12325CCD008738D4 /* wrapper.py */; };
+		768DA0571247D8DF008D71AF /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 766B55C812328322008738D4 /* UserDefaults.plist */; };
+		768DA0581247D8DF008D71AF /* GitSettingsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52667123F6AA7009094CC /* GitSettingsIcon.png */; };
+		768DA0591247D8DF008D71AF /* GlobalKeysIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52668123F6AA7009094CC /* GlobalKeysIcon.png */; };
+		768DA05A1247D8DF008D71AF /* MonitoringIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52669123F6AA7009094CC /* MonitoringIcon.png */; };
+		768DA05B1247D8DF008D71AF /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D5266A123F6AA7009094CC /* UpdatesIcon.png */; };
+		768DA05C1247D8DF008D71AF /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF31247D1A2008D71AF /* appcast.xml */; };
+		768DA05D1247D8DF008D71AF /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF51247D1C4008D71AF /* dsa_pub.pem */; };
+		768DA05E1247D8DF008D71AF /* ReleaseNotes.html in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF71247D1CF008D71AF /* ReleaseNotes.html */; };
+		768DA0601247D8DF008D71AF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		768DA0611247D8DF008D71AF /* GitBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* GitBuddy.m */; };
+		768DA0621247D8DF008D71AF /* GitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B543812324DA2008738D4 /* GitWrapper.m */; };
+		768DA0631247D8DF008D71AF /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B546A12325E43008738D4 /* NSObject+SBJSON.m */; };
+		768DA0641247D8DF008D71AF /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B546C12325E43008738D4 /* NSString+SBJSON.m */; };
+		768DA0651247D8DF008D71AF /* SBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B546E12325E43008738D4 /* SBJsonBase.m */; };
+		768DA0661247D8DF008D71AF /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B547012325E43008738D4 /* SBJsonParser.m */; };
+		768DA0671247D8DF008D71AF /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B547212325E43008738D4 /* SBJsonWriter.m */; };
+		768DA0681247D8DF008D71AF /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
+		768DA0691247D8DF008D71AF /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
+		768DA06A1247D8DF008D71AF /* GitWrapperCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */; };
+		768DA06B1247D8DF008D71AF /* ProjectSubMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */; };
+		768DA06C1247D8DF008D71AF /* ProjectFilesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */; };
+		768DA06D1247D8DF008D71AF /* FilesStager.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45F11236E74700C314A0 /* FilesStager.m */; };
+		768DA06E1247D8DF008D71AF /* DiffViewSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767E35181237CD2A009AB7D6 /* DiffViewSource.m */; };
+		768DA06F1247D8DF008D71AF /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D4612390D1E006B127D /* Preview.m */; };
+		768DA0701247D8DF008D71AF /* Highlight.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D641239103E006B127D /* Highlight.m */; };
+		768DA0711247D8DF008D71AF /* Commit.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1F2A12395774006B127D /* Commit.m */; };
+		768DA0721247D8DF008D71AF /* Clone.m in Sources */ = {isa = PBXBuildFile; fileRef = 763110E3123A79D60090CBFE /* Clone.m */; };
+		768DA0731247D8DF008D71AF /* MGPreferencePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7649A7F8123E6BC300D365AF /* MGPreferencePanel.m */; };
+		768DA0751247D8DF008D71AF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		768DA0761247D8DF008D71AF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76310F7C123A5CA60090CBFE /* Carbon.framework */; };
+		768DA0781247D8DF008D71AF /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */; };
+		768DA07A1247D8DF008D71AF /* ShortcutRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */; };
+		768DA11D1247E516008D71AF /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768DA11C1247E516008D71AF /* Sparkle.framework */; };
+		768DA11E1247E517008D71AF /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768DA11C1247E516008D71AF /* Sparkle.framework */; };
+		768DA11F1247E52A008D71AF /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 768DA11C1247E516008D71AF /* Sparkle.framework */; };
+		768DA1201247E52E008D71AF /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 768DA11C1247E516008D71AF /* Sparkle.framework */; };
 		769C1D4712390D1E006B127D /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D4612390D1E006B127D /* Preview.m */; };
 		769C1D651239103E006B127D /* Highlight.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D641239103E006B127D /* Highlight.m */; };
 		769C1F2B12395774006B127D /* Commit.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1F2A12395774006B127D /* Commit.m */; };
@@ -38,8 +89,6 @@
 		76D5266C123F6AA7009094CC /* GlobalKeysIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52668123F6AA7009094CC /* GlobalKeysIcon.png */; };
 		76D5266D123F6AA7009094CC /* MonitoringIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52669123F6AA7009094CC /* MonitoringIcon.png */; };
 		76D5266E123F6AA7009094CC /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D5266A123F6AA7009094CC /* UpdatesIcon.png */; };
-		76D526EF123F71BC009094CC /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76D526EE123F71BC009094CC /* ShortcutRecorder.framework */; };
-		76D526FF123F7578009094CC /* ShortcutRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 76D526EE123F71BC009094CC /* ShortcutRecorder.framework */; };
 		76FADB701235596F0075EAC0 /* GitWrapperCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */; };
 		76FC45CF1236D67600C314A0 /* ProjectFilesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */; };
 		76FC45F21236E74700C314A0 /* FilesStager.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45F11236E74700C314A0 /* FilesStager.m */; };
@@ -55,7 +104,19 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				76D526FF123F7578009094CC /* ShortcutRecorder.framework in CopyFiles */,
+				768DA11F1247E52A008D71AF /* Sparkle.framework in CopyFiles */,
+				768DA0391247D6CF008D71AF /* ShortcutRecorder.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		768DA0791247D8DF008D71AF /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				768DA1201247E52E008D71AF /* Sparkle.framework in CopyFiles */,
+				768DA07A1247D8DF008D71AF /* ShortcutRecorder.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,6 +168,12 @@
 		766B59561233A86C008738D4 /* ChangeSetViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeSetViewer.m; sourceTree = "<group>"; };
 		767E35171237CD2A009AB7D6 /* DiffViewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiffViewSource.h; sourceTree = "<group>"; };
 		767E35181237CD2A009AB7D6 /* DiffViewSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiffViewSource.m; sourceTree = "<group>"; };
+		768D9FF31247D1A2008D71AF /* appcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
+		768D9FF51247D1C4008D71AF /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
+		768D9FF71247D1CF008D71AF /* ReleaseNotes.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReleaseNotes.html; sourceTree = "<group>"; };
+		768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShortcutRecorder.framework; sourceTree = "<group>"; };
+		768DA0801247D8DF008D71AF /* GitBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		768DA11C1247E516008D71AF /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		769C1D4512390D1E006B127D /* Preview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preview.h; sourceTree = "<group>"; };
 		769C1D4612390D1E006B127D /* Preview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preview.m; sourceTree = "<group>"; };
 		769C1D631239103E006B127D /* Highlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Highlight.h; sourceTree = "<group>"; };
@@ -117,7 +184,6 @@
 		76D52668123F6AA7009094CC /* GlobalKeysIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GlobalKeysIcon.png; path = Images/Preferences/GlobalKeysIcon.png; sourceTree = "<group>"; };
 		76D52669123F6AA7009094CC /* MonitoringIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MonitoringIcon.png; path = Images/Preferences/MonitoringIcon.png; sourceTree = "<group>"; };
 		76D5266A123F6AA7009094CC /* UpdatesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpdatesIcon.png; path = Images/Preferences/UpdatesIcon.png; sourceTree = "<group>"; };
-		76D526EE123F71BC009094CC /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = "../shortcutrecorder-read-only/build/Release/ShortcutRecorder.framework"; sourceTree = SOURCE_ROOT; };
 		76FADB6E1235596F0075EAC0 /* GitWrapperCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitWrapperCommand.h; sourceTree = "<group>"; };
 		76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GitWrapperCommand.m; sourceTree = "<group>"; };
 		76FC45CD1236D67600C314A0 /* ProjectFilesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectFilesSource.h; sourceTree = "<group>"; };
@@ -129,13 +195,25 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		768DA0741247D8DF008D71AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768DA0751247D8DF008D71AF /* Cocoa.framework in Frameworks */,
+				768DA0761247D8DF008D71AF /* Carbon.framework in Frameworks */,
+				768DA0781247D8DF008D71AF /* ShortcutRecorder.framework in Frameworks */,
+				768DA11E1247E517008D71AF /* Sparkle.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D11072E0486CEB800E47090 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				76310F7D123A5CA60090CBFE /* Carbon.framework in Frameworks */,
-				76D526EF123F71BC009094CC /* ShortcutRecorder.framework in Frameworks */,
+				768DA02E1247D6CB008D71AF /* ShortcutRecorder.framework in Frameworks */,
+				768DA11D1247E516008D71AF /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,7 +259,8 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				76D526EE123F71BC009094CC /* ShortcutRecorder.framework */,
+				768DA11C1247E516008D71AF /* Sparkle.framework */,
+				768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */,
 				76310F7C123A5CA60090CBFE /* Carbon.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
@@ -202,6 +281,7 @@
 			isa = PBXGroup;
 			children = (
 				8D1107320486CEB800E47090 /* GitBuddy.app */,
+				768DA0801247D8DF008D71AF /* GitBuddy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -230,6 +310,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				768D9FF71247D1CF008D71AF /* ReleaseNotes.html */,
+				768D9FF51247D1C4008D71AF /* dsa_pub.pem */,
+				768D9FF31247D1A2008D71AF /* appcast.xml */,
 				766B543A12325CCD008738D4 /* wrapper.py */,
 				766B5413123245F8008738D4 /* Images */,
 				8D1107310486CEB800E47090 /* GitBuddy-Info.plist */,
@@ -296,20 +379,40 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8D1107260486CEB800E47090 /* GitBuddy */ = {
+		768DA04B1247D8DF008D71AF /* GitBuddy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "GitBuddy" */;
+			buildConfigurationList = 768DA07D1247D8DF008D71AF /* Build configuration list for PBXNativeTarget "GitBuddy" */;
 			buildPhases = (
-				8D1107290486CEB800E47090 /* Resources */,
-				8D11072C0486CEB800E47090 /* Sources */,
-				8D11072E0486CEB800E47090 /* Frameworks */,
-				766B545712325D5A008738D4 /* CopyFiles */,
+				768DA04C1247D8DF008D71AF /* Resources */,
+				768DA05F1247D8DF008D71AF /* Sources */,
+				768DA0741247D8DF008D71AF /* Frameworks */,
+				768DA0791247D8DF008D71AF /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = GitBuddy;
+			productInstallPath = "$(HOME)/Applications";
+			productName = GitBuddy;
+			productReference = 768DA0801247D8DF008D71AF /* GitBuddy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8D1107260486CEB800E47090 /* GitBuddy Release */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "GitBuddy Release" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+				766B545712325D5A008738D4 /* CopyFiles */,
+				768DA0191247D4B0008D71AF /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GitBuddy Release";
 			productInstallPath = "$(HOME)/Applications";
 			productName = GitBuddy;
 			productReference = 8D1107320486CEB800E47090 /* GitBuddy.app */;
@@ -327,12 +430,38 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8D1107260486CEB800E47090 /* GitBuddy */,
+				8D1107260486CEB800E47090 /* GitBuddy Release */,
+				768DA04B1247D8DF008D71AF /* GitBuddy */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		768DA04C1247D8DF008D71AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768DA04D1247D8DF008D71AF /* InfoPlist.strings in Resources */,
+				768DA04E1247D8DF008D71AF /* GitBuddy.xib in Resources */,
+				768DA04F1247D8DF008D71AF /* Git_72x25.png in Resources */,
+				768DA0501247D8DF008D71AF /* GitBuddy.icns in Resources */,
+				768DA0511247D8DF008D71AF /* GitBuddyLogo_512.png in Resources */,
+				768DA0521247D8DF008D71AF /* GitBuddyLogo_512.psd in Resources */,
+				768DA0531247D8DF008D71AF /* StatusIconBlack.png in Resources */,
+				768DA0541247D8DF008D71AF /* StatusIconGreen.png in Resources */,
+				768DA0551247D8DF008D71AF /* GitBuddyLogoWide.png in Resources */,
+				768DA0561247D8DF008D71AF /* wrapper.py in Resources */,
+				768DA0571247D8DF008D71AF /* UserDefaults.plist in Resources */,
+				768DA0581247D8DF008D71AF /* GitSettingsIcon.png in Resources */,
+				768DA0591247D8DF008D71AF /* GlobalKeysIcon.png in Resources */,
+				768DA05A1247D8DF008D71AF /* MonitoringIcon.png in Resources */,
+				768DA05B1247D8DF008D71AF /* UpdatesIcon.png in Resources */,
+				768DA05C1247D8DF008D71AF /* appcast.xml in Resources */,
+				768DA05D1247D8DF008D71AF /* dsa_pub.pem in Resources */,
+				768DA05E1247D8DF008D71AF /* ReleaseNotes.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D1107290486CEB800E47090 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -352,12 +481,58 @@
 				76D5266C123F6AA7009094CC /* GlobalKeysIcon.png in Resources */,
 				76D5266D123F6AA7009094CC /* MonitoringIcon.png in Resources */,
 				76D5266E123F6AA7009094CC /* UpdatesIcon.png in Resources */,
+				768D9FF41247D1A2008D71AF /* appcast.xml in Resources */,
+				768D9FF61247D1C4008D71AF /* dsa_pub.pem in Resources */,
+				768D9FF81247D1CF008D71AF /* ReleaseNotes.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		768DA0191247D4B0008D71AF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nRELEASE=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://www.endlessinsomnia.com/updates/gitbuddy\"\nRELEASENOTES_URL=\"http://www.endlessinsomnia.com/updates/gitbuddy/ReleaseNotes.html#version-$RELEASE\"\n\nARCHIVE_FILENAME=\"$PROJECT_NAME $VERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"GitBuddy Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"$PROJECT_NAME\"*.zip\nditto -ck --keepParent \"$PROJECT_NAME.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(LC_TIME=en_US date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g' | perl -MXML::LibXML -e 'print XML::LibXML->new()->parse_file(\"-\")->findvalue(q(//string[preceding-sibling::key[1] = \"NOTE\"]))') \\\n\t| openssl enc -base64\n)\n\ncat > release_$RELEASE.xml <<EOF\n\t\t<item>\n\t\t\t<title>GitBuddy $VERSION Release!</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		768DA05F1247D8DF008D71AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768DA0601247D8DF008D71AF /* main.m in Sources */,
+				768DA0611247D8DF008D71AF /* GitBuddy.m in Sources */,
+				768DA0621247D8DF008D71AF /* GitWrapper.m in Sources */,
+				768DA0631247D8DF008D71AF /* NSObject+SBJSON.m in Sources */,
+				768DA0641247D8DF008D71AF /* NSString+SBJSON.m in Sources */,
+				768DA0651247D8DF008D71AF /* SBJsonBase.m in Sources */,
+				768DA0661247D8DF008D71AF /* SBJsonParser.m in Sources */,
+				768DA0671247D8DF008D71AF /* SBJsonWriter.m in Sources */,
+				768DA0681247D8DF008D71AF /* ProjectBuddy.m in Sources */,
+				768DA0691247D8DF008D71AF /* ChangeSetViewer.m in Sources */,
+				768DA06A1247D8DF008D71AF /* GitWrapperCommand.m in Sources */,
+				768DA06B1247D8DF008D71AF /* ProjectSubMenu.m in Sources */,
+				768DA06C1247D8DF008D71AF /* ProjectFilesSource.m in Sources */,
+				768DA06D1247D8DF008D71AF /* FilesStager.m in Sources */,
+				768DA06E1247D8DF008D71AF /* DiffViewSource.m in Sources */,
+				768DA06F1247D8DF008D71AF /* Preview.m in Sources */,
+				768DA0701247D8DF008D71AF /* Highlight.m in Sources */,
+				768DA0711247D8DF008D71AF /* Commit.m in Sources */,
+				768DA0721247D8DF008D71AF /* Clone.m in Sources */,
+				768DA0731247D8DF008D71AF /* MGPreferencePanel.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D11072C0486CEB800E47090 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -407,6 +582,48 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		768DA07E1247D8DF008D71AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = GitBuddy_Prefix.pch;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "GitBuddy-Info copy.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = GitBuddy;
+			};
+			name = Debug;
+		};
+		768DA07F1247D8DF008D71AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\"$(SRCROOT)\\\"",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = GitBuddy_Prefix.pch;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "GitBuddy-Info copy.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = GitBuddy;
+			};
+			name = Release;
+		};
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -414,7 +631,7 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../shortcutrecorder-read-only/build/Release\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -436,7 +653,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../shortcutrecorder-read-only/build/Release\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -476,7 +693,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "GitBuddy" */ = {
+		768DA07D1247D8DF008D71AF /* Build configuration list for PBXNativeTarget "GitBuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				768DA07E1247D8DF008D71AF /* Debug */,
+				768DA07F1247D8DF008D71AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "GitBuddy Release" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
