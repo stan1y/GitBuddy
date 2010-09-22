@@ -22,6 +22,7 @@
 @synthesize operationPanel, operationDescription, operationIndicator;
 @synthesize newRemotePanel, newRemoteName, newRemoteURL;
 @synthesize newBranchPanel, newBranchName;
+@synthesize commitsLog, commitsLogPanel;
 @synthesize lastUpdatedOn, appVersion, updater;
 
 //	---	Keyboard Events processing
@@ -53,7 +54,7 @@
 			NSRunAlertPanel(@"GitBuddy cannot display Commit Log.", @"There is no Active Project now, so there is no target Repo for your action. Please select Activate in project's menu or create a new Repo.", @"Continue", nil, nil);
 			return;
 		}
-		[pbuddy commitLog:nil];
+		[pbuddy commitsLog:nil];
 	}
 	
 	if ( ([[rescanKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[rescanKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[rescanKey valueForKey:@"keyCode"] unsignedShortValue]) ) {

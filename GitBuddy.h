@@ -12,6 +12,7 @@
 #import "Preview.h"
 #import "Commit.h"
 #import "Clone.h"
+#import "CommitsLog.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -53,6 +54,9 @@
 	NSTextField *newRemoteURL;
 	ProjectBuddy *newRemoteProject;
 	
+	NSPanel *commitsLogPanel;
+	CommitsLog *commitsLog;
+	
 	NSMenuItem *activeProject;
 	
 	NSTextField *lastUpdatedOn;
@@ -70,11 +74,13 @@
 @property (assign) IBOutlet id updater;
 @property (assign) IBOutlet NSTextField *lastUpdatedOn;
 @property (assign) IBOutlet NSTextField *appVersion;
+@property (assign) IBOutlet CommitsLog *commitsLog;
 @property (assign) IBOutlet Clone *clone;
 @property (assign) IBOutlet FilesStager *filesStager;
 @property (assign) IBOutlet Preview *preview;
 @property (assign) IBOutlet Commit *commit;
 
+@property (assign) IBOutlet NSPanel *commitsLogPanel;
 @property (assign) IBOutlet NSPanel *operationPanel;
 @property (assign) IBOutlet NSTextField *operationDescription;
 @property (assign) IBOutlet NSProgressIndicator *operationIndicator;
