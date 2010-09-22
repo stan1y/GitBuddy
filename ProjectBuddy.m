@@ -207,8 +207,11 @@
 {
 	[ (GitBuddy*)[NSApp delegate] createBranchFor:self];
 }
-- (IBAction) commitLog:(id)sender
-{}
+- (IBAction) commitsLog:(id)sender
+{
+	[[(GitBuddy*)[NSApp delegate] commitsLog] initForProject:path];
+	[[(GitBuddy*)[NSApp delegate] commitsLog] showWindow:sender];
+}
 - (IBAction) commit:(id)sender
 {
 	[NSApp activateIgnoringOtherApps:YES];
@@ -412,7 +415,12 @@
 	[untracked setSubmenu:untrackedMenu];
 	[untrackedMenu setDelegate:untrackedSubMenu];
 	[parentMenu addItem:untracked];
-					  
+	
+	//commits log
+	commitsLog = [[NSMenuItem alloc] initWithTitle:@"Commits Log" action:@selector(commitsLog:) keyEquivalent:[NSString string]];
+	[commitsLog setTarget:self];
+	[parentMenu addItem:commitsLog];
+	
 	//push
 	push = [[NSMenuItem alloc] initWithTitle:@"Push" action:@selector(push:) keyEquivalent:[NSString string]];
 	[push setTarget:self];

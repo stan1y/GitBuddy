@@ -38,6 +38,7 @@
 	NSMenuItem *push;
 	NSMenuItem *rescan;
 	NSMenuItem *remove;
+	NSMenuItem *commitsLog;
 	
 	NSString * path;
 	NSString * title;
@@ -86,6 +87,6 @@
 - (IBAction) stageAll:(id)sender;
 - (IBAction) unstageFile:(id)sender;
 
-- (IBAction) commitLog:(id)sender;
+- (IBAction) commitsLog:(id)sender;
 
 @end
