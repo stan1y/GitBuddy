@@ -15,11 +15,6 @@
 		765C8F98123697AD00FCFF42 /* ProjectSubMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */; };
 		766B541A12324605008738D4 /* Git_72x25.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541412324605008738D4 /* Git_72x25.png */; };
 		766B541B12324605008738D4 /* GitBuddy.icns in Resources */ = {isa = PBXBuildFile; fileRef = 766B541512324605008738D4 /* GitBuddy.icns */; };
-		766B541C12324605008738D4 /* GitBuddyLogo_512.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541612324605008738D4 /* GitBuddyLogo_512.png */; };
-		766B541D12324605008738D4 /* GitBuddyLogo_512.psd in Resources */ = {isa = PBXBuildFile; fileRef = 766B541712324605008738D4 /* GitBuddyLogo_512.psd */; };
-		766B541E12324605008738D4 /* StatusIconBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541812324605008738D4 /* StatusIconBlack.png */; };
-		766B541F12324605008738D4 /* StatusIconGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541912324605008738D4 /* StatusIconGreen.png */; };
-		766B542D123246B5008738D4 /* GitBuddyLogoWide.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B542C123246B5008738D4 /* GitBuddyLogoWide.png */; };
 		766B543912324DA2008738D4 /* GitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B543812324DA2008738D4 /* GitWrapper.m */; };
 		766B543B12325CCD008738D4 /* wrapper.py in Resources */ = {isa = PBXBuildFile; fileRef = 766B543A12325CCD008738D4 /* wrapper.py */; };
 		766B547312325E43008738D4 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B546A12325E43008738D4 /* NSObject+SBJSON.m */; };
@@ -44,11 +39,6 @@
 		768DA04E1247D8DF008D71AF /* GitBuddy.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* GitBuddy.xib */; };
 		768DA04F1247D8DF008D71AF /* Git_72x25.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541412324605008738D4 /* Git_72x25.png */; };
 		768DA0501247D8DF008D71AF /* GitBuddy.icns in Resources */ = {isa = PBXBuildFile; fileRef = 766B541512324605008738D4 /* GitBuddy.icns */; };
-		768DA0511247D8DF008D71AF /* GitBuddyLogo_512.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541612324605008738D4 /* GitBuddyLogo_512.png */; };
-		768DA0521247D8DF008D71AF /* GitBuddyLogo_512.psd in Resources */ = {isa = PBXBuildFile; fileRef = 766B541712324605008738D4 /* GitBuddyLogo_512.psd */; };
-		768DA0531247D8DF008D71AF /* StatusIconBlack.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541812324605008738D4 /* StatusIconBlack.png */; };
-		768DA0541247D8DF008D71AF /* StatusIconGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541912324605008738D4 /* StatusIconGreen.png */; };
-		768DA0551247D8DF008D71AF /* GitBuddyLogoWide.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B542C123246B5008738D4 /* GitBuddyLogoWide.png */; };
 		768DA0561247D8DF008D71AF /* wrapper.py in Resources */ = {isa = PBXBuildFile; fileRef = 766B543A12325CCD008738D4 /* wrapper.py */; };
 		768DA0571247D8DF008D71AF /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 766B55C812328322008738D4 /* UserDefaults.plist */; };
 		768DA0581247D8DF008D71AF /* GitSettingsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52667123F6AA7009094CC /* GitSettingsIcon.png */; };
@@ -93,6 +83,12 @@
 		76D5266C123F6AA7009094CC /* GlobalKeysIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52668123F6AA7009094CC /* GlobalKeysIcon.png */; };
 		76D5266D123F6AA7009094CC /* MonitoringIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52669123F6AA7009094CC /* MonitoringIcon.png */; };
 		76D5266E123F6AA7009094CC /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D5266A123F6AA7009094CC /* UpdatesIcon.png */; };
+		76D8FAF6124A9475008A2296 /* GitBuddy16.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D8FAF4124A9475008A2296 /* GitBuddy16.png */; };
+		76D8FAF7124A9475008A2296 /* GitBuddy16Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D8FAF5124A9475008A2296 /* GitBuddy16Red.png */; };
+		76D8FAF8124A9475008A2296 /* GitBuddy16.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D8FAF4124A9475008A2296 /* GitBuddy16.png */; };
+		76D8FAF9124A9475008A2296 /* GitBuddy16Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D8FAF5124A9475008A2296 /* GitBuddy16Red.png */; };
+		76D8FB01124A9794008A2296 /* GitBuddy.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D8FB00124A9794008A2296 /* GitBuddy.png */; };
+		76D8FB02124A9794008A2296 /* GitBuddy.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D8FB00124A9794008A2296 /* GitBuddy.png */; };
 		76FADB701235596F0075EAC0 /* GitWrapperCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */; };
 		76FC45CF1236D67600C314A0 /* ProjectFilesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */; };
 		76FC45F21236E74700C314A0 /* FilesStager.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45F11236E74700C314A0 /* FilesStager.m */; };
@@ -146,11 +142,6 @@
 		765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectSubMenu.m; sourceTree = "<group>"; };
 		766B541412324605008738D4 /* Git_72x25.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Git_72x25.png; path = Images/Git_72x25.png; sourceTree = "<group>"; };
 		766B541512324605008738D4 /* GitBuddy.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = GitBuddy.icns; path = Images/GitBuddy.icns; sourceTree = "<group>"; };
-		766B541612324605008738D4 /* GitBuddyLogo_512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddyLogo_512.png; path = Images/GitBuddyLogo_512.png; sourceTree = "<group>"; };
-		766B541712324605008738D4 /* GitBuddyLogo_512.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = GitBuddyLogo_512.psd; path = Images/GitBuddyLogo_512.psd; sourceTree = "<group>"; };
-		766B541812324605008738D4 /* StatusIconBlack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusIconBlack.png; path = Images/StatusIconBlack.png; sourceTree = "<group>"; };
-		766B541912324605008738D4 /* StatusIconGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusIconGreen.png; path = Images/StatusIconGreen.png; sourceTree = "<group>"; };
-		766B542C123246B5008738D4 /* GitBuddyLogoWide.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddyLogoWide.png; path = Images/GitBuddyLogoWide.png; sourceTree = "<group>"; };
 		766B543712324DA2008738D4 /* GitWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitWrapper.h; sourceTree = "<group>"; };
 		766B543812324DA2008738D4 /* GitWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GitWrapper.m; sourceTree = "<group>"; };
 		766B543A12325CCD008738D4 /* wrapper.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = wrapper.py; sourceTree = "<group>"; };
@@ -192,6 +183,9 @@
 		76D52668123F6AA7009094CC /* GlobalKeysIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GlobalKeysIcon.png; path = Images/Preferences/GlobalKeysIcon.png; sourceTree = "<group>"; };
 		76D52669123F6AA7009094CC /* MonitoringIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MonitoringIcon.png; path = Images/Preferences/MonitoringIcon.png; sourceTree = "<group>"; };
 		76D5266A123F6AA7009094CC /* UpdatesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpdatesIcon.png; path = Images/Preferences/UpdatesIcon.png; sourceTree = "<group>"; };
+		76D8FAF4124A9475008A2296 /* GitBuddy16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddy16.png; path = Images/GitBuddy16.png; sourceTree = "<group>"; };
+		76D8FAF5124A9475008A2296 /* GitBuddy16Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddy16Red.png; path = Images/GitBuddy16Red.png; sourceTree = "<group>"; };
+		76D8FB00124A9794008A2296 /* GitBuddy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddy.png; path = Images/GitBuddy.png; sourceTree = "<group>"; };
 		76FADB6E1235596F0075EAC0 /* GitWrapperCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitWrapperCommand.h; sourceTree = "<group>"; };
 		76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GitWrapperCommand.m; sourceTree = "<group>"; };
 		76FC45CD1236D67600C314A0 /* ProjectFilesSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectFilesSource.h; sourceTree = "<group>"; };
@@ -347,14 +341,12 @@
 		766B5413123245F8008738D4 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				76D8FB00124A9794008A2296 /* GitBuddy.png */,
+				76D8FAF4124A9475008A2296 /* GitBuddy16.png */,
+				76D8FAF5124A9475008A2296 /* GitBuddy16Red.png */,
 				76D52666123F6A95009094CC /* Preferences */,
-				766B542C123246B5008738D4 /* GitBuddyLogoWide.png */,
 				766B541412324605008738D4 /* Git_72x25.png */,
 				766B541512324605008738D4 /* GitBuddy.icns */,
-				766B541612324605008738D4 /* GitBuddyLogo_512.png */,
-				766B541712324605008738D4 /* GitBuddyLogo_512.psd */,
-				766B541812324605008738D4 /* StatusIconBlack.png */,
-				766B541912324605008738D4 /* StatusIconGreen.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -457,11 +449,6 @@
 				768DA04E1247D8DF008D71AF /* GitBuddy.xib in Resources */,
 				768DA04F1247D8DF008D71AF /* Git_72x25.png in Resources */,
 				768DA0501247D8DF008D71AF /* GitBuddy.icns in Resources */,
-				768DA0511247D8DF008D71AF /* GitBuddyLogo_512.png in Resources */,
-				768DA0521247D8DF008D71AF /* GitBuddyLogo_512.psd in Resources */,
-				768DA0531247D8DF008D71AF /* StatusIconBlack.png in Resources */,
-				768DA0541247D8DF008D71AF /* StatusIconGreen.png in Resources */,
-				768DA0551247D8DF008D71AF /* GitBuddyLogoWide.png in Resources */,
 				768DA0561247D8DF008D71AF /* wrapper.py in Resources */,
 				768DA0571247D8DF008D71AF /* UserDefaults.plist in Resources */,
 				768DA0581247D8DF008D71AF /* GitSettingsIcon.png in Resources */,
@@ -471,6 +458,9 @@
 				768DA05C1247D8DF008D71AF /* appcast.xml in Resources */,
 				768DA05D1247D8DF008D71AF /* dsa_pub.pem in Resources */,
 				768DA05E1247D8DF008D71AF /* ReleaseNotes.html in Resources */,
+				76D8FAF6124A9475008A2296 /* GitBuddy16.png in Resources */,
+				76D8FAF7124A9475008A2296 /* GitBuddy16Red.png in Resources */,
+				76D8FB01124A9794008A2296 /* GitBuddy.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,11 +472,6 @@
 				1DDD58160DA1D0A300B32029 /* GitBuddy.xib in Resources */,
 				766B541A12324605008738D4 /* Git_72x25.png in Resources */,
 				766B541B12324605008738D4 /* GitBuddy.icns in Resources */,
-				766B541C12324605008738D4 /* GitBuddyLogo_512.png in Resources */,
-				766B541D12324605008738D4 /* GitBuddyLogo_512.psd in Resources */,
-				766B541E12324605008738D4 /* StatusIconBlack.png in Resources */,
-				766B541F12324605008738D4 /* StatusIconGreen.png in Resources */,
-				766B542D123246B5008738D4 /* GitBuddyLogoWide.png in Resources */,
 				766B543B12325CCD008738D4 /* wrapper.py in Resources */,
 				766B55C912328322008738D4 /* UserDefaults.plist in Resources */,
 				76D5266B123F6AA7009094CC /* GitSettingsIcon.png in Resources */,
@@ -496,6 +481,9 @@
 				768D9FF41247D1A2008D71AF /* appcast.xml in Resources */,
 				768D9FF61247D1C4008D71AF /* dsa_pub.pem in Resources */,
 				768D9FF81247D1CF008D71AF /* ReleaseNotes.html in Resources */,
+				76D8FAF8124A9475008A2296 /* GitBuddy16.png in Resources */,
+				76D8FAF9124A9475008A2296 /* GitBuddy16Red.png in Resources */,
+				76D8FB02124A9794008A2296 /* GitBuddy.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

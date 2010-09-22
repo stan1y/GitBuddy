@@ -449,8 +449,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem retain];
 	
 	//load images
-	statusImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"StatusIconBlack" ofType:@"png"]];
-	statusAltImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"StatusIconGreen" ofType:@"png"]];
+	statusImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy16" ofType:@"png"]];
+	statusAltImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy16Red" ofType:@"png"]];
 	
 	//set no changes image by default
 	[statusItem setImage: statusImage];
