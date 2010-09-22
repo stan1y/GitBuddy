@@ -63,6 +63,33 @@
 	}];
 }
 
+- (void) updateWithCommitDiff:(NSString *)filePath commitId:(NSString*)commitId inPath:(NSString *)projectPath
+{
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
+	NSString * diffArg = [NSString stringWithFormat:@"--commit-diff=%@", filePath];
+	NSString * keyArg = [NSString stringWithFormat:@"--key=%@", commitId];
+	
+	[tableView setEnabled:NO];
+	[indicator setHidden:NO];
+	[indicator startAnimation:nil];
+	
+	GitWrapper * wrapper = [GitWrapper sharedInstance];
+	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, keyArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+		if (currentSource) {
+			[currentSource release];
+		}
+		
+		[indicator stopAnimation:nil];
+		[indicator setHidden:YES];
+		[tableView setEnabled:YES];
+		
+		NSLog(@"Reloading changes with commit diff");
+		currentSource = dict;
+		[currentSource retain];
+		[tableView reloadData];
+	}];
+}
+
 - (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath
 {
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
