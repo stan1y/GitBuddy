@@ -173,6 +173,8 @@ if __name__ == '__main__':
 	
 	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
 	
+	parser.add_option("--commit-diff", help="git diff [commit] [path]")
+	parser.add_option("--key", help="A key for --commit-diff")
 	parser.add_option("--cached-diff", help="git diff --cached [path]")
 	parser.add_option("--diff", help="git diff [path]")
 	
@@ -279,6 +281,16 @@ if __name__ == '__main__':
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
+	elif options.commit_diff:
+		if not options.key:
+				parser.print_help()
+				sys.stderr.write('--key is required argument\n')
+				sys.exit(__ERR_USAGE)
+				
+		obj = b_cmd_lines(options.git, options.repo, ['diff', options.key, options.commit_diff])
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
 	elif options.stage:
 		args = ['stage', '--']
 		[args.append(part) for part in options.stage.split(',') ]
@@ -329,7 +341,20 @@ if __name__ == '__main__':
 		sys.exit(rc)
 		
 	elif options.log:
-		obj = b_cmd_json(options.git, options.repo, ['log', options.log], __LOG_TOKENS)
+		rc, out, err = b_cmd_chdir(options.git, options.repo, ['log', '--pretty=%H|%ar|%an (%ae)|%s', options.log], __LOG_TOKENS)
+		if err:
+			sys.stdout.write(json.dumps({ 'gitrc' : rc, 'giterr' : err}))
+			sys.exit(rc)
+		
+		obj = { 'gitrc' : rc, 'giterr' : err , 'items' : []}
+		count = 0
+		for line in out:
+			commitId, date, author, message = line.split('|', 4)
+			log('commit %s by %s on %s' % (commitId, author, date))
+			obj['items'].append( (commitId, date, author, message) )
+			count += 1
+			
+		obj['count'] = count
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
