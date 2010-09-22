@@ -30,6 +30,10 @@
 		766B55C912328322008738D4 /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 766B55C812328322008738D4 /* UserDefaults.plist */; };
 		766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
 		766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
+		767C9811124A4AB10037B0F9 /* CommitsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C9810124A4AB10037B0F9 /* CommitsSource.m */; };
+		767C9812124A4AB10037B0F9 /* CommitsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C9810124A4AB10037B0F9 /* CommitsSource.m */; };
+		767C985F124A50640037B0F9 /* CommitsLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C985E124A50640037B0F9 /* CommitsLog.m */; };
+		767C9860124A50640037B0F9 /* CommitsLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C985E124A50640037B0F9 /* CommitsLog.m */; };
 		767E35191237CD2A009AB7D6 /* DiffViewSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767E35181237CD2A009AB7D6 /* DiffViewSource.m */; };
 		768D9FF41247D1A2008D71AF /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF31247D1A2008D71AF /* appcast.xml */; };
 		768D9FF61247D1C4008D71AF /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF51247D1C4008D71AF /* dsa_pub.pem */; };
@@ -166,6 +170,10 @@
 		766B57CC1232BFD6008738D4 /* ProjectBuddy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectBuddy.m; sourceTree = "<group>"; };
 		766B59551233A86C008738D4 /* ChangeSetViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeSetViewer.h; sourceTree = "<group>"; };
 		766B59561233A86C008738D4 /* ChangeSetViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeSetViewer.m; sourceTree = "<group>"; };
+		767C980F124A4AB10037B0F9 /* CommitsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommitsSource.h; sourceTree = "<group>"; };
+		767C9810124A4AB10037B0F9 /* CommitsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommitsSource.m; sourceTree = "<group>"; };
+		767C985D124A50640037B0F9 /* CommitsLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommitsLog.h; sourceTree = "<group>"; };
+		767C985E124A50640037B0F9 /* CommitsLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommitsLog.m; sourceTree = "<group>"; };
 		767E35171237CD2A009AB7D6 /* DiffViewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiffViewSource.h; sourceTree = "<group>"; };
 		767E35181237CD2A009AB7D6 /* DiffViewSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiffViewSource.m; sourceTree = "<group>"; };
 		768D9FF31247D1A2008D71AF /* appcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
@@ -252,6 +260,10 @@
 				769C1F2A12395774006B127D /* Commit.m */,
 				763110E2123A79D60090CBFE /* Clone.h */,
 				763110E3123A79D60090CBFE /* Clone.m */,
+				767C980F124A4AB10037B0F9 /* CommitsSource.h */,
+				767C9810124A4AB10037B0F9 /* CommitsSource.m */,
+				767C985D124A50640037B0F9 /* CommitsLog.h */,
+				767C985E124A50640037B0F9 /* CommitsLog.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -530,6 +542,8 @@
 				768DA0711247D8DF008D71AF /* Commit.m in Sources */,
 				768DA0721247D8DF008D71AF /* Clone.m in Sources */,
 				768DA0731247D8DF008D71AF /* MGPreferencePanel.m in Sources */,
+				767C9811124A4AB10037B0F9 /* CommitsSource.m in Sources */,
+				767C985F124A50640037B0F9 /* CommitsLog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -557,6 +571,8 @@
 				769C1F2B12395774006B127D /* Commit.m in Sources */,
 				763110E4123A79D60090CBFE /* Clone.m in Sources */,
 				7649A7F9123E6BC300D365AF /* MGPreferencePanel.m in Sources */,
+				767C9812124A4AB10037B0F9 /* CommitsSource.m in Sources */,
+				767C9860124A50640037B0F9 /* CommitsLog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
