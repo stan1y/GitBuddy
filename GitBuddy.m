@@ -201,7 +201,9 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//merge events
 	if (queuedEvents) {
 		//append new events
-		queuedEvents = [queuedEvents arrayByAddingObjectsFromArray:paths];
+		NSArray *merged = [queuedEvents arrayByAddingObjectsFromArray:paths];
+		[queuedEvents release];
+		queuedEvents = merged;
 	}
 	else {
 		queuedEvents = paths;
@@ -255,7 +257,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 {
 	if ([statusMenu numberOfItems] > MENUITEMS) {
 		NSArray * items = [[statusMenu itemArray] subarrayWithRange:NSMakeRange(MENUITEMS - 1, [statusMenu numberOfItems] - MENUITEMS)];
-		NSMutableArray * paths = [[NSMutableArray alloc] initWithCapacity:[items count]];
+		NSMutableArray * paths = [NSMutableArray arrayWithCapacity:[items count]];
 		for (NSMenuItem * i in items) {
 			ProjectBuddy *pbuddy = [i representedObject];
 			[paths addObject:[pbuddy path]];
@@ -317,7 +319,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 				NSRunInformationalAlertPanel(@"New Branch Created.", [NSString stringWithFormat:@"A New branch %@ was created as set as current branch for project %@", [newBranchName stringValue], [newBranchProject path]], @"All Right", nil, nil);
 			}
-			
+			[dict release];
 			//done with project
 			newBranchProject = nil;
 		}];
@@ -341,6 +343,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			}
 			
 			//done with project
+			[dict release];
 			newRemoteProject = nil;
 		}];
 	}

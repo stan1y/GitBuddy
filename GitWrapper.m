@@ -42,7 +42,7 @@ static GitWrapper *_sharedGitWrapper = nil;
 
 - (GitWrapper*) init
 {
-	return [GitWrapper sharedInstance];
+	return [[GitWrapper sharedInstance] retain];
 }
 
 - (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock

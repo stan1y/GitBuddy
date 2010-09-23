@@ -59,6 +59,7 @@
 	NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
 	NSString *commitArg = [NSString stringWithFormat:@"--commit=%@", msg];
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, commitArg, nil] withCompletionBlock:^(NSDictionary *dict){
+		[dict release];
 	}];
 	
 	[[self window] performClose:sender];

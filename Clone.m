@@ -96,6 +96,7 @@
 				NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor. Cloning failed in some way.", @"Continue", nil, nil);
 			}
 		}
+		[dict release];
 	}];
 
 }

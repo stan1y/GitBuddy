@@ -21,7 +21,7 @@
 - (NSDictionary*) itemDict
 {
 	[itemLock lock];
-	NSDictionary *d = [[NSDictionary alloc] initWithDictionary:itemDict copyItems:YES];
+	NSDictionary *d = [[[NSMutableDictionary alloc] initWithDictionary:itemDict copyItems:YES] autorelease];
 	[itemLock unlock];
 	return d;
 	
@@ -76,15 +76,19 @@
 			[self mergeData:dict];
 			[self setCurrentBranch:[[[[self itemDict] objectForKey:@"branches"] objectForKey:@"current_branch"] objectAtIndex:0]];
 			NSLog(@"Current branch is %@", [self currentBranch]);
+			[dict release];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
+			[dict release];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
+			[dict release];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
+			[dict release];
 
 			NSLog(@"Project Status Dictionary:\n");
 			NSLog(@"%@", [self itemDict]);
@@ -128,7 +132,7 @@
 	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pushing commits in branch %@ to %@. It may take a while, please wait...", [self currentBranch], source]];
 	
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pushArg, branchArg, nil] timeoutAfter:pushTimeout withCompletionBlock:^ (NSDictionary *dict){
-		[dict retain];
+
 		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
@@ -168,7 +172,7 @@
 	[ (GitBuddy*)[NSApp delegate] startOperation:[NSString stringWithFormat:@"Pulling changes in branch %@ from %@. It may take a while, please wait...", [self currentBranch], targetRemoteSource]];
 	
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, pullArg, branchArg, nil] timeoutAfter:pullTimeout withCompletionBlock:^ (NSDictionary *dict){
-		[dict retain];
+
 		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
@@ -199,6 +203,7 @@
 	NSString * switchArg = [NSString stringWithFormat:@"--branch-switch=%@", b];
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, switchArg, nil] withCompletionBlock:^(NSDictionary *dict){
 		
+		[dict release];
 		[self setCurrentBranch:b];
 		NSLog(@"Switched to branch %@", b);
 	}];
@@ -244,6 +249,7 @@
 		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [sender representedObject]];
 		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
+			[dict release];
 			NSLog(@"Unstaging done...");
 		}];
 	}
@@ -262,6 +268,7 @@
 		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [sender representedObject]];
 		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
+			[dict release];
 			NSLog(@"Adding file done...");
 		}];
 	}
