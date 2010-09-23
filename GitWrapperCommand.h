@@ -13,7 +13,7 @@
 	NSTask *gitWrapper;
 	NSPipe *stdoutPipe;
 	NSPipe *stderrPipe;
-	NSString *path;
+	
 	int timeout;
 	NSDictionary * jsonResult;
 	SBJsonParser *parser;
