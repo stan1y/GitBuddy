@@ -1,3 +1,4 @@
 /* Localized versions of Info.plist keys */
 
 SUFeedURL = "http://www.endlessinsomnia.com/download/GitBuddy/appcast.xml";
+SUEnableAutomaticChecks = YES;
