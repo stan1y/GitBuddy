@@ -38,7 +38,7 @@
 			NSLog(@"Reloading commits %@",[self commits]);
 			[tableView reloadData];
 		}
-		[dict release];
+
 	}];
 }
 

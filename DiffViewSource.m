@@ -59,7 +59,6 @@
 			[tableView setEnabled:YES];
 			//call block
 			codeBlock();
-			[dict release];
 		}
 	}];
 }
@@ -83,7 +82,7 @@
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
-		[dict release];
+
 		NSLog(@"Reloading changes with commit diff");
 		currentSource = dict;
 		[currentSource retain];
@@ -109,7 +108,7 @@
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
-		[dict release];
+
 		NSLog(@"Reloading changes with file diff");
 		currentSource = dict;
 		[currentSource retain];
@@ -136,7 +135,7 @@
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
-		[dict release];
+
 		NSLog(@"Reloading changes with file diff");
 		currentSource = dict;
 		[currentSource retain];

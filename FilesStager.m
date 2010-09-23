@@ -139,7 +139,7 @@
 		NSLog(@"There are %d files to unstaged.", [toUnStage count]);
 		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [[toUnStage allKeys] componentsJoinedByString:@","]];
 		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
-			[dict release];
+
 		}];
 	}
 	
@@ -148,7 +148,6 @@
 		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [[toStage allKeys] componentsJoinedByString:@","]];
 		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
 			
-			[dict release];
 			NSMenuItem *i = [(GitBuddy*)[NSApp delegate] menuItemForPath:[project objectForKey:@"path"]];
 			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 				[(ProjectBuddy*)[i representedObject] rescanWithCompletionBlock: ^{			

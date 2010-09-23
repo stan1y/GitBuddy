@@ -319,7 +319,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 				NSRunInformationalAlertPanel(@"New Branch Created.", [NSString stringWithFormat:@"A New branch %@ was created as set as current branch for project %@", [newBranchName stringValue], [newBranchProject path]], @"All Right", nil, nil);
 			}
-			[dict release];
+
 			//done with project
 			newBranchProject = nil;
 		}];
@@ -343,7 +343,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			}
 			
 			//done with project
-			[dict release];
 			newRemoteProject = nil;
 		}];
 	}

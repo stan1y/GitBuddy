@@ -76,19 +76,15 @@
 			[self mergeData:dict];
 			[self setCurrentBranch:[[[[self itemDict] objectForKey:@"branches"] objectForKey:@"current_branch"] objectAtIndex:0]];
 			NSLog(@"Current branch is %@", [self currentBranch]);
-			[dict release];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			[dict release];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			[dict release];
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
-			[dict release];
 
 			NSLog(@"Project Status Dictionary:\n");
 			NSLog(@"%@", [self itemDict]);
@@ -138,7 +134,6 @@
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], source] , @"All right", nil, nil);
 		}
-		[dict release];
 	}];
 }
 
@@ -178,7 +173,6 @@
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			NSRunInformationalAlertPanel(@"Pull operation complete.", [NSString stringWithFormat:@"Changed in branch %@ were successfully pulled from %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
 		}
-		[dict release];
 	}];
 }
 - (IBAction) pushToSource:(id)sender
@@ -203,7 +197,6 @@
 	NSString * switchArg = [NSString stringWithFormat:@"--branch-switch=%@", b];
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, switchArg, nil] withCompletionBlock:^(NSDictionary *dict){
 		
-		[dict release];
 		[self setCurrentBranch:b];
 		NSLog(@"Switched to branch %@", b);
 	}];
@@ -249,7 +242,7 @@
 		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 		NSString * unstageArg = [NSString stringWithFormat:@"--unstage=%@", [sender representedObject]];
 		[wrapper executeGit:[NSArray arrayWithObjects:unstageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
-			[dict release];
+
 			NSLog(@"Unstaging done...");
 		}];
 	}
@@ -268,7 +261,7 @@
 		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
 		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [sender representedObject]];
 		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict){
-			[dict release];
+
 			NSLog(@"Adding file done...");
 		}];
 	}
