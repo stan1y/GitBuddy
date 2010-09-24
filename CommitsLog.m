@@ -37,25 +37,27 @@
 	if (aTableView == [[[self commitSource] diffSource] tableView]) {
 		//high light diff view
 		NSString *str = [[[self commitSource] diffSource] stringAtIndex:rowIndex];
-		[Highlight highLightCell:aCell forLine:str];	
+		[Highlight highLightCell:aCell forLine:str];
 	}
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-	int index = [[aNotification object] selectedRow];
-	if (index >= 0) {
-		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *listPath = [[self projectRoot] stringByAppendingPathComponent:[self currentPath]];
-		NSError *err = nil;
-		NSArray *contents = [fm contentsOfDirectoryAtPath:listPath error:&err];
-		if (err) {
-			[[NSApp delegate] presentError:err];
-			return;
+	if ([aNotification object] != [[[self commitSource] diffSource] tableView]) {
+		int index = [[aNotification object] selectedRow];
+		if (index >= 0) {
+			NSFileManager *fm = [NSFileManager defaultManager];
+			NSString *listPath = [[self projectRoot] stringByAppendingPathComponent:[self currentPath]];
+			NSError *err = nil;
+			NSArray *contents = [fm contentsOfDirectoryAtPath:listPath error:&err];
+			if (err) {
+				[[NSApp delegate] presentError:err];
+				return;
+			}
+			NSString *file =[contents objectAtIndex:index];
+			
+			[commitSource loadCommitsFor:file inProject:[self projectRoot]];
 		}
-		NSString *file =[contents objectAtIndex:index];
-		
-		[commitSource loadCommitsFor:file inProject:[self projectRoot]];
 	}
 }
 
