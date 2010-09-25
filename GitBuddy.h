@@ -13,6 +13,7 @@
 #import "Commit.h"
 #import "Clone.h"
 #import "CommitsLog.h"
+#import "AnimatedStatus.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -61,6 +62,8 @@
 	NSTextField *lastUpdatedOn;
 	NSTextField *appVersion;
 	id updater;
+	
+	AnimatedStatus *animStatus;
 }
 
 //Events thread implementation
@@ -118,6 +121,9 @@
 
 //projects counters
 - (void) setCounter:(int)changed forProject:(NSString*)path;
+
+//status icon
+- (void) setStatusImage:(NSImage*)image;
 
 @end
 

@@ -182,12 +182,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			[queuedEvents release];
 			queuedEvents = nil;
 			
-			//FIXME: icon animation start
+
+			[animStatus startAnimation];
 			
 			NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
 			for(NSMenuItem *mi in foldersToRescan) {
 				[[mi representedObject] rescanWithCompletionBlock: ^{
-					//FIXME: icon animation stop
+					[animStatus stopAnimation];
 				}];
 			}
 			
@@ -417,6 +418,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     // Set the initial values in the shared user defaults controller
     [[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:userDefaultsValuesDict];
 }
+
+- (void) setStatusImage:(NSImage*)image
+{
+	//set no changes image by default
+	[statusItem setImage: image];
+	[statusItem setAlternateImage:image];
+}
 												  
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
 {
@@ -460,13 +468,12 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	statusImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy16" ofType:@"png"]];
 	statusAltImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy16Red" ofType:@"png"]];
 	
-	//set no changes image by default
-	[statusItem setImage: statusImage];
-	[statusItem setAlternateImage: statusImage];
-	
+	//no changed by default
+	[self setStatusImage:statusImage];
 	[statusItem setMenu:statusMenu];
-	[statusItem setHighlightMode:YES];	
-	[statusItem setMenu: statusMenu];
+	[statusItem setHighlightMode:YES];
+	
+	animStatus = [[AnimatedStatus alloc] initWithPeriod:0.5];
 	
 	//subscribe on kbd events
 	//works only if "Enable Access for Assistive Devices" enabled in
@@ -537,15 +544,15 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		//update with number of items
 		[statusItem setTitle:[NSString stringWithFormat:@" %d", totalItems]];
 		//set alternate icon
-		[statusItem setImage: statusAltImage];
-		[statusItem setAlternateImage: statusAltImage];
+		[animStatus stopAnimation];
+		[self setStatusImage:statusAltImage];
 		[statusItem setToolTip:[NSString stringWithFormat:@"GitBuddy found %d unstaved changes.", totalItems]];
 	}
 	else {
 		//set normal icon & no title
 		[statusItem setTitle:@""];
-		[statusItem setImage: statusImage];
-		[statusItem setAlternateImage: statusImage];
+		[animStatus stopAnimation];
+		[self setStatusImage:statusImage];
 		[statusItem setToolTip:@"GitBuddy running."];
 	}
 }
