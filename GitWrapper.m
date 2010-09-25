@@ -67,7 +67,6 @@ static GitWrapper *_sharedGitWrapper = nil;
 	
 	[cmd setCompletionBlock: ^{
 		codeBlock([cmd jsonResult]);
-		NSLog(@"executeGit %@ done: ref count %d", [args objectAtIndex:0], [cmd retainCount]);
 	}];
 	
 	[queue addOperation:cmd];

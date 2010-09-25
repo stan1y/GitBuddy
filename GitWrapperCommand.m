@@ -109,7 +109,6 @@
 			return;
 		}
 
-		NSLog(@"setJsonResult ref count %d", [jsonResult retainCount]);
 		//check json answer
 		if ([[[self jsonResult] objectForKey:@"giterr"] count] > 0 && [[[self jsonResult] objectForKey:@"gitrc"] intValue] != 0 ){
 			NSLog(@"Git error: %@", [[self jsonResult] objectForKey:@"giterr"]);
