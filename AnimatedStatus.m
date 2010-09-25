@@ -36,6 +36,7 @@
 - (void) startAnimation
 {
 	if ( !thread ) {
+		NSLog(@"Starting animation...");
 		thread = [[NSThread alloc] initWithTarget:self selector:@selector(animateIcon) object:nil];
 		[thread start];
 	}
@@ -52,10 +53,11 @@
 {
 	while (YES) {
 		if ([thread isCancelled]) {
-			NSLog(@"exiting animation thread...");
-			[NSThread exit];
+			NSLog(@"Exiting animation thread...");
+			[[NSApp delegate] performSelectorOnMainThread:@selector(setCurrentImage) withObject:nil waitUntilDone:NO];
 			[thread release];
 			thread = nil;
+			[NSThread exit];
 		}
 		
 		[[NSApp delegate] performSelectorOnMainThread:@selector(setStatusImage:) withObject:stage1 waitUntilDone:NO];
