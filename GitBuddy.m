@@ -443,9 +443,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	eventsLock = [[NSLock alloc] init];
 	projCounters = [[NSMutableDictionary alloc] init];
 	
-	//calls to other programs as operations
-	queue = [[NSOperationQueue alloc] init];
-	
 	//status item
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength] retain];
 	[statusItem retain];
@@ -483,7 +480,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem release];
 	[addRepoField release];
 	[addRepoPanel release];
-	[queue release];
 	[queuedEvents release];
 	
 	[operationPanel release];

@@ -21,8 +21,7 @@
 
 @property (assign) int timeout;
 @property (nonatomic, retain, readonly) NSTask *gitWrapper;
-@property (nonatomic, retain) NSDictionary * jsonResult;
-- (id) init;
-+ (GitWrapperCommand*) gitCommand:(NSString*)wrapperPath withArgs:(NSArray *)args andTimeout:(int)tsecs;
+@property (assign, readonly) NSDictionary * jsonResult;
+- (id) initWith:(NSString*)wrapperPath withArgs:(NSArray *)args andTimeout:(int)tsecs;
 
 @end

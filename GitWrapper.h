@@ -12,6 +12,7 @@
 	NSString * wrapperPath;
 	NSString * gitPath;
 	int timeout;
+	NSOperationQueue *queue;
 }
 
 + (GitWrapper*) sharedInstance;

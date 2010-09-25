@@ -29,7 +29,6 @@
 	
 	NSPanel *addRepoPanel;
 	NSTextField *addRepoField;
-	NSOperationQueue *queue;
 	
 	NSThread *eventsThread;
 	NSLock *eventsLock;

@@ -18,12 +18,21 @@ static GitWrapper *_sharedGitWrapper = nil;
 
 //	- Initialization
 
+- (void) dealloc
+{
+	[queue release];
+	[wrapperPath release];
+	
+	[super dealloc];
+}
+
 - (GitWrapper*) _init
 {
 	if ( !(self = [super init]) ) {
 		return nil;
 	}
 	
+	queue = [[NSOperationQueue alloc] init];
 	wrapperPath = [[NSBundle mainBundle] pathForResource:@"wrapper" ofType:@"py"];
 	[wrapperPath retain];
 	NSLog(@"Git wrapper at %@", wrapperPath);
@@ -53,12 +62,28 @@ static GitWrapper *_sharedGitWrapper = nil;
 
 - (void) executeGit:(NSArray *)args timeoutAfter:(int)tsecs withCompletionBlock:(void (^)(NSDictionary*))codeBlock
 {
-	GitWrapperCommand *cmd = [GitWrapperCommand gitCommand:wrapperPath withArgs:args andTimeout:tsecs];
+	/*
+	GitWrapperCommand *cmd = [[GitWrapperCommand alloc] initWith:wrapperPath withArgs:args andTimeout:tsecs];
+	
 	[cmd setCompletionBlock: ^{
 		codeBlock([cmd jsonResult]);
+		NSLog(@"executeGit %@ done: ref count %d", [args objectAtIndex:0], [cmd retainCount]);
 	}];
-	[[(GitBuddy*)[NSApp delegate] queue] addOperation:cmd];
+	
+	[queue addOperation:cmd];
 	[cmd release];
+	 */
+	
+	[queue addOperationWithBlock:^{
+		GitWrapperCommand *cmd = [[GitWrapperCommand alloc] initWith:wrapperPath withArgs:args andTimeout:tsecs];
+		[cmd main];
+		id result = [cmd jsonResult];
+		if (result) {
+			codeBlock(result);
+		}
+		
+		[cmd release];
+	}];
 }
 
 @end

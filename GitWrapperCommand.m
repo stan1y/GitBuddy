@@ -18,15 +18,11 @@
 	[stderrPipe release];
 	[gitWrapper release];
 	[parser release];
-	if (jsonResult) {
-		[jsonResult release];
-		
-	}
 	
 	[super dealloc];
 }
 
-- (id) init
+- (id) initWith:(NSString*)wrapperPath withArgs:(NSArray *)args andTimeout:(int)tsecs
 {
 	if ( !(self = [super init]) ) {
 		return nil;
@@ -36,25 +32,19 @@
 	stdoutPipe = [[NSPipe alloc] init];
 	stderrPipe = [[NSPipe alloc] init];
 	gitWrapper = [[NSTask alloc] init];
-	
+	[self setTimeout:tsecs];
 	[gitWrapper setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
 	[gitWrapper setStandardError:stderrPipe];
 	[gitWrapper setStandardOutput:stdoutPipe];
 	[gitWrapper setLaunchPath:@"/usr/bin/python"];
 	
-	return self;
-}
-
-+ (GitWrapperCommand*) gitCommand:(NSString*)wrapperPath withArgs:(NSArray *)args andTimeout:(int)tsecs
-{
-	GitWrapperCommand *cmd = [[GitWrapperCommand alloc] init];
 	NSMutableArray * _args = [NSMutableArray arrayWithArray:args];
-	[cmd setTimeout:tsecs];
 	[_args insertObject:wrapperPath atIndex:0];
 	[_args insertObject:[NSString stringWithFormat:@"--git=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"gitPath"]] atIndex:1];
-	[[cmd gitWrapper] setArguments:_args];
+	[gitWrapper setArguments:_args];
 	NSLog(@"git operation: /usr/bin/python %@", [_args componentsJoinedByString:@" "]);
-	return cmd;
+	
+	return self;
 }
 
 - (void) main
@@ -87,6 +77,7 @@
 		NSLog(@"Git failed with unknown reason");
 		[[NSApplication sharedApplication] terminate:nil];
 		[gitWrapper release];
+
 		return;
 	}
 	else {
@@ -94,42 +85,46 @@
 		NSLog(@"wrapper exit code %d", rc);
 		//	wrapper exit codes: -1 is incorrect usage, other - git exit code
 		if (rc == -1) {
+			
+			//FATALITY!
+			
 			NSLog(@"Git usage error code %d", rc);
 			NSRunAlertPanel(@"Oups... Git command failed.", @"Git wrapper failed with error saying that usage is wrong. That mostly means unknown git installed here.", @"Exit", nil, nil);
-			
 			[[NSApplication sharedApplication] terminate:nil];
 		}
-		else {
-			
-			NSError * err = nil;
-			id jsonObj = [parser objectWithString:totalOutput error:&err];
+		
+		
+		NSError * err = nil;
+		jsonResult = [parser objectWithString:totalOutput error:&err];
+		
+		if (err) {
+			NSLog(@"Git error: %@", err);
+			[[NSApplication sharedApplication] presentError:err];
 
-			if (err) {
-				NSLog(@"Git error: %@", err);
-				[[NSApplication sharedApplication] presentError:err];
-				return;
-			}
-			if (jsonObj) {
-				[self setJsonResult:jsonObj];
-				
-				//check json answer
-				if ([[[self jsonResult] objectForKey:@"giterr"] count] > 0 && [[[self jsonResult] objectForKey:@"gitrc"] intValue] != 0 ){
-					NSLog(@"Git error: %@", [[self jsonResult] objectForKey:@"giterr"]);
-					int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[[self jsonResult] objectForKey:@"gitrc"] intValue], [[[self jsonResult] objectForKey:@"giterr"] componentsJoinedByString:@" "]], @"Terminate", @"Continue", nil);
-					
-					//terminate
-					if (rc == 1) {
-						[[NSApplication sharedApplication] terminate:nil];
-					}
-					//continue
-					return;
-				}
-				return;
-			}
-			else {
-				return;
+			return;
+		}
+		if (!jsonResult) {
+			NSLog(@"OMG no object from json library!");
+
+			return;
+		}
+
+		NSLog(@"setJsonResult ref count %d", [jsonResult retainCount]);
+		//check json answer
+		if ([[[self jsonResult] objectForKey:@"giterr"] count] > 0 && [[[self jsonResult] objectForKey:@"gitrc"] intValue] != 0 ){
+			NSLog(@"Git error: %@", [[self jsonResult] objectForKey:@"giterr"]);
+			int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[[self jsonResult] objectForKey:@"gitrc"] intValue], [[[self jsonResult] objectForKey:@"giterr"] componentsJoinedByString:@" "]], @"Terminate", @"Continue", nil);
+			
+			//terminate
+			if (rc == 1) {
+				//FINISH HIM!
+				[[NSApplication sharedApplication] terminate:nil];
 			}
 		}
+		
+		//All done
+
+		return;
 	}
 }
 
