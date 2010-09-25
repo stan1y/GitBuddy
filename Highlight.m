@@ -16,8 +16,8 @@ static NSDictionary* _charColorsDictionary = nil;
 {
 	if (!_charColorsDictionary) {
 		_charColorsDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
-								 [NSColor greenColor], [NSString stringWithString:@"+"],
-								 [NSColor redColor], [NSString stringWithString:@"-"],
+								 [NSColor redColor], [NSString stringWithString:@"+"],
+								 [NSColor greenColor], [NSString stringWithString:@"-"],
 								 nil];
 	}
 	
@@ -26,10 +26,8 @@ static NSDictionary* _charColorsDictionary = nil;
 
 + (void) highLightCell:(NSTextFieldCell*)cell forLine:(NSString*)line
 {
-	//light gray by default
-	[cell setTextColor:[NSColor lightGrayColor]];
-	
 	//color
+	[cell setTextColor:[NSColor secondarySelectedControlColor]];
 	if ([line length] > 0) {
 		NSString *first = [line substringToIndex:1];
 		NSColor *c = [[Highlight charColorsDictionary] objectForKey:first];
