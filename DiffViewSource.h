@@ -3,7 +3,7 @@
 //  GitBuddy
 //
 //  Created by Stanislav Yudin on 8/9/2010.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Copyright 2010 Endless Insomnia Labs. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
