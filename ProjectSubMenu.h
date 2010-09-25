@@ -20,11 +20,12 @@
 	NSArray *checkedItems;
 }
 
+@property (retain) NSArray *checkedItems;
+
 - (id) initProject:(NSString*)project withDict:(NSDictionary*)dict forMenu:(NSMenu *)aMenu;
 - (void) setData:(NSDictionary*)dict;
 - (void) setInitialItems:(NSArray*)items;
 - (void) setItemSelector:(SEL)sel target:(id)aTarget;
-- (void) setCheckedItems:(NSArray*)items;
 - (int) totalNumberOfFiles;
 - (NSArray*) selectedFiles;
 
