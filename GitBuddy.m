@@ -159,11 +159,21 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 					NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self matches %@", [excludedPatterns objectAtIndex:i]];
 					if ([predicate evaluateWithObject:p]) {
 						//path is excluded
+						NSLog(@"Path %@ is excuted with predicte %@", p, predicate);
 						continue;
 					}
 				}
 				NSMenuItem *folderItem = [self menuItemForPath:p];
+				NSString *folderPath = [[[folderItem representedObject] path] stringByAppendingPathComponent:@"/.git/"];
+				
+				if ([folderPath isEqual:[p substringToIndex:([p length] - 1)]]) {
+					NSLog(@"Ignoring git repo root path");
+					//repo query flashback. should ignore
+					continue;
+				}
+					 
 				if (folderItem) {
+					NSLog(@"Processing %@ with in repo %@", p, folderPath);
 					[foldersToRescan addObject:folderItem];
 				}
 			}
@@ -208,7 +218,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	else {
 		queuedEvents = paths;
 	}
-	NSLog(@"FS Event paths: '%@'", [paths componentsJoinedByString:@", "]);
 	NSLog(@"Totaly %d events queued.", [queuedEvents count]);
 	[queuedEvents retain];
 	[eventsLock unlock];
@@ -572,7 +581,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 }
 
-//	-- Operation Panel
+//	-- Operation Panel, Clonning, Pushing & Pulling progress
 
 - (void) startOperation:(NSString*)description
 {
