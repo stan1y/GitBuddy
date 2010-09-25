@@ -69,6 +69,7 @@
 
 //Events thread implementation
 - (void) processEvents;
+- (void) processEventsNow;
 
 - (void) setActiveProjectByPath:(NSString*)path;
 - (ProjectBuddy*) getActiveProjectBuddy;
@@ -95,7 +96,6 @@
 @property (assign) IBOutlet NSTextField *newRemoteURL;
 @property (assign) IBOutlet NSTextField *newRemoteName;
 
-@property (nonatomic, retain, readonly) NSOperationQueue *queue;
 @property (assign) IBOutlet NSTextField *addRepoField;
 @property (assign) IBOutlet NSPanel *addRepoPanel;
 

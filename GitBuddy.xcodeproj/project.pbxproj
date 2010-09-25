@@ -30,7 +30,6 @@
 		767C985F124A50640037B0F9 /* CommitsLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C985E124A50640037B0F9 /* CommitsLog.m */; };
 		767C9860124A50640037B0F9 /* CommitsLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C985E124A50640037B0F9 /* CommitsLog.m */; };
 		767E35191237CD2A009AB7D6 /* DiffViewSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767E35181237CD2A009AB7D6 /* DiffViewSource.m */; };
-		768D9FF41247D1A2008D71AF /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF31247D1A2008D71AF /* appcast.xml */; };
 		768D9FF61247D1C4008D71AF /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF51247D1C4008D71AF /* dsa_pub.pem */; };
 		768D9FF81247D1CF008D71AF /* ReleaseNotes.html in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF71247D1CF008D71AF /* ReleaseNotes.html */; };
 		768DA02E1247D6CB008D71AF /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */; };
@@ -45,7 +44,6 @@
 		768DA0591247D8DF008D71AF /* GlobalKeysIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52668123F6AA7009094CC /* GlobalKeysIcon.png */; };
 		768DA05A1247D8DF008D71AF /* MonitoringIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D52669123F6AA7009094CC /* MonitoringIcon.png */; };
 		768DA05B1247D8DF008D71AF /* UpdatesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 76D5266A123F6AA7009094CC /* UpdatesIcon.png */; };
-		768DA05C1247D8DF008D71AF /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF31247D1A2008D71AF /* appcast.xml */; };
 		768DA05D1247D8DF008D71AF /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF51247D1C4008D71AF /* dsa_pub.pem */; };
 		768DA05E1247D8DF008D71AF /* ReleaseNotes.html in Resources */ = {isa = PBXBuildFile; fileRef = 768D9FF71247D1CF008D71AF /* ReleaseNotes.html */; };
 		768DA0601247D8DF008D71AF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -175,7 +173,6 @@
 		767C985E124A50640037B0F9 /* CommitsLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommitsLog.m; sourceTree = "<group>"; };
 		767E35171237CD2A009AB7D6 /* DiffViewSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiffViewSource.h; sourceTree = "<group>"; };
 		767E35181237CD2A009AB7D6 /* DiffViewSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiffViewSource.m; sourceTree = "<group>"; };
-		768D9FF31247D1A2008D71AF /* appcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
 		768D9FF51247D1C4008D71AF /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		768D9FF71247D1CF008D71AF /* ReleaseNotes.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReleaseNotes.html; sourceTree = "<group>"; };
 		768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShortcutRecorder.framework; sourceTree = "<group>"; };
@@ -333,7 +330,6 @@
 			children = (
 				768D9FF71247D1CF008D71AF /* ReleaseNotes.html */,
 				768D9FF51247D1C4008D71AF /* dsa_pub.pem */,
-				768D9FF31247D1A2008D71AF /* appcast.xml */,
 				766B543A12325CCD008738D4 /* wrapper.py */,
 				766B5413123245F8008738D4 /* Images */,
 				8D1107310486CEB800E47090 /* GitBuddy-Info.plist */,
@@ -473,7 +469,6 @@
 				768DA0591247D8DF008D71AF /* GlobalKeysIcon.png in Resources */,
 				768DA05A1247D8DF008D71AF /* MonitoringIcon.png in Resources */,
 				768DA05B1247D8DF008D71AF /* UpdatesIcon.png in Resources */,
-				768DA05C1247D8DF008D71AF /* appcast.xml in Resources */,
 				768DA05D1247D8DF008D71AF /* dsa_pub.pem in Resources */,
 				768DA05E1247D8DF008D71AF /* ReleaseNotes.html in Resources */,
 				76D8FAF6124A9475008A2296 /* GitBuddy16.png in Resources */,
@@ -499,7 +494,6 @@
 				76D5266C123F6AA7009094CC /* GlobalKeysIcon.png in Resources */,
 				76D5266D123F6AA7009094CC /* MonitoringIcon.png in Resources */,
 				76D5266E123F6AA7009094CC /* UpdatesIcon.png in Resources */,
-				768D9FF41247D1A2008D71AF /* appcast.xml in Resources */,
 				768D9FF61247D1C4008D71AF /* dsa_pub.pem in Resources */,
 				768D9FF81247D1CF008D71AF /* ReleaseNotes.html in Resources */,
 				76D8FAF8124A9475008A2296 /* GitBuddy16.png in Resources */,
@@ -525,7 +519,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nRELEASE=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://www.endlessinsomnia.com/download/GitBuddy\"\nRELEASENOTES_URL=\"http://www.endlessinsomnia.com/download/GitBuddy/ReleaseNotes.html#version-$RELEASE\"\n\nARCHIVE_FILENAME=\"$PROJECT_NAME $VERSION $RELEASE.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"GitBuddy Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"$PROJECT_NAME\"*.zip\nditto -ck --keepParent \"$PROJECT_NAME.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(LC_TIME=en_US date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g' | perl -MXML::LibXML -e 'print XML::LibXML->new()->parse_file(\"-\")->findvalue(q(//string[preceding-sibling::key[1] = \"NOTE\"]))') \\\n\t| openssl enc -base64\n)\n\ncat > release_$RELEASE.xml <<EOF\n\t\t<item>\n\t\t\t<title>GitBuddy $VERSION Release!</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$RELEASE\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF";
+			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nRELEASE=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleShortVersionString)\nDOWNLOAD_BASE_URL=\"http://www.endlessinsomnia.com/download/GitBuddy\"\nRELEASENOTES_URL=\"http://www.endlessinsomnia.com/download/GitBuddy/ReleaseNotes.html#version-$RELEASE\"\n\nARCHIVE_FILENAME=\"$PROJECT_NAME $VERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"GitBuddy Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"$PROJECT_NAME\"*.zip\nditto -ck --keepParent \"$PROJECT_NAME.app\" \"$ARCHIVE_FILENAME\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(LC_TIME=en_US date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g' | perl -MXML::LibXML -e 'print XML::LibXML->new()->parse_file(\"-\")->findvalue(q(//string[preceding-sibling::key[1] = \"NOTE\"]))') \\\n\t| openssl enc -base64\n)\n\ncat > appcast.xml <<EOF\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<rss version=\"2.0\" xmlns:sparkle=\"http://www.andymatuschak.org/xml-namespaces/sparkle\"  xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n   <channel>\n      <title>GitBuddy Changelog</title>\n      <link>http://www.endlessinsomnia.com/updates/GitBuddy/appcast.xml</link>\n      <description>Most recent changes with links to updates.</description>\n      <language>en</language>\n\t  \n\t\t<item>\n\t\t\t<title>GitBuddy $VERSION Released!</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$RELEASE\"\n\t\t\t\tsparkle:shortVersionString=\"$VERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\n\t\t\n   </channel>\n</rss>\nEOF";
 		};
 /* End PBXShellScriptBuildPhase section */
 

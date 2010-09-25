@@ -17,7 +17,6 @@
 @implementation GitBuddy
 
 @synthesize addRepoPanel, addRepoField;
-@synthesize queue;
 @synthesize filesStager, preview, commit, clone;
 @synthesize operationPanel, operationDescription, operationIndicator;
 @synthesize newRemotePanel, newRemoteName, newRemoteURL;

@@ -21,10 +21,17 @@
 {
 	if (filePath) {
 		[filePath release];
+		filePath = nil;
 	}
 	
 	if (projectPath) {
 		[projectPath release];
+		projectPath = nil;
+	}
+	
+	if (queue) {
+		[queue release];
+		queue = nil;
 	}
 	
 	[super dealloc];
@@ -57,9 +64,11 @@
 - (IBAction) showInExternalViewer:(id)sender
 {
 	//FIXME : won't work for anything except git difftool
-	
+	if ( !queue ) {
+		queue = [[NSOperationQueue alloc] init];
+	}
 	ChangeSetViewer *viewer = [ChangeSetViewer viewModified:@"/dev/null" diffTo:[self filePath] project:[self projectPath]];
-	[[(GitBuddy*)[NSApp delegate] queue] addOperation:viewer];
+	[queue addOperation:viewer];
 	[viewer release];
 	
 	[[self window] performClose:sender];

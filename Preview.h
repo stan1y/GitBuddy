@@ -14,6 +14,7 @@
 	
 	NSString *filePath;
 	NSString *projectPath;
+	NSOperationQueue *queue;
 }
 
 @property (nonatomic, retain) NSString *filePath;

@@ -2,3 +2,5 @@
 
 SUFeedURL = "http://www.endlessinsomnia.com/download/GitBuddy/appcast.xml";
 SUEnableAutomaticChecks = YES;
+SUAllowsAutomaticUpdates = YES;
+SUPublicDSAKeyFile = "dsa_pub.pem"
