@@ -398,7 +398,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[addRepoPanel orderOut:sender];
 		
 		//scan new repo
-		[self appendEventPaths:[NSArray arrayWithObject:repoPath]];
+		[self appendEventPaths:[NSArray arrayWithObject:path]];
 		[self processEventsNow];
 	}
 	else {
