@@ -20,6 +20,7 @@
 	
 	NSStatusItem *statusItem;
 	
+	NSImage *currentImage;
 	NSImage *statusImage;
 	NSImage *statusAltImage;
 	
@@ -104,7 +105,7 @@
 - (BOOL) addMonitoredPath:(NSString *)path;
 - (NSArray *) monitoredPathsArray;
 
-- (void) scanFsEventsAtPaths:(NSArray *)paths;
+- (void) appendEventPaths:(NSArray *)paths;
 
 - (IBAction) browseForRepo:(id)sender;
 - (IBAction) addRepo:(id)sender;
@@ -124,7 +125,7 @@
 
 //status icon
 - (void) setStatusImage:(NSImage*)image;
-
+- (void) setCurrentImage;
 @end
 
 //get current time in seconds

@@ -101,10 +101,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[buddy setLastEventId:eventIds[i]];
 		NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
 		if ([paths isKindOfClass:[NSArray class]]) {
-			[buddy scanFsEventsAtPaths:(NSArray *)paths];
+			[buddy appendEventPaths:(NSArray *)paths];
 		}
 		else {
-			[buddy scanFsEventsAtPaths:[NSArray arrayWithObject:paths]];
+			[buddy appendEventPaths:[NSArray arrayWithObject:paths]];
 		}
     }
 }
@@ -140,64 +140,70 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 //	--- Changes scanning
 
+- (void) processEventsNow
+{
+	//processing events
+	[eventsLock lock];
+	
+	if ([queuedEvents count]) {
+		[animStatus startAnimation];
+		NSLog(@"Processing %d events in queue.", [queuedEvents count]);
+		NSMutableSet * foldersToRescan = [NSMutableSet set];
+		NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
+		for(NSString *p in queuedEvents) {
+			//check if path is excluded
+			for(int i=0; i< [excludedPatterns count]; i++) {
+				NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self matches %@", [excludedPatterns objectAtIndex:i]];
+				if ([predicate evaluateWithObject:p]) {
+					//path is excluded
+					NSLog(@"Path %@ is excuted with predicte %@", p, predicate);
+					continue;
+				}
+			}
+			NSMenuItem *folderItem = [self menuItemForPath:p];
+			NSString *folderPath = [[[folderItem representedObject] path] stringByAppendingPathComponent:@"/.git/"];
+			
+			if ([folderPath isEqual:[p substringToIndex:([p length] - 1)]]) {
+				NSLog(@"Ignoring git repo root path");
+				//repo query flashback. should ignore
+				continue;
+			}
+			
+			if (folderItem) {
+				NSLog(@"Processing %@ with in repo %@", p, folderPath);
+				[foldersToRescan addObject:folderItem];
+			}
+		}
+		
+		//clear array
+		[queuedEvents release];
+		queuedEvents = nil;
+		
+		NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
+		if ( ![foldersToRescan count] ) {
+			[animStatus stopAnimation];
+		}
+		
+		for(NSMenuItem *mi in foldersToRescan) {
+			[[mi representedObject] rescanWithCompletionBlock: ^{
+				[animStatus stopAnimation];
+			}];
+		}
+		
+	}
+	
+	lastUpdatedSec = now_seconds();
+	
+	//unlock events
+	[eventsLock unlock];
+}
+
 - (void) processEvents
 {
 	while(YES) {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		
-		//processing events
-		[eventsLock lock];
-		if ([queuedEvents count]) {
-			
-			
-			NSLog(@"Processing %d events in queue.", [queuedEvents count]);
-			NSMutableSet * foldersToRescan = [NSMutableSet set];
-			NSArray * excludedPatterns = [[NSUserDefaults standardUserDefaults] arrayForKey:@"excludedPatterns"];
-			for(NSString *p in queuedEvents) {
-				//check if path is excluded
-				for(int i=0; i< [excludedPatterns count]; i++) {
-					NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self matches %@", [excludedPatterns objectAtIndex:i]];
-					if ([predicate evaluateWithObject:p]) {
-						//path is excluded
-						NSLog(@"Path %@ is excuted with predicte %@", p, predicate);
-						continue;
-					}
-				}
-				NSMenuItem *folderItem = [self menuItemForPath:p];
-				NSString *folderPath = [[[folderItem representedObject] path] stringByAppendingPathComponent:@"/.git/"];
-				
-				if ([folderPath isEqual:[p substringToIndex:([p length] - 1)]]) {
-					NSLog(@"Ignoring git repo root path");
-					//repo query flashback. should ignore
-					continue;
-				}
-					 
-				if (folderItem) {
-					NSLog(@"Processing %@ with in repo %@", p, folderPath);
-					[foldersToRescan addObject:folderItem];
-				}
-			}
-			
-			//clear array
-			[queuedEvents release];
-			queuedEvents = nil;
-			
-
-			[animStatus startAnimation];
-			
-			NSLog(@"Total %d Git repos were changed.", [foldersToRescan count]);
-			for(NSMenuItem *mi in foldersToRescan) {
-				[[mi representedObject] rescanWithCompletionBlock: ^{
-					[animStatus stopAnimation];
-				}];
-			}
-			
-		}
-				
-		lastUpdatedSec = now_seconds();
-		
-		//unlock events
-		[eventsLock unlock];
+		[self processEventsNow];
 		[pool release];
 		
 		//sleep thread
@@ -205,7 +211,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 }
 
-- (void) scanFsEventsAtPaths:(NSArray *)paths
+- (void) appendEventPaths:(NSArray *)paths
 {
 	//processing events
 	[eventsLock lock];
@@ -237,6 +243,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		//there is only one project, so make it active
 		[self setActiveProjectByPath:[paths objectAtIndex:0]];
 	}
+	
+	[self processEventsNow];
 }
 
 - (NSMenuItem *) menuItemForPath:(NSString *)path
@@ -292,7 +300,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		//add new monitored path
 		[self newMenuItem:path withPath:[path stringByExpandingTildeInPath]];
 		//scan for changes after repo was added
-		[self scanFsEventsAtPaths:[self monitoredPathsArray]];
+		[self appendEventPaths:[self monitoredPathsArray]];
 		//restart events with new repo
 		[self initializeEventForPaths:[self monitoredPathsArray]];
 	}
@@ -398,7 +406,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 {
 	lastUpdatedSec = 0;
 	NSLog(@"Rescaning repos...");
-	[self scanFsEventsAtPaths:[self monitoredPathsArray]];
+	[self appendEventPaths:[self monitoredPathsArray]];
+	[self processEventsNow];
 }
 
 //	-- Initialization
@@ -417,6 +426,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	
     // Set the initial values in the shared user defaults controller
     [[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:userDefaultsValuesDict];
+}
+
+- (void) setCurrentImage
+{
+	if (currentImage) {
+		[self setStatusImage:currentImage];
+	}
 }
 
 - (void) setStatusImage:(NSImage*)image
@@ -544,15 +560,14 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		//update with number of items
 		[statusItem setTitle:[NSString stringWithFormat:@" %d", totalItems]];
 		//set alternate icon
-		[animStatus stopAnimation];
-		[self setStatusImage:statusAltImage];
+		currentImage = statusAltImage;
+		[self setCurrentImage];
 		[statusItem setToolTip:[NSString stringWithFormat:@"GitBuddy found %d unstaved changes.", totalItems]];
 	}
 	else {
 		//set normal icon & no title
 		[statusItem setTitle:@""];
-		[animStatus stopAnimation];
-		[self setStatusImage:statusImage];
+		currentImage = statusImage;
 		[statusItem setToolTip:@"GitBuddy running."];
 	}
 }
