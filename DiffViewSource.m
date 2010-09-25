@@ -11,7 +11,7 @@
 
 @implementation DiffViewSource
 
-@synthesize tableView, indicator, gitObjectsIndex;
+@synthesize tableView, indicator, gitObjectsIndex, currentSource;
 
 - (id) init
 {
@@ -75,17 +75,14 @@
 	
 	GitWrapper * wrapper = [GitWrapper sharedInstance];
 	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, keyArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-		if (currentSource) {
-			[currentSource release];
-		}
+		
+		[self setCurrentSource:dict];
 		
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
 
 		NSLog(@"Reloading changes with commit diff");
-		currentSource = dict;
-		[currentSource retain];
 		[tableView reloadData];
 	}];
 }
@@ -101,17 +98,13 @@
 	
 	GitWrapper * wrapper = [GitWrapper sharedInstance];
 	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-		if (currentSource) {
-			[currentSource release];
-		}
+		[self setCurrentSource:dict];
 		
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
 
 		NSLog(@"Reloading changes with file diff");
-		currentSource = dict;
-		[currentSource retain];
 		[tableView reloadData];
 	}];
 	
@@ -128,17 +121,13 @@
 	
 	GitWrapper * wrapper = [GitWrapper sharedInstance];
 	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-		if (currentSource) {
-			[currentSource release];
-		}
+		[self setCurrentSource:dict];
 		
 		[indicator stopAnimation:nil];
 		[indicator setHidden:YES];
 		[tableView setEnabled:YES];
 
-		NSLog(@"Reloading changes with file diff");
-		currentSource = dict;
-		[currentSource retain];
+		NSLog(@"Reloading changes with cached file diff");
 		[tableView reloadData];
 	}];
 	
@@ -146,12 +135,16 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return [[currentSource objectForKey:@"lines"] count];
+	
+	if (currentSource) return [[currentSource objectForKey:@"lines"] count];
+	return 0;
 }
 
 - (NSString *) stringAtIndex:(int)index
 {
-	return [[currentSource objectForKey:@"lines"] objectAtIndex:index];
+	if (currentSource) return [[currentSource objectForKey:@"lines"] objectAtIndex:index];
+	return @"";
+	
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
