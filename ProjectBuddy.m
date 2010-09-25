@@ -35,7 +35,7 @@
 	while((theKey = [e nextObject]) != nil)
 	{
 		id theObject = [dict objectForKey:theKey];
-		[theObject retain];
+		//[theObject retain];
 		[itemDict setObject:theObject forKey:theKey];
 	}
 	
@@ -89,9 +89,7 @@
 			NSLog(@"Project Status Dictionary:\n");
 			NSLog(@"%@", [self itemDict]);
 			NSLog(@"  ***");
-			
-			[self updateMenuItems];
-			[parentMenu update];
+			[self performSelectorOnMainThread:@selector(updateMenuItems) withObject:nil waitUntilDone:YES];
 			
 			//set counter for project
 			[ (GitBuddy*)[NSApp delegate] setCounter:[self totalChangeSetItems] forProject:path];
@@ -274,6 +272,8 @@
 
 - (void) updateMenuItems
 {
+	[parentMenu update];
+	
 	//update dynamic menus
 	[changedSubMenu setData:[[self itemDict] objectForKey:@"unstaged"]];
 	[stagedSubMenu setData:[[self itemDict] objectForKey:@"staged"]];
