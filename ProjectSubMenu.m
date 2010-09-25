@@ -10,10 +10,13 @@
 
 @implementation ProjectSubMenu
 
+@synthesize checkedItems;
+
 - (void) dealloc
 {
 	[data release];
 	[project release];
+	[checkedItems release];
 	[super dealloc];
 }
 
@@ -32,11 +35,6 @@
 	[data retain];
 	
 	return self;
-}
-
-- (void) setCheckedItems:(NSArray*)items
-{
-	checkedItems = [items copy];
 }
 
 - (void) setData:(NSDictionary *)dict
