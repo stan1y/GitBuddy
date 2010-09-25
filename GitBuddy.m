@@ -396,6 +396,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		//close dialog
 		[addRepoField setStringValue:@""];
 		[addRepoPanel orderOut:sender];
+		
+		//scan new repo
+		[self appendEventPaths:[NSArray arrayWithObject:repoPath]];
+		[self processEventsNow];
 	}
 	else {
 		NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor", @"Try again", nil, nil);

@@ -89,6 +89,9 @@
 				[buddy initializeEventForPaths:[buddy monitoredPathsArray]];
 				//set new repo as active
 				[buddy setActiveProjectByPath:repoPath];
+				//scan new repo
+				[buddy appendEventPaths:[NSArray arrayWithObject:repoPath]];
+				[buddy processEventsNow];
 				
 				NSRunInformationalAlertPanel(@"GitBuddy successfully cloned repository.", [NSString stringWithFormat:@"New repository was cloned to %@ and set as Active Project.", repoPath], @"Continue", nil, nil);
 			}
