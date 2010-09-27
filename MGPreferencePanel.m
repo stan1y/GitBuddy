@@ -225,6 +225,9 @@ NSString * const keysIcon = @"GlobalKeysIcon";
 	return [item autorelease];
 }
 
-
+- (void)windowWillClose:(NSNotification *)notification
+{
+	[[NSUserDefaults standardUserDefaults] synchronize];
+}
 
 @end
