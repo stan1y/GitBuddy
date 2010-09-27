@@ -80,7 +80,7 @@
 			return;
 		}
 	}
-	else if ( !isDir) {
+	else if (!isDir) {
 		NSRunAlertPanel(@"Oups...", [NSString stringWithFormat:@"Specified path %@ is occupied by some file, you need to remove it or specify another local path for repository.", localPath], @"Continue", nil, nil);
 		return;
 	}

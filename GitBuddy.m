@@ -469,6 +469,17 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[self setLastEventId:[[defaults objectForKey:@"lastEventId"] unsignedLongLongValue]];
 	NSLog(@"Last event id: %d", lastEventId);
 	
+	//check git binary
+	NSFileManager *mgr = [NSFileManager defaultManager];
+	BOOL exists, dir = NO;
+	exists = [mgr fileExistsAtPath:[defaults valueForKey:@"gitPath"] isDirectory:&dir];
+	if (!exists || dir) {
+		int rc = NSRunAlertPanel(@"Git not found", @"GitBuddy failed to find git binary at %@. Please specify correct path in preferences.", @"Open preferences", @"Terminate", nil);
+		if (rc == 1 ) {
+			
+		}
+	}
+	
 	//setup fs events
 	eventsRescanDelay = [defaults doubleForKey:@"eventsRescanDelay"];
 	NSLog(@"Events rescan delay: %.2f", eventsRescanDelay);
