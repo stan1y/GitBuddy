@@ -16,8 +16,8 @@ static NSDictionary* _charColorsDictionary = nil;
 {
 	if (!_charColorsDictionary) {
 		_charColorsDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
-								 [NSColor redColor], [NSString stringWithString:@"+"],
-								 [NSColor greenColor], [NSString stringWithString:@"-"],
+								 [NSColor redColor], [NSString stringWithString:@"-"],
+								 [NSColor greenColor], [NSString stringWithString:@"+"],
 								 nil];
 	}
 	
