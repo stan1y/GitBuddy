@@ -22,7 +22,7 @@
 @synthesize newRemotePanel, newRemoteName, newRemoteURL;
 @synthesize newBranchPanel, newBranchName;
 @synthesize commitsLog, commitsLogPanel;
-@synthesize lastUpdatedOn, appVersion, updater;
+@synthesize lastUpdatedOn, appVersion, updater, preferences;
 
 //	---	Keyboard Events processing
 
@@ -476,7 +476,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	if (!exists || dir) {
 		int rc = NSRunAlertPanel(@"Git not found", @"GitBuddy failed to find git binary at %@. Please specify correct path in preferences.", @"Open preferences", @"Terminate", nil);
 		if (rc == 1 ) {
-			
+			[[[self preferences] window] orderFront:self];
 		}
 	}
 	

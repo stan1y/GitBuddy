@@ -29,6 +29,8 @@ NSString * const keysIcon = @"GlobalKeysIcon";
 
 @implementation MGPreferencePanel
 
+@synthesize window;
+
 -(id) init
 {
 	if( self = [super init] )

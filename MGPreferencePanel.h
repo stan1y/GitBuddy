@@ -19,6 +19,8 @@
 	IBOutlet NSWindow *window;
 }
 
+@property (readonly, retain) NSWindow *window;
+
 -(void) mapViewsToToolbar;
 -(void) firstPane;
 -(IBAction) changePanes: (id)sender;

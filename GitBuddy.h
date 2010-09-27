@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "MGPreferencePanel.h"
 #import "ProjectBuddy.h"
 #import "FilesStager.h"
 #import "Preview.h"
@@ -36,6 +37,8 @@
 	NSLock *eventsLock;
 	NSArray *queuedEvents;
 	NSMutableDictionary *projCounters;
+	
+	MGPreferencePanel *preferences;
 	
 	FilesStager *filesStager;
 	Preview *preview;
@@ -75,6 +78,7 @@
 - (ProjectBuddy*) getActiveProjectBuddy;
 
 //assigned from nib
+@property (assign) IBOutlet MGPreferencePanel *preferences;
 @property (assign) IBOutlet id updater;
 @property (assign) IBOutlet NSTextField *lastUpdatedOn;
 @property (assign) IBOutlet NSTextField *appVersion;
