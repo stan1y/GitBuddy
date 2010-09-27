@@ -386,6 +386,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 - (IBAction) addRepo:(id)sender
 {
 	NSString *path = [addRepoField stringValue];
+	if ( !path || ![path length]) {
+		return;
+	}
+	
 	NSLog(@"Adding path: %@", path);
 	if ([self addMonitoredPath:path]) {
 		[self initializeEventForPaths:[self monitoredPathsArray]];
@@ -461,7 +465,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//set version
 	[[self appVersion] setStringValue:[NSString stringWithFormat:@"Your version is %@ (%@)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]]];
 
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[self setLastEventId:[[defaults objectForKey:@"lastEventId"] unsignedLongLongValue]];
 	NSLog(@"Last event id: %d", lastEventId);
 	

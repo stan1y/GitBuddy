@@ -61,8 +61,14 @@
 
 - (IBAction) cloneRepo:(id)sender
 {	
+	NSString *localPath = [[repoLocalPath stringValue] stringByExpandingTildeInPath];
+	NSString *url = [repoUrl stringValue];
+
+	if (!localPath || !url || ![localPath length] || ![url length]) {
+		return;
+	}
+	
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
-	NSString * localPath = [[repoLocalPath stringValue] stringByExpandingTildeInPath];
 	NSFileManager *mgr = [NSFileManager defaultManager];
 	BOOL isDir = NO;
 	BOOL exists = [mgr fileExistsAtPath:localPath isDirectory:&isDir];
@@ -80,7 +86,7 @@
 	}
 	
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", localPath];
-	NSString * cloneArg = [NSString stringWithFormat:@"--clone=%@", [repoUrl stringValue]];
+	NSString * cloneArg = [NSString stringWithFormat:@"--clone=%@", url];
 	NSArray * urlParts = [[NSURL URLWithString:[repoUrl stringValue]] pathComponents];
 	NSString * repoPath = [localPath stringByAppendingPathComponent:[[urlParts objectAtIndex:[urlParts count] - 1] stringByDeletingPathExtension]];
 	
