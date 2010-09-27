@@ -405,11 +405,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 }
 
-- (IBAction) rescanRepos:(id)sender
+- (void) rescanRepoAtPath:(NSString*)path
 {
 	lastUpdatedSec = 0;
-	NSLog(@"Rescaning repos...");
-	[self appendEventPaths:[self monitoredPathsArray]];
+	NSLog(@"Rescaning repo %@", path);
+	[self appendEventPaths:[NSArray arrayWithObject:path]];
 	[self processEventsNow];
 }
 

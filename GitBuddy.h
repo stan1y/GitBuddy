@@ -120,6 +120,9 @@
 - (void) startOperation:(NSString*)description;
 - (void) finishOperation;
 
+//rescan
+- (void) rescanRepoAtPath:(NSString*)path;
+
 //projects counters
 - (void) setCounter:(int)changed forProject:(NSString*)path;
 

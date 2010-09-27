@@ -62,10 +62,27 @@
 - (IBAction) cloneRepo:(id)sender
 {	
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
-	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", [repoLocalPath stringValue]];
+	NSString * localPath = [[repoLocalPath stringValue] stringByExpandingTildeInPath];
+	NSFileManager *mgr = [NSFileManager defaultManager];
+	BOOL isDir = NO;
+	BOOL exists = [mgr fileExistsAtPath:localPath isDirectory:&isDir];
+	if ( !exists ) {
+		NSError *err = nil;
+		[mgr createDirectoryAtPath:localPath withIntermediateDirectories:YES attributes:nil error:&err];
+		if (err) {
+			[[NSApp delegate] presentError:err];
+			return;
+		}
+	}
+	else if ( !isDir) {
+		NSRunAlertPanel(@"Oups...", [NSString stringWithFormat:@"Specified path %@ is occupied by some file, you need to remove it or specify another local path for repository.", localPath], @"Continue", nil, nil);
+		return;
+	}
+	
+	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", localPath];
 	NSString * cloneArg = [NSString stringWithFormat:@"--clone=%@", [repoUrl stringValue]];
 	NSArray * urlParts = [[NSURL URLWithString:[repoUrl stringValue]] pathComponents];
-	NSString * repoPath = [[repoLocalPath stringValue] stringByAppendingPathComponent:[[urlParts objectAtIndex:[urlParts count] - 1] stringByDeletingPathExtension]];
+	NSString * repoPath = [localPath stringByAppendingPathComponent:[[urlParts objectAtIndex:[urlParts count] - 1] stringByDeletingPathExtension]];
 	
 	int cloneTimeout = [[NSUserDefaults standardUserDefaults] integerForKey:@"gitCloneTimeout"];
 	NSLog(@"Cloning repo with timeout %d seconds", cloneTimeout);
@@ -89,10 +106,11 @@
 				[buddy initializeEventForPaths:[buddy monitoredPathsArray]];
 				//set new repo as active
 				[buddy setActiveProjectByPath:repoPath];
+				
 				//scan new repo
 				[buddy appendEventPaths:[NSArray arrayWithObject:repoPath]];
 				[buddy processEventsNow];
-				
+
 				NSRunInformationalAlertPanel(@"GitBuddy successfully cloned repository.", [NSString stringWithFormat:@"New repository was cloned to %@ and set as Active Project.", repoPath], @"Continue", nil, nil);
 			}
 			else {

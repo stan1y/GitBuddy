@@ -109,7 +109,7 @@
 
 - (IBAction) rescan:(id)sender
 {
-	[self rescanWithCompletionBlock: ^{}];
+	[(GitBuddy*)[NSApp delegate] rescanRepoAtPath:path];
 }
 
 - (void) pushToNamedSource:(NSString*)source
