@@ -84,7 +84,7 @@
 		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [self projectPath]];
 		NSString *resetArg = [NSString stringWithFormat:@"--reset=%@", [self filePath]];
 		[wrapper executeGit:[NSArray arrayWithObjects:repoArg, resetArg, nil] withCompletionBlock:^(NSDictionary *dict){
-
+			[ (GitBuddy*)[NSApp delegate] rescanRepoAtPath:projectPath];
 			NSLog(@"File %@ was reset to HEAD", [self filePath]);
 		}];
 		
