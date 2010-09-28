@@ -18,6 +18,7 @@
 	NSProgressIndicator *indicator;
 	
 	DiffViewSource *diffSource;
+	NSArray *selectedCommit;
 }
 
 @property (assign) IBOutlet NSTextField *commitMessage;
@@ -25,9 +26,10 @@
 @property (assign) IBOutlet NSTableView *tableView;
 @property (assign) IBOutlet NSProgressIndicator *indicator;
 
-@property(nonatomic, retain) NSArray *commits;
-@property(nonatomic, retain) NSString *sourceFile;
-@property(nonatomic, retain) NSString *projectPath;
+@property (nonatomic, retain) NSArray *selectedCommit;
+@property (nonatomic, retain) NSArray *commits;
+@property (nonatomic, retain) NSString *sourceFile;
+@property (nonatomic, retain) NSString *projectPath;
 
 - (void) loadCommitsFor:(NSString*)file inProject:(NSString*)project;
 

@@ -11,7 +11,7 @@
 
 @implementation CommitsSource
 
-@synthesize commits, sourceFile, projectPath;
+@synthesize commits, sourceFile, projectPath, selectedCommit;
 @synthesize tableView, indicator, diffSource, commitMessage;
 
 - (void) loadCommitsFor:(NSString*)file inProject:(NSString*)project
@@ -47,6 +47,7 @@
 	int index = [[aNotification object] selectedRow];
 	if (index >= 0) {
 		NSArray *commit = [[self commits] objectAtIndex:index];
+		[self setSelectedCommit:commit];
 		[diffSource updateWithCommitDiff:sourceFile commitId:[commit objectAtIndex:0] inPath:[self projectPath]];
 		[[self commitMessage] setStringValue:[commit objectAtIndex:3]];
 	}
