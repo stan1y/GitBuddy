@@ -24,7 +24,6 @@
 		766B547712325E43008738D4 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B547212325E43008738D4 /* SBJsonWriter.m */; };
 		766B55C912328322008738D4 /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 766B55C812328322008738D4 /* UserDefaults.plist */; };
 		766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
-		766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
 		767C9811124A4AB10037B0F9 /* CommitsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C9810124A4AB10037B0F9 /* CommitsSource.m */; };
 		767C9812124A4AB10037B0F9 /* CommitsSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C9810124A4AB10037B0F9 /* CommitsSource.m */; };
 		767C985F124A50640037B0F9 /* CommitsLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 767C985E124A50640037B0F9 /* CommitsLog.m */; };
@@ -55,7 +54,6 @@
 		768DA0661247D8DF008D71AF /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B547012325E43008738D4 /* SBJsonParser.m */; };
 		768DA0671247D8DF008D71AF /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B547212325E43008738D4 /* SBJsonWriter.m */; };
 		768DA0681247D8DF008D71AF /* ProjectBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B57CC1232BFD6008738D4 /* ProjectBuddy.m */; };
-		768DA0691247D8DF008D71AF /* ChangeSetViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 766B59561233A86C008738D4 /* ChangeSetViewer.m */; };
 		768DA06A1247D8DF008D71AF /* GitWrapperCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */; };
 		768DA06B1247D8DF008D71AF /* ProjectSubMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */; };
 		768DA06C1247D8DF008D71AF /* ProjectFilesSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 76FC45CE1236D67600C314A0 /* ProjectFilesSource.m */; };
@@ -165,8 +163,6 @@
 		766B55C812328322008738D4 /* UserDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = UserDefaults.plist; sourceTree = "<group>"; };
 		766B57CB1232BFD6008738D4 /* ProjectBuddy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectBuddy.h; sourceTree = "<group>"; };
 		766B57CC1232BFD6008738D4 /* ProjectBuddy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectBuddy.m; sourceTree = "<group>"; };
-		766B59551233A86C008738D4 /* ChangeSetViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeSetViewer.h; sourceTree = "<group>"; };
-		766B59561233A86C008738D4 /* ChangeSetViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeSetViewer.m; sourceTree = "<group>"; };
 		767C980F124A4AB10037B0F9 /* CommitsSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommitsSource.h; sourceTree = "<group>"; };
 		767C9810124A4AB10037B0F9 /* CommitsSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommitsSource.m; sourceTree = "<group>"; };
 		767C985D124A50640037B0F9 /* CommitsLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommitsLog.h; sourceTree = "<group>"; };
@@ -244,8 +240,6 @@
 				766B543812324DA2008738D4 /* GitWrapper.m */,
 				766B57CB1232BFD6008738D4 /* ProjectBuddy.h */,
 				766B57CC1232BFD6008738D4 /* ProjectBuddy.m */,
-				766B59551233A86C008738D4 /* ChangeSetViewer.h */,
-				766B59561233A86C008738D4 /* ChangeSetViewer.m */,
 				76FADB6E1235596F0075EAC0 /* GitWrapperCommand.h */,
 				76FADB6F1235596F0075EAC0 /* GitWrapperCommand.m */,
 				765C8F96123697AD00FCFF42 /* ProjectSubMenu.h */,
@@ -537,7 +531,6 @@
 				768DA0661247D8DF008D71AF /* SBJsonParser.m in Sources */,
 				768DA0671247D8DF008D71AF /* SBJsonWriter.m in Sources */,
 				768DA0681247D8DF008D71AF /* ProjectBuddy.m in Sources */,
-				768DA0691247D8DF008D71AF /* ChangeSetViewer.m in Sources */,
 				768DA06A1247D8DF008D71AF /* GitWrapperCommand.m in Sources */,
 				768DA06B1247D8DF008D71AF /* ProjectSubMenu.m in Sources */,
 				768DA06C1247D8DF008D71AF /* ProjectFilesSource.m in Sources */,
@@ -567,7 +560,6 @@
 				766B547612325E43008738D4 /* SBJsonParser.m in Sources */,
 				766B547712325E43008738D4 /* SBJsonWriter.m in Sources */,
 				766B57CD1232BFD6008738D4 /* ProjectBuddy.m in Sources */,
-				766B59571233A86C008738D4 /* ChangeSetViewer.m in Sources */,
 				76FADB701235596F0075EAC0 /* GitWrapperCommand.m in Sources */,
 				765C8F98123697AD00FCFF42 /* ProjectSubMenu.m in Sources */,
 				76FC45CF1236D67600C314A0 /* ProjectFilesSource.m in Sources */,
