@@ -38,7 +38,6 @@
 	
 	NSUInteger flags = [event modifierFlags];
 	unsigned short keyCode = [event keyCode];
-	NSLog(@"Key %d, flags %X was pressed", keyCode, flags);
 	
 	if ( ([[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue] == (flags & [[stageFilesKey valueForKey:@"modifierFlags"] unsignedIntegerValue])) && (keyCode == [[stageFilesKey valueForKey:@"keyCode"] unsignedShortValue]) ) {
 		if ( !pbuddy ) {
@@ -163,7 +162,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			NSString *folderPath = [[[folderItem representedObject] path] stringByAppendingPathComponent:@"/.git/"];
 			
 			if ([folderPath isEqual:[p substringToIndex:([p length] - 1)]]) {
-				NSLog(@"Ignoring git repo root path");
+				NSLog(@"Ignoring git repo root path: %@", p);
 				//repo query flashback. should ignore
 				continue;
 			}
