@@ -20,6 +20,7 @@
 	}
 	
 	gitObjectsIndex = nil;
+	exists, isDir = NO;
 	
 	return self;
 }
@@ -89,48 +90,64 @@
 
 - (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath
 {
-	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
-	NSString * diffArg = [NSString stringWithFormat:@"--diff=%@", filePath];
-	
-	[tableView setEnabled:NO];
-	[indicator setHidden:NO];
-	[indicator startAnimation:nil];
-	
-	GitWrapper * wrapper = [GitWrapper sharedInstance];
-	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-		[self setCurrentSource:dict];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	exists = [fm fileExistsAtPath:[projectPath stringByAppendingPathComponent:filePath] isDirectory:&isDir];
+	if (exists && !isDir) {
 		
-		[indicator stopAnimation:nil];
-		[indicator setHidden:YES];
-		[tableView setEnabled:YES];
-
-		NSLog(@"Reloading changes with file diff");
+		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
+		NSString * diffArg = [NSString stringWithFormat:@"--diff=%@", filePath];
+		
+		[tableView setEnabled:NO];
+		[indicator setHidden:NO];
+		[indicator startAnimation:nil];
+		
+		GitWrapper * wrapper = [GitWrapper sharedInstance];
+		[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			[self setCurrentSource:dict];
+			
+			[indicator stopAnimation:nil];
+			[indicator setHidden:YES];
+			[tableView setEnabled:YES];
+			
+			NSLog(@"Reloading changes with file diff");
+			[tableView reloadData];
+		}];
+	}
+	else {
+		[self setCurrentSource:nil];
 		[tableView reloadData];
-	}];
-	
+	}	
 }
 
 - (void) updateWithCachedFileDiff:(NSString *)filePath inPath:(NSString *)projectPath
 {
-	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
-	NSString * diffArg = [NSString stringWithFormat:@"--cached-diff=%@", filePath];
-	
-	[tableView setEnabled:NO];
-	[indicator setHidden:NO];
-	[indicator startAnimation:nil];
-	
-	GitWrapper * wrapper = [GitWrapper sharedInstance];
-	[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-		[self setCurrentSource:dict];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	exists = [fm fileExistsAtPath:[projectPath stringByAppendingPathComponent:filePath] isDirectory:&isDir];
+	if (exists && !isDir) {
 		
-		[indicator stopAnimation:nil];
-		[indicator setHidden:YES];
-		[tableView setEnabled:YES];
+		NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath];
+		NSString * diffArg = [NSString stringWithFormat:@"--cached-diff=%@", filePath];
+		
+		[tableView setEnabled:NO];
+		[indicator setHidden:NO];
+		[indicator startAnimation:nil];
+		
+		GitWrapper * wrapper = [GitWrapper sharedInstance];
+		[wrapper executeGit:[NSArray arrayWithObjects:diffArg, repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			[self setCurrentSource:dict];
+			
+			[indicator stopAnimation:nil];
+			[indicator setHidden:YES];
+			[tableView setEnabled:YES];
 
-		NSLog(@"Reloading changes with cached file diff");
+			NSLog(@"Reloading changes with cached file diff");
+			[tableView reloadData];
+		}];
+	}
+	else {
+		[self setCurrentSource:nil];
 		[tableView reloadData];
-	}];
-	
+	}
 }
 
 + (void) externalDiffViewer:(NSString*)modified withOriginal:(NSString*)original project:(NSString*)project
@@ -184,8 +201,16 @@
 - (NSString *) stringAtIndex:(int)index
 {
 	if (currentSource) return [[currentSource objectForKey:@"lines"] objectAtIndex:index];
-	return @"    No diference found";
+	else {
+		if (!exists) {
+			return @"File does not exists.";
+		}
+		if (isDir) {
+			return @"Specified path is a directory.";
+		}
 	
+		return @"No difference loaded.";
+	}	
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex

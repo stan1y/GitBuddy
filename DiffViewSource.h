@@ -18,6 +18,7 @@
 	NSMutableDictionary *gitObjectsIndex;
 	NSTableView *tableView;
 	NSProgressIndicator *indicator;
+	BOOL exists, isDir;
 }
 
 //assigned from nib
