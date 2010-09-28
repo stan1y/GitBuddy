@@ -133,17 +133,58 @@
 	
 }
 
++ (void) externalDiffViewer:(NSString*)modified withOriginal:(NSString*)original project:(NSString*)project
+{
+	NSTask * diffTask = [[[NSTask alloc] init] autorelease];
+	[diffTask setCurrentDirectoryPath:project];
+
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+	BOOL useDiffTool = [defaults boolForKey:@"useOpenDiff"];
+	if (useDiffTool) {
+		
+		//check opendiff available
+		NSFileManager *fm = [NSFileManager defaultManager];
+		if (![fm fileExistsAtPath:@"/Developer/Applications/Utilities/FileMerge.app/Contents/MacOS/FileMerge"]) {
+			//FIXME: open prefs window
+			NSRunAlertPanel(@"X Code FileMerge tool not found.", @"Please specify custom diff & merge viewer in Git preferences, or install XCode from a Developer CD or download it from www.apple.com", @"Continue", nil, nil);
+			return;
+		}
+		
+		NSString * gitPath = [defaults stringForKey:@"gitPath"];
+		NSArray * args = [NSArray arrayWithObjects:@"difftool", @"-y", @"-t", @"opendiff", modified, nil];
+		
+		[diffTask setLaunchPath:gitPath];
+		[diffTask setArguments:args];
+	}
+	else {
+		NSString *customDiffViewer = [defaults stringForKey:@"customDiffViewer"];
+		NSMutableArray * args = [NSMutableArray arrayWithArray:[customDiffViewer componentsSeparatedByString:@" "]];
+		// change $(original) and $(modified) with actual values
+		for(int i=0; i < [args count]; i++) {
+			if ([[args objectAtIndex:i] isEqual:[NSString stringWithString:@"$(original)"]]) {
+				[args insertObject:original atIndex:i];
+			}
+			if ([[args objectAtIndex:i] isEqual:[NSString stringWithString:@"$(modified)"]]) {
+				[args insertObject:modified atIndex:i];
+			}
+		}
+	}
+
+	NSLog(@"Launch external diff viewer: %@ %@", [diffTask launchPath], [[diffTask arguments] componentsJoinedByString:@" "]);
+	[diffTask launch];
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	
 	if (currentSource) return [[currentSource objectForKey:@"lines"] count];
-	return 0;
+	return 1;
 }
 
 - (NSString *) stringAtIndex:(int)index
 {
 	if (currentSource) return [[currentSource objectForKey:@"lines"] objectAtIndex:index];
-	return @"";
+	return @"    No diference found";
 	
 }
 

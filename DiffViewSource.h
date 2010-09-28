@@ -28,7 +28,7 @@
 @property (retain) NSDictionary *currentSource;
 
 - (void) rebuildIndex:(NSString *)projectPath withCompletionBlock:(void (^)(void))codeBlock;
-
++ (void) externalDiffViewer:(NSString*)modified withOriginal:(NSString*)original project:(NSString*)project;
 - (void) updateWithFileDiff:(NSString *)filePath inPath:(NSString *)projectPath;
 - (void) updateWithCachedFileDiff:(NSString *)filePath inPath:(NSString *)projectPath;
 - (void) updateWithCommitDiff:(NSString *)filePath commitId:(NSString*)commitId inPath:(NSString *)projectPath;
