@@ -103,14 +103,17 @@ static NSArray *_arrayDataKeys;
 - (NSString *)fileAtIndex:(int)index inGroup:(NSString**)grp groupIndexOffset:(int*)offset
 {
 	*offset = 0;
-	int prevGroupCount = 0;
+	int groupOffset = 0;
 	for(NSString *k in [ProjectFilesSource dataKeys]) {
 		*offset += [[data objectForKey:k] count];
+		NSLog(@"offset: %d", *offset);
 		if ( index < *offset ) {
 			*grp = k;
-			return [[data objectForKey:k] objectAtIndex:index - prevGroupCount];
+			NSLog(@"reading: %@[%d]", k, index - groupOffset);
+			return [[data objectForKey:k] objectAtIndex:index - groupOffset];
 		}
-		prevGroupCount = [[data objectForKey:k] count];
+		groupOffset += [[data objectForKey:k] count];
+		NSLog(@"total += len(%@) => %d", k, groupOffset);
 	}
 		
 	return nil;
