@@ -150,28 +150,78 @@
 	
 	if ([toStage count]) { 
 		NSLog(@"There are %d files to stage.", [toStage count]);
-		NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [[toStage allKeys] componentsJoinedByString:@","]];
-		[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
-			
-			NSMenuItem *i = [(GitBuddy*)[NSApp delegate] menuItemForPath:[project objectForKey:@"path"]];
-			if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
-				[(ProjectBuddy*)[i representedObject] rescanWithCompletionBlock: ^{			
-					
-					//make sure Commit window will have 
-					//the updated status dict
-					if (commit) {
-						[NSApp activateIgnoringOtherApps:YES];
-						[[(GitBuddy*)[NSApp delegate] commit] commitProject:[(ProjectBuddy*)[i representedObject] itemDict] atPath:[project objectForKey:@"path"]];
-						[[(GitBuddy*)[NSApp delegate] commit] showWindow:nil];
-					}
-				}];
+		
+		NSMutableArray *toStageArray = [NSMutableArray array];
+		NSMutableArray *toRemoveArray = [NSMutableArray array];
+		
+		for (NSString *file in [toStage allKeys]) {
+			NSString* grp = [stagedSource fileInGroup:file];
+			if ([grp isEqual:[NSString stringWithString:@"removed"]]) {
+				[toRemoveArray addObject:file];
 			}
-		}];
+			else {
+				[toStageArray addObject:file];
+			}
+
+		}
+		
+		//Stage files
+		if ([toStageArray count]) {
+			NSString * stageArg = [NSString stringWithFormat:@"--stage=%@", [toStageArray componentsJoinedByString:@","]];
+			[wrapper executeGit:[NSArray arrayWithObjects:stageArg, repoArg, nil] withCompletionBlock:^(NSDictionary *dict) {
+				
+				
+				if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
+					
+					//Remove files if any
+					if ([toRemoveArray count]) {
+						NSString * rmArg = [NSString stringWithFormat:@"--rm=%@", [toRemoveArray componentsJoinedByString:@","]];
+						[wrapper executeGit:[NSArray arrayWithObjects:repoArg, rmArg, nil] withCompletionBlock:^(NSDictionary *dict2) {
+							if ([[dict2 objectForKey:@"gitrc"] intValue] == 0) {
+								
+								//Commit if removed & staged ok
+								[self showCommitPanel:nil];
+							}	
+						}];
+					}
+					else {
+						//Show commit panel after staged ok
+						[self showCommitPanel:nil];
+					}
+				}		 
+			}];
+		}
+		else if ([toRemoveArray count]){
+			//Only remove files
+			NSString * rmArg = [NSString stringWithFormat:@"--rm=%@", [toRemoveArray componentsJoinedByString:@","]];
+			[wrapper executeGit:[NSArray arrayWithObjects:repoArg, rmArg, nil] withCompletionBlock:^(NSDictionary *dict2) {
+				if ([[dict2 objectForKey:@"gitrc"] intValue] == 0) {
+					
+					//Commit if removed & staged ok
+					[self showCommitPanel:nil];
+				}	
+			}];
+		}
+
 	}
 	
 	//close window
 	checkOnClose = NO;
 	[[self window] performClose:nil];
+}
+
+- (void) showCommitPanel:(id)sender
+{
+	NSMenuItem *i = [(GitBuddy*)[NSApp delegate] menuItemForPath:[project objectForKey:@"path"]];
+	
+	[(ProjectBuddy*)[i representedObject] rescanWithCompletionBlock: ^{			
+		
+		//make sure Commit window will have 
+		//the updated status dict
+		[NSApp activateIgnoringOtherApps:YES];
+		[[(GitBuddy*)[NSApp delegate] commit] commitProject:[(ProjectBuddy*)[i representedObject] itemDict] atPath:[project objectForKey:@"path"]];
+		[[(GitBuddy*)[NSApp delegate] commit] showWindow:nil];
+	}];
 }
 
 - (IBAction) showInExternalViewer:(id)sender
@@ -263,7 +313,7 @@
 			[aCell setTextColor:[NSColor greenColor]];
 		}
 		else if ([grp isEqual:@"removed"] || [grp isEqual:@"renamed"]) {
-			[aCell setTextColor:[NSColor orangeColor]];
+			[aCell setTextColor:[NSColor redColor]];
 		}
 		
 	} else {

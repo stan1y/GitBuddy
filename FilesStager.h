@@ -49,6 +49,7 @@
 
 //initialize with project
 - (void) setProject:(NSDictionary *)dict stageAll:(BOOL)stage;
+- (void) showCommitPanel:(id)sender;
 
 //table view selection
 - (BOOL) tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex;
