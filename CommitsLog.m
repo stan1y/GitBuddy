@@ -61,7 +61,7 @@
 			[wrapper executeGit:[NSArray arrayWithObjects:repoArg, resetArg, idArg, nil] withCompletionBlock:^(NSDictionary *dict){
 				[ (GitBuddy*)[NSApp delegate] rescanRepoAtPath:[self projectRoot]];
 				NSLog(@"File %@ was reset to %@", [self selectedFile], [commit objectAtIndex:0]);
-				[[commitSource diffSource] reloadData];
+				[[[commitSource diffSource] tableView] reloadData];
 			}];
 		}
 	}
