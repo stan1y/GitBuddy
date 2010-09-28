@@ -15,12 +15,15 @@
 @implementation FilesStager
 
 @synthesize stagedSource, unstagedSource, changesSource;
-@synthesize stagedView, unstagedView, title;
+@synthesize stagedView, unstagedView, title, externalBtn;
+@synthesize selectedFile;
 
 //	- Initialization
 
 - (void) dealloc
 {
+	[selectedFile release];
+	
 	if (project) {
 		[project release];
 	}
@@ -43,7 +46,7 @@
 	NSLog(@"%@", dict);
 	NSLog(@" *** ");
 	
-	[title setStringValue:@"Loading Git index..."];
+	[title setStringValue:@"Loading diff preview..."];
 	[stagedView setEnabled:NO];
 	[unstagedView setEnabled:NO];
 	
@@ -53,6 +56,8 @@
 	//load project files to table views
 	[stagedSource loadProjectData:[project objectForKey:@"staged"] forPath:[project objectForKey:@"path"]];
 	[unstagedSource loadProjectData:[project objectForKey:@"unstaged"] forPath:[project objectForKey:@"path"]];
+	
+	[title setStringValue:@"No diff found"];
 	
 	if ([[[project objectForKey:@"unstaged"] objectForKey:@"count"] intValue] > 0) {
 		
@@ -169,11 +174,17 @@
 	[[self window] performClose:nil];
 }
 
+- (IBAction) showInExternalViewer:(id)sender
+{
+	[DiffViewSource externalDiffViewer:[self selectedFile] withOriginal:@"/dev/nul" project:[project objectForKey:@"path"]];
+}
+
 //	- TableView delegate
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
 {
 	NSString *file = [(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex];
+	[self setSelectedFile:file];
 	[title setStringValue:[NSString stringWithFormat:@"Preview of %@", file]  ];
 	
 	//deselect opposite table if it was selected
@@ -197,6 +208,7 @@
 	NSLog(@"Unstaged Files:");
 	NSLog(@"%@", unstagedGroup);
 	NSLog(@" *** ");
+	
 	if ( [aTableView isEqual:stagedView]) {
 		//stage list clicked
 		
@@ -208,7 +220,9 @@
 			//belongs to unstaged
 			[changesSource updateWithFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
 		}
-
+		
+		//enable external
+		[externalBtn setHidden:NO];
 	}
 	else if ( [aTableView isEqual:unstagedView]) {
 		//unstaged list clicked
@@ -219,13 +233,15 @@
 		else {
 			[changesSource updateWithCachedFileDiff:[(ProjectFilesSource*)[aTableView dataSource] fileAtIndex:rowIndex] inPath:[project objectForKey:@"path"]];
 		}
-
+		
+		//enable external
+		[externalBtn setHidden:NO];
 	}
 	else {
+		[externalBtn setHidden:YES];
 		return NO;
 	}
 
-	
 	return YES;
 }
 

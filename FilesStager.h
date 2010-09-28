@@ -20,10 +20,16 @@
 	NSTableView *stagedView;
 	NSTableView *unstagedView;
 	
+	NSButton *externalBtn;
+	
 	BOOL checkOnClose;
+	NSString *selectedFile;
 }
 
+@property (retain) NSString *selectedFile;
+
 //assigned from nib
+@property (assign) IBOutlet NSButton *externalBtn;
 @property (assign) IBOutlet NSTextField *title;
 @property (assign) IBOutlet DiffViewSource *changesSource;
 @property (assign) IBOutlet ProjectFilesSource *stagedSource;
@@ -35,6 +41,7 @@
 - (IBAction) stageFiles:(id)sender;
 - (IBAction) stageAndCommitFiles:(id)sender;
 - (void) stageAndCommit:(BOOL)commit;
+- (IBAction) showInExternalViewer:(id)sender;
 
 //modifications
 - (NSDictionary *) filesToUnStage;
