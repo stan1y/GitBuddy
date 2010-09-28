@@ -19,7 +19,7 @@ def log(msg):
 __STATUS_TOKENS = {
 	'modified'	: '(?<=modified:...)\S+',
 	'added'		: '(?<=new.file:...)\S+',
-	'removed'	: '(?<=deleted:...)\S+',
+	'removed'	: '(?<=deleted:....)\S+',
 	'renamed'	: '(?<=renamed:...)\S+',
 }
 
@@ -182,7 +182,8 @@ if __name__ == '__main__':
 	parser.add_option("--unstage", help="git reset HEAD [path]")
 	
 	parser.add_option("--commit", help="git commit -m [message]")
-	parser.add_option("--reset", help="git checkout [path]")
+	parser.add_option("--reset", help="git checkout [path] [sha256]")
+	parser.add_option("--sha256", help="sha256 value for reset. Default is last commit id", default = "")
 	
 	parser.add_option("--clone", help="git clone [url]\n --repo is used to specify PARENT folder of new repo.")
 	
@@ -311,7 +312,7 @@ if __name__ == '__main__':
 		sys.exit(obj['gitrc'])
 		
 	elif options.reset:
-		obj = b_cmd_json(options.git, options.repo, ['checkout', options.reset], {})
+		obj = b_cmd_json(options.git, options.repo, ['checkout', options.sha256, options.reset], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		
