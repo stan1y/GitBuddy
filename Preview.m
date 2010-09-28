@@ -8,7 +8,6 @@
 
 #import "Preview.h"
 #import "Highlight.h"
-#import "ChangeSetViewer.h"
 #import "GitBuddy.h"
 #import "GitWrapper.h"
 
@@ -29,10 +28,6 @@
 		projectPath = nil;
 	}
 	
-	if (queue) {
-		[queue release];
-		queue = nil;
-	}
 	
 	[super dealloc];
 }
@@ -63,20 +58,13 @@
 
 - (IBAction) showInExternalViewer:(id)sender
 {
-	//FIXME : won't work for anything except git difftool
-	if ( !queue ) {
-		queue = [[NSOperationQueue alloc] init];
-	}
-	ChangeSetViewer *viewer = [ChangeSetViewer viewModified:@"/dev/null" diffTo:[self filePath] project:[self projectPath]];
-	[queue addOperation:viewer];
-	[viewer release];
-	
+	[DiffViewSource externalDiffViewer:[self filePath] withOriginal:@"/dev/nul" project:[self projectPath]];
 	[[self window] performClose:sender];
 }
 
 - (IBAction) resetChanges:(id)sender
 {
-	int rc = NSRunAlertPanel(@"Resetting changes in file", [NSString stringWithFormat:@"You are about to dismiss all changes you've made to %@. Are you sure about it?", [self filePath]] , @"Yes", @"No", nil);
+	int rc = NSRunInformationalAlertPanel([NSString stringWithFormat:@"Revert %@ to head of current branch?", [self filePath]], [NSString stringWithFormat:@"You are about to revert your current %@ to last commited state.", [self filePath]], @"Yes", @"No", nil);
 	
 	if (rc == 1) {
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
