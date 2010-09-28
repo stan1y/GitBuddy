@@ -8,11 +8,13 @@
 
 #import "CommitsLog.h"
 #import "Highlight.h"
+#import "GitWrapper.h"
+#import "GitBuddy.h"
 
 @implementation CommitsLog
 
 @synthesize projectRoot, currentPath, filesTableView;
-@synthesize commitSource, folder, parentFolder;
+@synthesize commitSource, folder, parentFolder, selectedFile;
 
 - (void) dealloc
 {
@@ -20,6 +22,7 @@
 	[projectRoot release];
 	[currentPath release];
 	[filesTableView release];
+	[selectedFile release];
 	[super dealloc];
 }
 
@@ -41,6 +44,27 @@
 
 	
 	[folder setStringValue:[NSString stringWithFormat:@"Files at %@", [self currentPath]]];
+}
+
+- (IBAction) revertToRevision:(id)sender
+{
+	NSArray *commit = [commitSource selectedCommit];
+	if (commit) {
+		int rc = NSRunInformationalAlertPanel([NSString stringWithFormat:@"Revert %@ to commit %@?", [self selectedFile], [commit objectAtIndex:0]], [NSString stringWithFormat:@"You are about to revert your current %@ to what it was %@", [self selectedFile], [commit objectAtIndex:1]], @"Yes", @"No", nil);
+		
+		if (rc == 1) {
+			GitWrapper *wrapper = [GitWrapper sharedInstance];
+			
+			NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", [self projectRoot]];
+			NSString *resetArg = [NSString stringWithFormat:@"--reset=%@", [self selectedFile]];
+			NSString *idArg = [NSString stringWithFormat:@"--sha256=%@", [commit objectAtIndex:0]];
+			[wrapper executeGit:[NSArray arrayWithObjects:repoArg, resetArg, idArg, nil] withCompletionBlock:^(NSDictionary *dict){
+				[ (GitBuddy*)[NSApp delegate] rescanRepoAtPath:[self projectRoot]];
+				NSLog(@"File %@ was reset to %@", [self selectedFile], [commit objectAtIndex:0]);
+				[[commitSource diffSource] reloadData];
+			}];
+		}
+	}
 }
 
 - (IBAction) goToParentFolder:(id)sender
@@ -101,7 +125,8 @@
 			[mgr fileExistsAtPath:[listPath stringByAppendingPathComponent:file] isDirectory:&isDir];
 			if (!isDir) {
 				NSString *filePath = [[self currentPath] stringByAppendingPathComponent:file];
-				[commitSource loadCommitsFor: [filePath substringWithRange:NSMakeRange(1, [filePath length] -1)] inProject:[self projectRoot]];
+				[self setSelectedFile:[filePath substringWithRange:NSMakeRange(1, [filePath length] -1)]];
+				[commitSource loadCommitsFor:[self selectedFile] inProject:[self projectRoot]];
 			}
 		}
 	}

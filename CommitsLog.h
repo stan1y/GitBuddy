@@ -18,6 +18,7 @@
 	
 	NSTableView *filesTableView;
 	CommitsSource *commitSource;
+	NSString *selectedFile;
 }
 
 @property (assign) IBOutlet NSTextField *folder;
@@ -26,11 +27,13 @@
 @property (assign) IBOutlet NSTableView *filesTableView;
 
 @property (nonatomic, retain) NSString *projectRoot;
+@property (nonatomic, retain) NSString *selectedFile;
 @property (nonatomic, retain, readonly) NSString *currentPath;
 
 - (void) initForProject:(NSString*)project;
 - (void) fileDoubleClicked;
 - (IBAction) goToParentFolder:(id)sender;
+- (IBAction) revertToRevision:(id)sender;
 - (NSArray*) currentFolderFiles;
 
 @end
