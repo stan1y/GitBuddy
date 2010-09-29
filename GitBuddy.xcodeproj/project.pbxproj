@@ -11,6 +11,10 @@
 		256AC3DA0F4B6AC300CF3369 /* GitBuddy.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* GitBuddy.m */; };
 		76310F7D123A5CA60090CBFE /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76310F7C123A5CA60090CBFE /* Carbon.framework */; };
 		763110E4123A79D60090CBFE /* Clone.m in Sources */ = {isa = PBXBuildFile; fileRef = 763110E3123A79D60090CBFE /* Clone.m */; };
+		763D51A9125344500062039A /* RepositoryTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 763D51A8125344500062039A /* RepositoryTracker.m */; };
+		763D51AA125344500062039A /* RepositoryTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 763D51A8125344500062039A /* RepositoryTracker.m */; };
+		763D51FD125370CD0062039A /* NotificationsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 763D51FC125370CD0062039A /* NotificationsIcon.png */; };
+		763D51FE125370CD0062039A /* NotificationsIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 763D51FC125370CD0062039A /* NotificationsIcon.png */; };
 		7649A7F9123E6BC300D365AF /* MGPreferencePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7649A7F8123E6BC300D365AF /* MGPreferencePanel.m */; };
 		765C8F98123697AD00FCFF42 /* ProjectSubMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 765C8F97123697AD00FCFF42 /* ProjectSubMenu.m */; };
 		766B541A12324605008738D4 /* Git_72x25.png in Resources */ = {isa = PBXBuildFile; fileRef = 766B541412324605008738D4 /* Git_72x25.png */; };
@@ -140,6 +144,9 @@
 		76310F7C123A5CA60090CBFE /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		763110E2123A79D60090CBFE /* Clone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clone.h; sourceTree = "<group>"; };
 		763110E3123A79D60090CBFE /* Clone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Clone.m; sourceTree = "<group>"; };
+		763D51A7125344500062039A /* RepositoryTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepositoryTracker.h; sourceTree = "<group>"; };
+		763D51A8125344500062039A /* RepositoryTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RepositoryTracker.m; sourceTree = "<group>"; };
+		763D51FC125370CD0062039A /* NotificationsIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NotificationsIcon.png; path = Images/Preferences/NotificationsIcon.png; sourceTree = "<group>"; };
 		7649A7F7123E6BC300D365AF /* MGPreferencePanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGPreferencePanel.h; sourceTree = "<group>"; };
 		7649A7F8123E6BC300D365AF /* MGPreferencePanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGPreferencePanel.m; sourceTree = "<group>"; };
 		765C8F96123697AD00FCFF42 /* ProjectSubMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectSubMenu.h; sourceTree = "<group>"; };
@@ -264,6 +271,8 @@
 				767C985E124A50640037B0F9 /* CommitsLog.m */,
 				76A5F3D9124DFAE60095280F /* AnimatedStatus.h */,
 				76A5F3DA124DFAE60095280F /* AnimatedStatus.m */,
+				763D51A7125344500062039A /* RepositoryTracker.h */,
+				763D51A8125344500062039A /* RepositoryTracker.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -380,6 +389,7 @@
 		76D52666123F6A95009094CC /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				763D51FC125370CD0062039A /* NotificationsIcon.png */,
 				76D52667123F6AA7009094CC /* GitSettingsIcon.png */,
 				76D52668123F6AA7009094CC /* GlobalKeysIcon.png */,
 				76D52669123F6AA7009094CC /* MonitoringIcon.png */,
@@ -471,6 +481,7 @@
 				76A5F3EE124DFD500095280F /* GitBuddy16Progress1.png in Resources */,
 				76A5F3EF124DFD500095280F /* GitBuddy16Progress2.png in Resources */,
 				76A5F3F0124DFD500095280F /* GitBuddy16Progress3.png in Resources */,
+				763D51FD125370CD0062039A /* NotificationsIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,6 +507,7 @@
 				76A5F3F1124DFD500095280F /* GitBuddy16Progress1.png in Resources */,
 				76A5F3F2124DFD500095280F /* GitBuddy16Progress2.png in Resources */,
 				76A5F3F3124DFD500095280F /* GitBuddy16Progress3.png in Resources */,
+				763D51FE125370CD0062039A /* NotificationsIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,6 +556,7 @@
 				767C9811124A4AB10037B0F9 /* CommitsSource.m in Sources */,
 				767C985F124A50640037B0F9 /* CommitsLog.m in Sources */,
 				76A5F3DB124DFAE60095280F /* AnimatedStatus.m in Sources */,
+				763D51A9125344500062039A /* RepositoryTracker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,6 +586,7 @@
 				767C9812124A4AB10037B0F9 /* CommitsSource.m in Sources */,
 				767C9860124A50640037B0F9 /* CommitsLog.m in Sources */,
 				76A5F3DC124DFAE60095280F /* AnimatedStatus.m in Sources */,
+				763D51AA125344500062039A /* RepositoryTracker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

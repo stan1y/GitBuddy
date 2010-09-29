@@ -25,7 +25,8 @@ NSString * const updatesIcon = @"UpdatesIcon";
 NSString * const keysIdentifier = @"Global Keys";
 NSString * const keysIcon = @"GlobalKeysIcon";
 
-
+NSString * const notificationsIdentifier = @"Notifications";
+NSString * const notificationsIcon = @"NotificationsIcon";
 
 @implementation MGPreferencePanel
 
@@ -84,6 +85,7 @@ NSString * const keysIcon = @"GlobalKeysIcon";
 -(NSArray*) toolbarSelectableItemIdentifiers: (NSToolbar*)toolbar
 {
 	return [NSArray arrayWithObjects:
+			notificationsIdentifier,
 			gitSettingsIdentifier,
 			monitoringIdentifier,
 			updatesIdentifier,
@@ -99,21 +101,27 @@ NSString * const keysIcon = @"GlobalKeysIcon";
 	switch ([sender tag]) 
 	{
 		case 0:
+			[window setTitle: NSLocalizedString(@"Notifications", @"")];
+			view = notifications;
+			break;
+		case 1:
 			[window setTitle: NSLocalizedString(@"Git Settings", @"")];
 			view = git;
 			break;
-		case 1:
+		case 2:
 			[window setTitle: NSLocalizedString(@"Monitoring", @"")];
 			view = monitoring;
 			break;
-		case 2:
+		case 3:
 			[window setTitle: NSLocalizedString(@"Updates", @"")];
 			view = updates;
 			break;
-		case 3:
+		case 4:
 			[window setTitle: NSLocalizedString(@"Global Keys", @"")];
 			view = keys;
 			break;
+		
+
 		default:
 			break;
 	}
@@ -137,7 +145,7 @@ NSString * const keysIcon = @"GlobalKeysIcon";
 -(void) firstPane
 {
 	NSView *view = nil;
-	view = git;
+	view = notifications;
 	
 	NSRect windowFrame = [window frame];
 	windowFrame.size.height = [view frame].size.height + WINDOW_TOOLBAR_HEIGHT;
@@ -157,34 +165,42 @@ NSString * const keysIcon = @"GlobalKeysIcon";
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar {
     return [NSArray arrayWithObjects:
+			notificationsIdentifier,
 			gitSettingsIdentifier,
 			monitoringIdentifier,
 			updatesIdentifier,
-			keysIdentifier,	
+			keysIdentifier,
 			nil];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar {
     return [NSArray arrayWithObjects:
+			notificationsIdentifier,
 			gitSettingsIdentifier,
 			monitoringIdentifier,
 			updatesIdentifier,
-			keysIdentifier,		
+			keysIdentifier,
 			NSToolbarSeparatorItemIdentifier,
 			NSToolbarSpaceItemIdentifier,
 			NSToolbarFlexibleSpaceItemIdentifier,
 			nil];
 }
 
-
-
-
-
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)willBeInsertedIntoToolbar;
 {
 	NSToolbarItem *item = nil;
 	
-    if ([itemIdentifier isEqualToString:gitSettingsIdentifier]) {
+	if ([itemIdentifier isEqualToString:notificationsIdentifier]) {
+		
+        item = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+        [item setPaletteLabel:NSLocalizedString(@"Notifications", @"")];
+        [item setLabel:NSLocalizedString(@"Notifications", @"")];
+        [item setImage:[NSImage imageNamed:notificationsIcon]];
+		[item setAction:@selector(changePanes:)];
+        [item setToolTip:NSLocalizedString(@"", @"")];
+		[item setTag:0];
+    }
+    else if ([itemIdentifier isEqualToString:gitSettingsIdentifier]) {
 		
         item = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
         [item setPaletteLabel:NSLocalizedString(@"Git Settings", @"")];
@@ -192,7 +208,7 @@ NSString * const keysIcon = @"GlobalKeysIcon";
         [item setImage:[NSImage imageNamed:gitSettingsIcon]];
 		[item setAction:@selector(changePanes:)];
         [item setToolTip:NSLocalizedString(@"", @"")];
-		[item setTag:0];
+		[item setTag:1];
     }
 	else if ([itemIdentifier isEqualToString:monitoringIdentifier]) {
 		
@@ -202,7 +218,7 @@ NSString * const keysIcon = @"GlobalKeysIcon";
         [item setImage:[NSImage imageNamed:monitoringIcon]];
 		[item setAction:@selector(changePanes:)];
         [item setToolTip:NSLocalizedString(@"", @"")];
-		[item setTag:1];
+		[item setTag:2];
     }
 	else if ([itemIdentifier isEqualToString:updatesIdentifier]) {
 		
@@ -212,7 +228,7 @@ NSString * const keysIcon = @"GlobalKeysIcon";
         [item setImage:[NSImage imageNamed:updatesIcon]];
 		[item setAction:@selector(changePanes:)];
         [item setToolTip:NSLocalizedString(@"", @"")];
-		[item setTag:2];
+		[item setTag:3];
     }
 	else if ([itemIdentifier isEqualToString:keysIdentifier]) {
 		
@@ -222,8 +238,9 @@ NSString * const keysIcon = @"GlobalKeysIcon";
         [item setImage:[NSImage imageNamed:keysIcon]];
 		[item setAction:@selector(changePanes:)];
         [item setToolTip:NSLocalizedString(@"", @"")];
-		[item setTag:3];
+		[item setTag:4];
     }
+
 	return [item autorelease];
 }
 

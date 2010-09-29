@@ -77,5 +77,27 @@
 	<true/>
 	<key>customDiffCmd</key>
 	<string></string>
+	<key>localNumberOfChanges</key>
+	<true/>
+	<key>localNumberOfChangesActiveOnly</key>
+	<false/>
+	<key>remoteNumberOfNotPulled</key>
+	<true/>
+	<key>remoteNumberOfNotPushed</key>
+	<true/>
+	<key>monitorRemoteBranches</key>
+	<true/>
+	<key>monitorRemoteNotifyGrowl</key>
+	<false/>
+	<key>monitorRemotePeriod</key>
+	<integer>10</integer>
+	<key>monitorRemoteSelectedTermID</key>
+	<integer>1</integer>
+	<key>monitorRemoteTerms</key>
+	<array>
+		<string>seconds</string>
+		<string>minutes</string>
+		<string>hours</string>
+	</array>
 </dict>
 </plist>

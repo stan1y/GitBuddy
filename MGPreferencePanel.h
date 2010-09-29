@@ -14,7 +14,8 @@
 	IBOutlet NSView *git;
 	IBOutlet NSView *monitoring;
 	IBOutlet NSView *updates;
-	IBOutlet NSView *keys;	
+	IBOutlet NSView *keys;
+	IBOutlet NSView *notifications;
 	IBOutlet NSView *contentView;
 	IBOutlet NSWindow *window;
 }
