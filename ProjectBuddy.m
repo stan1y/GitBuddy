@@ -82,6 +82,16 @@
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
+			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+			if ([defaults objectForKey:@"monitorRemoteBranches"]) {
+				
+				if ([tracker isRunning]) {
+					[tracker stopMonitoring:self];
+				}
+				//start remote branches monitoring
+				[tracker setRemoteBranches:[[self itemDict] objectForKey:@"rbranch"]];
+				[tracker startMonitoring:self];
+			}
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			[self mergeData:dict];
@@ -342,6 +352,24 @@
 	itemLock = [[NSLock alloc] init];
 	[self setTitle:aTitle];
 	[self setPath:aPath];
+	
+	//tracker
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	int count = [defaults integerForKey:@"monitorRemotePeriod"];
+	int mpl = 0;
+	switch ([defaults integerForKey:@"monitorRemoteSelectedTermID"]) {
+		default:
+		case 0:
+			mpl = 1;
+			break;
+		case 1:
+			mpl = 60;
+			break;
+		case 2:
+			mpl = 60 * 60;
+			break;
+	}
+	tracker = [[RepositoryTracker alloc] initTrackerForProject:aPath withPeriod:(count * mpl)];
 		
 	//set parent menu
 	[self setParentItem:anItem];

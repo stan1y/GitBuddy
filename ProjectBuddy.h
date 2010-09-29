@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ProjectSubMenu.h"
+#import "RepositoryTracker.h"
 
 @interface ProjectBuddy : NSObject {
 	NSMenuItem *parentItem;
@@ -48,6 +49,7 @@
 	// Project data dict
 	NSMutableDictionary * itemDict;
 	NSLock *itemLock;
+	RepositoryTracker *tracker;
 	
 	NSMutableArray * selectedChanges;
 }
