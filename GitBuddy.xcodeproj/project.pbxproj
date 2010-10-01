@@ -79,6 +79,10 @@
 		769C1D4712390D1E006B127D /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D4612390D1E006B127D /* Preview.m */; };
 		769C1D651239103E006B127D /* Highlight.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1D641239103E006B127D /* Highlight.m */; };
 		769C1F2B12395774006B127D /* Commit.m in Sources */ = {isa = PBXBuildFile; fileRef = 769C1F2A12395774006B127D /* Commit.m */; };
+		769EB1CD125610E3000B7CE7 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
+		769EB1CE125610E3000B7CE7 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
+		769EB1FF125614F3000B7CE7 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
+		769EB2051256150C000B7CE7 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
 		76A5F3DB124DFAE60095280F /* AnimatedStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 76A5F3DA124DFAE60095280F /* AnimatedStatus.m */; };
 		76A5F3DC124DFAE60095280F /* AnimatedStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 76A5F3DA124DFAE60095280F /* AnimatedStatus.m */; };
 		76A5F3EE124DFD500095280F /* GitBuddy16Progress1.png in Resources */ = {isa = PBXBuildFile; fileRef = 76A5F3EB124DFD500095280F /* GitBuddy16Progress1.png */; };
@@ -112,6 +116,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				769EB1FF125614F3000B7CE7 /* Growl.framework in CopyFiles */,
 				768DA11F1247E52A008D71AF /* Sparkle.framework in CopyFiles */,
 				768DA0391247D6CF008D71AF /* ShortcutRecorder.framework in CopyFiles */,
 			);
@@ -123,6 +128,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				769EB2051256150C000B7CE7 /* Growl.framework in CopyFiles */,
 				768DA1201247E52E008D71AF /* Sparkle.framework in CopyFiles */,
 				768DA07A1247D8DF008D71AF /* ShortcutRecorder.framework in CopyFiles */,
 			);
@@ -187,6 +193,7 @@
 		769C1D641239103E006B127D /* Highlight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Highlight.m; sourceTree = "<group>"; };
 		769C1F2912395774006B127D /* Commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commit.h; sourceTree = "<group>"; };
 		769C1F2A12395774006B127D /* Commit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Commit.m; sourceTree = "<group>"; };
+		769EB1CC125610E3000B7CE7 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		76A5F3D9124DFAE60095280F /* AnimatedStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatedStatus.h; sourceTree = "<group>"; };
 		76A5F3DA124DFAE60095280F /* AnimatedStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnimatedStatus.m; sourceTree = "<group>"; };
 		76A5F3EB124DFD500095280F /* GitBuddy16Progress1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddy16Progress1.png; path = Images/GitBuddy16Progress1.png; sourceTree = "<group>"; };
@@ -218,6 +225,7 @@
 				768DA0761247D8DF008D71AF /* Carbon.framework in Frameworks */,
 				768DA0781247D8DF008D71AF /* ShortcutRecorder.framework in Frameworks */,
 				768DA11E1247E517008D71AF /* Sparkle.framework in Frameworks */,
+				769EB1CD125610E3000B7CE7 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +237,7 @@
 				76310F7D123A5CA60090CBFE /* Carbon.framework in Frameworks */,
 				768DA02E1247D6CB008D71AF /* ShortcutRecorder.framework in Frameworks */,
 				768DA11D1247E516008D71AF /* Sparkle.framework in Frameworks */,
+				769EB1CE125610E3000B7CE7 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +289,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				769EB1CC125610E3000B7CE7 /* Growl.framework */,
 				768DA11C1247E516008D71AF /* Sparkle.framework */,
 				768DA02D1247D6CB008D71AF /* ShortcutRecorder.framework */,
 				76310F7C123A5CA60090CBFE /* Carbon.framework */,

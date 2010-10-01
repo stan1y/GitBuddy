@@ -74,11 +74,11 @@ NSString * const notificationsIcon = @"NotificationsIcon";
     
     [toolbar setDelegate: self]; // 10.4 - otherwise use <NSToolbarDelegate>
     [window setToolbar: toolbar];	
-	[window setTitle: NSLocalizedString(@"Git Settings", @"")];
+	[window setTitle: NSLocalizedString(@"Notifications", @"")];
 	
 	if([toolbar respondsToSelector: @selector(setSelectedItemIdentifier:)])
 	{
-		[toolbar setSelectedItemIdentifier: gitSettingsIdentifier];
+		[toolbar setSelectedItemIdentifier: notificationsIdentifier];
 	}
 }
 
