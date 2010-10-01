@@ -14,21 +14,18 @@
 	NSThread *thread;
 	SEL branchUdpSel;
 	id branchUdpTarget;
-	double period;
+	int period;
 	NSString *projectPath;
 	
 	NSMutableArray *notPushed;
 	NSMutableArray *notPulled;
-	NSArray *remoteBranches;
 }
-
-@property (nonatomic, retain) NSArray *remoteBranches;
+@property (assign) int period;
 @property (nonatomic, retain) NSMutableArray *notPushed;
 @property (nonatomic, retain) NSMutableArray *notPulled;
 @property (nonatomic, retain) NSString *projectPath;
 
 - (id) initTrackerForProject:(NSString*)path withPeriod:(int)secs;
-- (void) compare:(NSDictionary*)projectLog withBranches:(NSArray*)remoteBranches;
 - (void) setBranchUpdatedSelector:(SEL)sel;
 - (void) setBranchUpdatedTarget:(id)target;
 
