@@ -492,8 +492,21 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	//check git binary
 	NSFileManager *mgr = [NSFileManager defaultManager];
 	BOOL exists, dir = NO;
-	exists = [mgr fileExistsAtPath:[defaults valueForKey:@"gitPath"] isDirectory:&dir];
+	NSString *gitPath = [defaults valueForKey:@"gitPath"];
+	exists = [mgr fileExistsAtPath:gitPath isDirectory:&dir];
 	if (!exists || dir) {
+		gitPath = @"/usr/local/bin/git";
+		exists = [mgr fileExistsAtPath:gitPath isDirectory:&dir];
+	}
+	if (!exists || dir ) {
+		gitPath = @"/usr/local/bin/git";
+		exists = [mgr fileExistsAtPath:gitPath isDirectory:&dir];
+	}
+	
+	if (exists && !dir && [gitPath length]) {
+		[defaults setObject:gitPath forKey:@"gitPath"];
+	}
+	else {	
 		int rc = NSRunAlertPanel(@"Git not found", @"GitBuddy failed to find git binary at %@. Please specify correct path in preferences.", @"Open preferences", @"Terminate", nil);
 		if (rc == 1 ) {
 			[[[self preferences] window] orderFront:self];
