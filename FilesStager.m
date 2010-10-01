@@ -42,10 +42,6 @@
 	project = [[NSDictionary alloc] initWithDictionary:dict	copyItems:YES];
 	checkOnClose = YES;
 	
-	NSLog(@"Loading File Stager with Project Dictionary:");
-	NSLog(@"%@", dict);
-	NSLog(@" *** ");
-	
 	[title setStringValue:@"Loading diff preview..."];
 	[stagedView setEnabled:NO];
 	[unstagedView setEnabled:NO];

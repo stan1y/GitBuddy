@@ -62,10 +62,6 @@ static NSArray *_arrayDataKeys;
 
 	//copy path
 	path = [[NSString alloc] initWithString:p];
-	
-	NSLog(@"Loading Project File Source Data (%@):", self);
-	NSLog(@"%@", data);
-	NSLog(@" *** ");
 }
 
 - (void) dealloc
@@ -106,14 +102,11 @@ static NSArray *_arrayDataKeys;
 	int groupOffset = 0;
 	for(NSString *k in [ProjectFilesSource dataKeys]) {
 		*offset += [[data objectForKey:k] count];
-		NSLog(@"offset: %d", *offset);
 		if ( index < *offset ) {
 			*grp = k;
-			NSLog(@"reading: %@[%d]", k, index - groupOffset);
 			return [[data objectForKey:k] objectAtIndex:index - groupOffset];
 		}
 		groupOffset += [[data objectForKey:k] count];
-		NSLog(@"total += len(%@) => %d", k, groupOffset);
 	}
 		
 	return nil;
