@@ -16,13 +16,24 @@
 
 @implementation GitBuddy
 
-@synthesize addRepoPanel, addRepoField;
+@synthesize addRepoPanel, addRepoField, newBranch;
 @synthesize filesStager, preview, commit, clone;
 @synthesize operationPanel, operationDescription, operationIndicator;
 @synthesize newRemotePanel, newRemoteName, newRemoteURL;
 @synthesize newBranchPanel, newBranchName;
 @synthesize commitsLog, commitsLogPanel;
 @synthesize lastUpdatedOn, appVersion, updater, preferences, aboutWnd;
+
+- (void) restartAllTrackers
+{
+	if ([statusMenu numberOfItems] > MENUITEMS) {
+		NSArray * items = [[statusMenu itemArray] subarrayWithRange:NSMakeRange(MENUITEMS - 1, [statusMenu numberOfItems] - MENUITEMS)];
+		for (NSMenuItem * i in items) {
+			ProjectBuddy *pbuddy = [i representedObject];
+			[pbuddy restartTracker];
+		}
+	}
+}
 
 //	---	Keyboard Events processing
 
@@ -596,7 +607,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 - (NSDictionary*) registrationDictionaryForGrowl
 {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:1], @"TicketVersion", [NSArray arrayWithObjects:@"REMOTE_BRANCH_CHANGED", nil], @"AllNotifications", [NSArray arrayWithObjects:@"REMOTE_BRANCH_CHANGED", nil], @"DefaultNotifications", nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:1], @"TicketVersion", [NSArray arrayWithObjects:@"REMOTE_BRANCH_CHANGED", @"LOCAL_BRANCH_CHANGED", nil], @"AllNotifications", [NSArray arrayWithObjects:@"REMOTE_BRANCH_CHANGED", @"LOCAL_BRANCH_CHANGED", nil], @"DefaultNotifications", nil];
 }
 
 - (NSString *) applicationNameForGrowl
@@ -704,25 +715,21 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			if (changed) {
 				changedCount = [changed count];
 				[projectCounters setObject:[NSNumber numberWithInt:changedCount] forKey:@"modified"];
-				NSLog(@"Modified %d", changedCount);
 			}
 			
 			if (added) {
 				addedCount = [added count];
 				[projectCounters setObject:[NSNumber numberWithInt:addedCount] forKey:@"added"];
-				NSLog(@"Added %d", addedCount);
 			}
 			
 			if (removed) {
 				removedCount = [removed count];
 				[projectCounters setObject:[NSNumber numberWithInt:removedCount] forKey:@"removed"];
-				NSLog(@"Removed %d", removedCount);
 			}
 			
 			if (renamed) {
 				renamedCount = [renamed count];
 				[projectCounters setObject:[NSNumber numberWithInt:renamedCount] forKey:@"renamed"];		
-				NSLog(@"Renamed %d", renamedCount);
 			}
 			
 		}

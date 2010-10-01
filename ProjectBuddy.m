@@ -85,17 +85,6 @@
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict) {
 			
 			[self mergeData:dict];
-			
-			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-			if ([defaults objectForKey:@"monitorRemoteBranches"]) {
-				
-				if ([tracker isRunning]) {
-					[tracker stopMonitoring:self];
-				}
-				//start remote branches monitoring
-				[tracker setRemoteBranches:[[self itemDict] objectForKey:@"rbranch"]];
-				[tracker startMonitoring:self];
-			}
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			
@@ -158,6 +147,7 @@
 		int rc = NSRunAlertPanel(@"Destination branch does not exists.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to push too. Are you sure that you want to create a new remote branch?", [self currentBranch]], @"Yes", @"No", nil);
 		if (rc == 1) {
 			//FIXME: create a new remote branch. select origin first
+			[[ (GitBuddy*)[NSApp delegate] newBranch] showNewBranchOf:path withSources:[[self itemDict] objectForKey:@"remote"]];
 		}
 		else {
 			return;
@@ -345,7 +335,7 @@
 	}
 	
 	//set remote pull/push items
-	if ([[[self itemDict] objectForKey:@"not_pushed"] count]) {
+	/*if ([[[self itemDict] objectForKey:@"not_pushed"] count]) {
 		[push setTitle:[NSString stringWithFormat:@"Push (%d)", [[[self itemDict] objectForKey:@"not_pushed"] count]]];
 	}
 	else {
@@ -357,7 +347,7 @@
 	else {
 		[pull setTitle:@"Pull"];
 	}
-
+*/
 	
 	//set parent item
 	if ([self totalChangeSetItems]) {
@@ -380,7 +370,43 @@
 	}
 }
 
+- (int) getRepoTrackerPeriod
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	int count = [[defaults objectForKey:@"monitorRemotePeriod"] intValue];
+	int mpl = 0;
+	switch ([defaults integerForKey:@"monitorRemoteSelectedTermID"]) {
+		default:
+		case 0:
+			mpl = 1;
+			NSLog(@"Repo tracker period: %d seconds", count);
+			break;
+		case 1:
+			mpl = 60;
+			NSLog(@"Repo tracker period: %d minutes, %d seconds", count, mpl * count);
+			break;
+		case 2:
+			mpl = 60 * 60;
+			NSLog(@"Repo tracker period: %d hours, %d seconds", count, mpl * count);
+			break;
+	}
+	return mpl * count;
+}
+
 //	--- Initialization ---
+
+- (void) restartTracker
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	if ([tracker isRunning]) {
+		[tracker stopMonitoring:self];
+	}
+	if ([defaults objectForKey:@"monitorRemoteBranches"]) {
+		//start remote branches monitoring
+		[tracker setPeriod:[self getRepoTrackerPeriod]];
+		[tracker startMonitoring:self];
+	}
+}
 
 - (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle
 {
@@ -395,25 +421,11 @@
 	[self setPath:aPath];
 	
 	//tracker
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	int count = [defaults integerForKey:@"monitorRemotePeriod"];
-	int mpl = 0;
-	switch ([defaults integerForKey:@"monitorRemoteSelectedTermID"]) {
-		default:
-		case 0:
-			mpl = 1;
-			break;
-		case 1:
-			mpl = 60;
-			break;
-		case 2:
-			mpl = 60 * 60;
-			break;
-	}
-	tracker = [[RepositoryTracker alloc] initTrackerForProject:aPath withPeriod:(count * mpl)];
+	tracker = [[RepositoryTracker alloc] initTrackerForProject:aPath withPeriod:[self getRepoTrackerPeriod]];
 	[tracker setBranchUpdatedSelector:@selector(updateCounters:)];
 	[tracker setBranchUpdatedTarget:[NSApp delegate]];
-		
+	[self restartTracker];
+	
 	//set parent menu
 	[self setParentItem:anItem];
 	parentMenu = [[NSMenu alloc] init];

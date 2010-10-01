@@ -70,10 +70,11 @@
 - (int) totalChangeSetItems;
 - (int) changedFilesCount;
 - (int) stagedFilesCount;
-
+- (int) getRepoTrackerPeriod;
+- (void) restartTracker;
 - (void) mergeData:(NSDictionary *)dict;
 - (void) updateMenuItems;
-
+- (NSString*) getSourceForBranch:(NSString*)branchName;
 - (void) rescanWithCompletionBlock:(void (^)(void))codeBlock;
 
 //push commits

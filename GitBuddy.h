@@ -16,6 +16,7 @@
 #import "Clone.h"
 #import "CommitsLog.h"
 #import "AnimatedStatus.h"
+#import "NewBranch.h"
 
 @interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate, GrowlApplicationBridgeDelegate> {
 	IBOutlet NSMenu *statusMenu;
@@ -71,6 +72,8 @@
 	AnimatedStatus *animStatus;
 	
 	NSWindow *aboutWnd;
+	
+	NewBranch *newBranch;
 }
 
 //Events thread implementation
@@ -81,6 +84,7 @@
 - (ProjectBuddy*) getActiveProjectBuddy;
 
 //assigned from nib
+@property (assign) IBOutlet NewBranch *newBranch;
 @property (assign) IBOutlet NSWindow *aboutWnd;
 @property (assign) IBOutlet MGPreferencePanel *preferences;
 @property (assign) IBOutlet id updater;
@@ -110,9 +114,10 @@
 - (void) initializeEventForPaths:(NSArray *)pathsToWatch;
 - (NSMenuItem *) menuItemForPath:(NSString *)path;
 - (NSMenuItem *) newMenuItem:(NSString *)title withPath:(NSString *)path;
+
+// FS Events
 - (BOOL) addMonitoredPath:(NSString *)path;
 - (NSArray *) monitoredPathsArray;
-
 - (void) appendEventPaths:(NSArray *)paths;
 
 - (IBAction) browseForRepo:(id)sender;
@@ -140,6 +145,10 @@
 //status icon
 - (void) setStatusImage:(NSImage*)image;
 - (void) setCurrentImage;
+
+//remote repo trackers
+- (void) restartAllTrackers;
+
 @end
 
 //get current time in seconds
