@@ -19,4 +19,7 @@
 - (void) executeGit:(NSArray *)args timeoutAfter:(int)tsecs withCompletionBlock:(void (^)(NSDictionary*))codeBlock;
 - (void) executeGit:(NSArray *)args withCompletionBlock:(void (^)(NSDictionary*))codeBlock;
 
+- (NSDictionary*) executeGit:(NSArray *)args timeoutAfter:(int)tsecs;
+- (NSDictionary*) executeGit:(NSArray *)args;
+
 @end
