@@ -52,6 +52,9 @@
 	RepositoryTracker *tracker;
 	
 	NSMutableArray * selectedChanges;
+	
+	id statusTarget;
+	SEL statusSelector;
 }
 
 @property (nonatomic, retain, readonly) NSDictionary * itemDict;
@@ -60,8 +63,13 @@
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) NSMenuItem * parentItem;
 
+@property (nonatomic, retain) id statusTarget;
+@property (nonatomic) SEL statusSelector;
+
 - (id) initBuddy:(NSMenuItem *)anItem forPath:(NSString *)aPath withTitle:(NSString *)aTitle;
 - (int) totalChangeSetItems;
+- (int) changedFilesCount;
+- (int) stagedFilesCount;
 
 - (void) mergeData:(NSDictionary *)dict;
 - (void) updateMenuItems;

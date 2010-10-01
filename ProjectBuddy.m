@@ -14,7 +14,7 @@
 
 @synthesize path, title, parentItem;
 @synthesize currentBranch;
-
+@synthesize statusSelector, statusTarget;
 
 // Dictionary management
 
@@ -73,15 +73,19 @@
 		//scan remote, branch and changes
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			
 			[self mergeData:dict];
 			[self setCurrentBranch:[[[[self itemDict] objectForKey:@"branches"] objectForKey:@"current_branch"] objectAtIndex:0]];
 			NSLog(@"Current branch is %@", [self currentBranch]);
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+			
 			[self mergeData:dict];
 		}];
-		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
+		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict) {
+			
 			[self mergeData:dict];
+			
 			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 			if ([defaults objectForKey:@"monitorRemoteBranches"]) {
 				
@@ -94,15 +98,14 @@
 			}
 		}];
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-			[self mergeData:dict];
-
-			NSLog(@"Project Status Dictionary:\n");
-			NSLog(@"%@", [self itemDict]);
-			NSLog(@"  ***");
-			[self performSelectorOnMainThread:@selector(updateMenuItems) withObject:nil waitUntilDone:YES];
 			
-			//set counter for project
-			[ (GitBuddy*)[NSApp delegate] setCounter:[self totalChangeSetItems] forProject:path];
+			[self mergeData:dict];
+			//NSLog(@"Project Status:\n%@\n***", [self itemDict]);
+			//sent notification
+			if (statusTarget && statusSelector) {
+				NSLog(@"Notifying about status update of project %@", [self path]);
+				[statusTarget performSelectorOnMainThread:statusSelector withObject:[self itemDict] waitUntilDone:YES];
+			} 
 			
 			//call user code block
 			codeBlock();
@@ -141,6 +144,9 @@
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], source] , @"All right", nil, nil);
+			
+			//rescan after push
+			[self rescan:nil];
 		}
 	}];
 }
@@ -149,8 +155,14 @@
 {
 	NSString *targetRemoteSource = [self getSourceForBranch:[self currentBranch]];
 	if ( !targetRemoteSource) {
-		NSRunAlertPanel(@"No destination known.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to push too. You need to add a remote source with target branch", [self currentBranch]], @"Ok", nil, nil);
-		return;
+		int rc = NSRunAlertPanel(@"Destination branch does not exists.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to push too. Are you sure that you want to create a new remote branch?", [self currentBranch]], @"Yes", @"No", nil);
+		if (rc == 1) {
+			//FIXME: create a new remote branch. select origin first
+		}
+		else {
+			return;
+		}
+		
 	}
 	
 	[self pushToNamedSource:targetRemoteSource];
@@ -159,7 +171,7 @@
 {
 	NSString *targetRemoteSource = [self getSourceForBranch:[self currentBranch]];
 	if ( !targetRemoteSource) {
-		NSRunAlertPanel(@"No destination known.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to pull from. You need to add a remote source with target branch.", [self currentBranch]], @"Ok", nil, nil);
+		NSRunAlertPanel(@"No destination known.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to pull from. Your remote sources should have %@ branch. You can push to remote source in order to create new remote branch", [self currentBranch]], @"Ok", nil, nil);
 		return;
 	}
 	
@@ -180,9 +192,13 @@
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			NSRunInformationalAlertPanel(@"Pull operation complete.", [NSString stringWithFormat:@"Changed in branch %@ were successfully pulled from %@", [self currentBranch], targetRemoteSource] , @"All right", nil, nil);
+			
+			//rescan after pull
+			[self rescan:nil];
 		}
 	}];
 }
+			 
 - (IBAction) pushToSource:(id)sender
 {
 	NSString *source = [sender representedObject];
@@ -275,9 +291,19 @@
 	}
 }
 
+- (int) changedFilesCount
+{
+	return [changedSubMenu totalNumberOfFiles];
+}
+
+- (int) stagedFilesCount
+{
+	return [stagedSubMenu totalNumberOfFiles];
+}
+
 - (int) totalChangeSetItems
 {
-	return [changedSubMenu totalNumberOfFiles] + [stagedSubMenu totalNumberOfFiles];
+	return [self stagedFilesCount] + [self changedFilesCount];
 }
 
 - (void) updateMenuItems
@@ -317,6 +343,21 @@
 	else {
 		[untracked setTitle:@"Untracked"];
 	}
+	
+	//set remote pull/push items
+	if ([[[self itemDict] objectForKey:@"not_pushed"] count]) {
+		[push setTitle:[NSString stringWithFormat:@"Push (%d)", [[[self itemDict] objectForKey:@"not_pushed"] count]]];
+	}
+	else {
+		[push setTitle:@"Push"];
+	}
+	if ([[[self itemDict] objectForKey:@"not_pulled"] count]) {
+		[pull setTitle:[NSString stringWithFormat:@"Pull (%d)", [[[self itemDict] objectForKey:@"not_pulled"] count]]];
+	}
+	else {
+		[pull setTitle:@"Pull"];
+	}
+
 	
 	//set parent item
 	if ([self totalChangeSetItems]) {
@@ -370,6 +411,8 @@
 			break;
 	}
 	tracker = [[RepositoryTracker alloc] initTrackerForProject:aPath withPeriod:(count * mpl)];
+	[tracker setBranchUpdatedSelector:@selector(updateCounters:)];
+	[tracker setBranchUpdatedTarget:[NSApp delegate]];
 		
 	//set parent menu
 	[self setParentItem:anItem];

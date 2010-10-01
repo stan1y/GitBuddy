@@ -60,6 +60,8 @@
 	NSString *commitArg = [NSString stringWithFormat:@"--commit=%@", msg];
 	[wrapper executeGit:[NSArray arrayWithObjects:repoArg, commitArg, nil] withCompletionBlock:^(NSDictionary *dict){
 		
+		//rescan after commit
+		[(GitBuddy*)[NSApp delegate] rescanRepoAtPath:projectPath];
 	}];
 	
 	[[self window] performClose:sender];
