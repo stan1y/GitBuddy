@@ -77,9 +77,13 @@
 	<true/>
 	<key>customDiffCmd</key>
 	<string></string>
-	<key>localNumberOfChanges</key>
+	<key>localNumberOfChanged</key>
 	<true/>
-	<key>localNumberOfChangesActiveOnly</key>
+	<key>localNumberOfStaged</key>
+	<string></string>
+	<key>localNotificationsOnlyActive</key>
+	<false/>
+	<key>remoteNotificationsOnlyActive</key>
 	<false/>
 	<key>remoteNumberOfNotPulled</key>
 	<true/>
