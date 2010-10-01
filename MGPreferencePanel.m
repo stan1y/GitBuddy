@@ -247,6 +247,10 @@ NSString * const notificationsIcon = @"NotificationsIcon";
 - (void)windowWillClose:(NSNotification *)notification
 {
 	[[NSUserDefaults standardUserDefaults] synchronize];
+	NSLog(@"Saving preferences.");
+	
+	//update menu status if prefs were changed
+	[[NSApp delegate] performSelectorOnMainThread:@selector(rescanAll) withObject:nil waitUntilDone:YES];
 }
 
 @end
