@@ -83,6 +83,8 @@
 		769EB1CE125610E3000B7CE7 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
 		769EB1FF125614F3000B7CE7 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
 		769EB2051256150C000B7CE7 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 769EB1CC125610E3000B7CE7 /* Growl.framework */; };
+		769EB283125622BD000B7CE7 /* NewBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 769EB282125622BD000B7CE7 /* NewBranch.m */; };
+		769EB284125622BD000B7CE7 /* NewBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 769EB282125622BD000B7CE7 /* NewBranch.m */; };
 		76A5F3DB124DFAE60095280F /* AnimatedStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 76A5F3DA124DFAE60095280F /* AnimatedStatus.m */; };
 		76A5F3DC124DFAE60095280F /* AnimatedStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 76A5F3DA124DFAE60095280F /* AnimatedStatus.m */; };
 		76A5F3EE124DFD500095280F /* GitBuddy16Progress1.png in Resources */ = {isa = PBXBuildFile; fileRef = 76A5F3EB124DFD500095280F /* GitBuddy16Progress1.png */; };
@@ -194,6 +196,8 @@
 		769C1F2912395774006B127D /* Commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commit.h; sourceTree = "<group>"; };
 		769C1F2A12395774006B127D /* Commit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Commit.m; sourceTree = "<group>"; };
 		769EB1CC125610E3000B7CE7 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
+		769EB281125622BD000B7CE7 /* NewBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewBranch.h; sourceTree = "<group>"; };
+		769EB282125622BD000B7CE7 /* NewBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewBranch.m; sourceTree = "<group>"; };
 		76A5F3D9124DFAE60095280F /* AnimatedStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatedStatus.h; sourceTree = "<group>"; };
 		76A5F3DA124DFAE60095280F /* AnimatedStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnimatedStatus.m; sourceTree = "<group>"; };
 		76A5F3EB124DFD500095280F /* GitBuddy16Progress1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GitBuddy16Progress1.png; path = Images/GitBuddy16Progress1.png; sourceTree = "<group>"; };
@@ -282,6 +286,8 @@
 				76A5F3DA124DFAE60095280F /* AnimatedStatus.m */,
 				763D51A7125344500062039A /* RepositoryTracker.h */,
 				763D51A8125344500062039A /* RepositoryTracker.m */,
+				769EB281125622BD000B7CE7 /* NewBranch.h */,
+				769EB282125622BD000B7CE7 /* NewBranch.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -567,6 +573,7 @@
 				767C985F124A50640037B0F9 /* CommitsLog.m in Sources */,
 				76A5F3DB124DFAE60095280F /* AnimatedStatus.m in Sources */,
 				763D51A9125344500062039A /* RepositoryTracker.m in Sources */,
+				769EB283125622BD000B7CE7 /* NewBranch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,6 +604,7 @@
 				767C9860124A50640037B0F9 /* CommitsLog.m in Sources */,
 				76A5F3DC124DFAE60095280F /* AnimatedStatus.m in Sources */,
 				763D51AA125344500062039A /* RepositoryTracker.m in Sources */,
+				769EB284125622BD000B7CE7 /* NewBranch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
