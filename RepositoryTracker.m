@@ -6,6 +6,7 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
+#import <Growl/GrowlApplicationBridge.h>
 #import "RepositoryTracker.h"
 #import "GitWrapper.h"
 #include "time.h"
@@ -114,9 +115,23 @@
 				[branchUdpTarget performSelectorOnMainThread:branchUdpSel withObject:data  waitUntilDone:YES];
 			}
 			
+			NSString *growlNotice = [NSString string];
+			if ([remoteIds count]) {
+				growlNotice = [growlNotice stringByAppendingString:[NSString stringWithFormat:@"%d commit(s) to pull from %@", [remoteIds count], projectPath]];
+			}
+			if ([localIds count]) {
+				if ([growlNotice length]) {
+					growlNotice = [growlNotice stringByAppendingString:@", "];
+				}
+				
+				growlNotice = [growlNotice stringByAppendingString:[NSString stringWithFormat:@"%d commit(s) to push from %@", [localIds count], projectPath]];
+			}
+			
 			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-			if ([defaults boolForKey:@"monitorRemoteNotifyGrowl"]) {
-				//FIXME notify growl here
+			if ([defaults boolForKey:@"monitorRemoteNotifyGrowl"] && [growlNotice length]) {
+				
+				//Notify with growl
+				[GrowlApplicationBridge notifyWithTitle:[NSString stringWithFormat:@"%@ was changed", rbranch] description:growlNotice notificationName:@"REMOTE_BRANCH_CHANGED" iconData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy" ofType:@"png"]] priority:0 isSticky:NO clickContext:nil];
 			}
 			
 			
