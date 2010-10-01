@@ -89,7 +89,7 @@
 		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
 			
 			[self mergeData:dict];
-			//NSLog(@"Project Status:\n%@\n***", [self itemDict]);
+			NSLog(@"Project Status:\n%@\n***", [self itemDict]);
 			//sent notification
 			if (statusTarget && statusSelector) {
 				NSLog(@"Notifying about status update of project %@", [self path]);
@@ -146,15 +146,10 @@
 	if ( !targetRemoteSource) {
 		int rc = NSRunAlertPanel(@"Destination branch does not exists.", [NSString stringWithFormat:@"The branch %@ does not have it's remote counterpart to push too. Are you sure that you want to create a new remote branch?", [self currentBranch]], @"Yes", @"No", nil);
 		if (rc == 1) {
-			//FIXME: create a new remote branch. select origin first
-			[[ (GitBuddy*)[NSApp delegate] newBranch] showNewBranchOf:path withSources:[[self itemDict] objectForKey:@"remote"]];
+			[[ (GitBuddy*)[NSApp delegate] newBranch] showNewBranchOf:path withSources:[[[self itemDict] objectForKey:@"sources"] objectForKey:@"source"]];
 		}
-		else {
-			return;
-		}
-		
+		return;
 	}
-	
 	[self pushToNamedSource:targetRemoteSource];
 }
 - (IBAction) pull:(id)sender
