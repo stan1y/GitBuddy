@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <Growl/GrowlApplicationBridge.h>
 #import "MGPreferencePanel.h"
 #import "ProjectBuddy.h"
 #import "FilesStager.h"
@@ -16,7 +17,7 @@
 #import "CommitsLog.h"
 #import "AnimatedStatus.h"
 
-@interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate> {
+@interface GitBuddy : NSObject <NSApplicationDelegate, NSMenuDelegate, GrowlApplicationBridgeDelegate> {
 	IBOutlet NSMenu *statusMenu;
 	
 	NSStatusItem *statusItem;

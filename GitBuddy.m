@@ -542,7 +542,21 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[statusItem setMenu:statusMenu];
 	[statusItem setHighlightMode:YES];
 	
+	//setup animation
 	animStatus = [[AnimatedStatus alloc] initWithPeriod:0.5];
+	
+	//Growl setup
+	NSBundle *b = [NSBundle bundleForClass:[GitBuddy class]]; 
+	NSString *growlPath = [[b privateFrameworksPath] stringByAppendingPathComponent:@"Growl.framework"];
+	
+	NSBundle *growlBundle = [NSBundle bundleWithPath:growlPath]; 
+	if (growlBundle && [growlBundle load]) { 
+		[GrowlApplicationBridge setGrowlDelegate:self]; 
+		[GrowlApplicationBridge reregisterGrowlNotifications];
+	}
+	else { 
+		NSLog(@"Could not load Growl.framework"); 
+	}
 	
 	//subscribe on kbd events
 	//works only if "Enable Access for Assistive Devices" enabled in
@@ -574,6 +588,20 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	[newBranchName release];
 
 	[super dealloc];
+}
+
+//
+// - Growl Delegate methods
+//
+
+- (NSDictionary*) registrationDictionaryForGrowl
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:1], @"TicketVersion", [NSArray arrayWithObjects:@"REMOTE_BRANCH_CHANGED", nil], @"AllNotifications", [NSArray arrayWithObjects:@"REMOTE_BRANCH_CHANGED", nil], @"DefaultNotifications", nil];
+}
+
+- (NSString *) applicationNameForGrowl
+{
+	return @"Git Buddy";
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate: (NSApplication *)app
