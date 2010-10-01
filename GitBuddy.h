@@ -36,7 +36,6 @@
 	NSThread *eventsThread;
 	NSLock *eventsLock;
 	NSArray *queuedEvents;
-	NSMutableDictionary *projCounters;
 	
 	MGPreferencePanel *preferences;
 	
@@ -67,7 +66,10 @@
 	NSTextField *appVersion;
 	id updater;
 	
+	NSMutableDictionary *statusCounters;
 	AnimatedStatus *animStatus;
+	
+	NSWindow *aboutWnd;
 }
 
 //Events thread implementation
@@ -78,6 +80,7 @@
 - (ProjectBuddy*) getActiveProjectBuddy;
 
 //assigned from nib
+@property (assign) IBOutlet NSWindow *aboutWnd;
 @property (assign) IBOutlet MGPreferencePanel *preferences;
 @property (assign) IBOutlet id updater;
 @property (assign) IBOutlet NSTextField *lastUpdatedOn;
@@ -114,6 +117,8 @@
 - (IBAction) browseForRepo:(id)sender;
 - (IBAction) addRepo:(id)sender;
 - (IBAction) showGitManual:(id)sender;
+- (IBAction) showPreferences:(id)sender;
+- (IBAction) showAbout:(id)sender;
 
 - (void) createBranchFor:(ProjectBuddy*)buddy;
 - (void) createRemoteFor:(ProjectBuddy*)buddy;
@@ -125,10 +130,11 @@
 - (void) finishOperation;
 
 //rescan
+- (void) rescanAll;
 - (void) rescanRepoAtPath:(NSString*)path;
 
 //projects counters
-- (void) setCounter:(int)changed forProject:(NSString*)path;
+- (void) updateCounters:(NSDictionary*)data;
 
 //status icon
 - (void) setStatusImage:(NSImage*)image;

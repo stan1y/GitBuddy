@@ -22,7 +22,7 @@
 @synthesize newRemotePanel, newRemoteName, newRemoteURL;
 @synthesize newBranchPanel, newBranchName;
 @synthesize commitsLog, commitsLogPanel;
-@synthesize lastUpdatedOn, appVersion, updater, preferences;
+@synthesize lastUpdatedOn, appVersion, updater, preferences, aboutWnd;
 
 //	---	Keyboard Events processing
 
@@ -94,7 +94,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     GitBuddy *buddy = (GitBuddy *)userData;
 	size_t i;
     for(i=0; i < numEvents; i++){
-		NSLog(@"Received event %d", eventIds[i]);
 		
 		[buddy setLastEventId:eventIds[i]];
 		NSObject * paths = [(NSArray *)eventPaths objectAtIndex:i];
@@ -162,13 +161,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			NSString *folderPath = [[[folderItem representedObject] path] stringByAppendingPathComponent:@"/.git/"];
 			
 			if ([folderPath isEqual:[p substringToIndex:([p length] - 1)]]) {
-				NSLog(@"Ignoring git repo root path: %@", p);
 				//repo query flashback. should ignore
 				continue;
 			}
 			
 			if (folderItem) {
-				NSLog(@"Processing %@ with in repo %@", p, folderPath);
 				[foldersToRescan addObject:folderItem];
 			}
 		}
@@ -223,7 +220,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	else {
 		queuedEvents = paths;
 	}
-	NSLog(@"Totaly %d events queued.", [queuedEvents count]);
 	[queuedEvents retain];
 	[eventsLock unlock];
 }
@@ -263,6 +259,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	int insertIndex = [statusMenu numberOfItems] - 1;
 	NSMenuItem *pathItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:[NSString string]];
 	ProjectBuddy * pbuddy = [[ProjectBuddy alloc] initBuddy:pathItem forPath:path withTitle:title];
+	[pbuddy setStatusTarget:self];
+	[pbuddy setStatusSelector:@selector(updateCounters:)];
 	[pathItem setRepresentedObject:pbuddy];
 	[statusMenu insertItem:pathItem atIndex:insertIndex];
 	
@@ -364,6 +362,18 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	}
 }
 
+- (IBAction) showPreferences:(id)sender
+{
+	[NSApp activateIgnoringOtherApps:YES];
+	[[preferences window] orderFront:sender];
+}
+
+- (IBAction) showAbout:(id)sender
+{
+	[NSApp activateIgnoringOtherApps:YES];
+	[aboutWnd orderFront:sender];
+}
+
 - (IBAction) showGitManual:(id)sender
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -406,6 +416,17 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	else {
 		NSRunAlertPanel(@"Oups...", @"Specified path is not valid Git repository to monitor", @"Try again", nil, nil);
 	}
+}
+
+- (void) rescanAll
+{
+	lastUpdatedSec = 0;
+	NSLog(@"Rescaning all repos");
+	
+	for (NSString *prj in [self monitoredPathsArray]) {
+		[self appendEventPaths:[NSArray arrayWithObject:prj]];
+	}
+	[self processEventsNow];
 }
 
 - (void) rescanRepoAtPath:(NSString*)path
@@ -479,6 +500,9 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		}
 	}
 	
+	//counters
+	statusCounters = [[NSMutableDictionary alloc] init];
+	
 	//setup fs events
 	eventsRescanDelay = [defaults doubleForKey:@"eventsRescanDelay"];
 	NSLog(@"Events rescan delay: %.2f", eventsRescanDelay);
@@ -491,7 +515,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	
 	//events queue
 	eventsLock = [[NSLock alloc] init];
-	projCounters = [[NSMutableDictionary alloc] init];
 	
 	//status item
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength] retain];
@@ -523,7 +546,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 - (void) dealloc
 {
-	[projCounters release];
 	[statusImage release];
 	[statusAltImage release];
 	[statusItem release];
@@ -563,30 +585,213 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 //	-- Counters
 
-- (void) setCounter:(int)changed forProject:(NSString*)path
+- (void) updateCounters:(NSDictionary*)data
 {
-	[projCounters setObject:[NSNumber numberWithInt:changed] forKey:path];
+	/*
+	 * Data for update is the project status dict plus
+	 *		these keys:
+	 *	- not_pushed - list of sha256
+	 *	- not_pulled - list of sha256
+	 *	- remote_commits - dict with [sha256:commit array]
+	 *	- local_commits - dict with [sha256:commit array]
+	 *  - path ... + other from itemDict
+	 
+	 
+	 Notification settings
+	 <key>localNumberOfChanges</key>
+	 <true/>
+	 <key>localNumberOfChangesActiveOnly</key>
+	 <false/>
+	 <key>remoteNumberOfNotPulled</key>
+	 <true/>
+	 <key>remoteNumberOfNotPushed</key>
+	 <true/>
+	 <key>monitorRemoteBranches</key>
+	 <true/>
+	 <key>monitorRemoteNotifyGrowl</key>
+	 <false/>
+	 <key>monitorRemotePeriod</key>
+	 
+	 */
+
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	
-	//update status icon
-	
-	int totalItems = 0;
-	for (NSNumber *num in [projCounters allValues]) {
-		totalItems += [num intValue];
+	NSString *projectPath = [data objectForKey:@"path"];
+	ProjectBuddy *pbuddy = [[self menuItemForPath:projectPath] representedObject];
+	NSMutableDictionary *projectCounters = [statusCounters objectForKey:projectPath];
+	if (!projectCounters) {
+		projectCounters = [NSMutableDictionary dictionary];
 	}
-	if (totalItems) {
+	
+	//
+	// Process received data
+	//
+	if (data && [[data allKeys] count]) {
+		
+		//merge with repo repos status data
+		if ([data objectForKey:@"not_pushed"] || [data objectForKey:@"not_pulled"]) {
+			[pbuddy mergeData:data];
+		}
+		
+		NSLog(@"Processing notification from %@", projectPath);
+		
+		id notPushed = [data objectForKey:@"not_pushed"];
+		if (notPushed && [notPushed count]) {
+			
+			NSLog(@"%d commits to push in %@", [notPushed count], projectPath);
+			[projectCounters setObject:[NSNumber numberWithInt:[notPushed count]] forKey:@"not_pushed"];
+		}
+		
+		id notPulled = [data objectForKey:@"not_pulled"];
+		if (notPulled && [notPulled count] && [defaults boolForKey:@"remoteNumberOfNotPulled"]) {
+			
+			NSLog(@"%d commits to pull in %@", [notPulled count], projectPath);
+			[projectCounters setObject:[NSNumber numberWithInt:[notPulled count]] forKey:@"not_pulled"];
+		}
+		
+		//Set Staged count
+		[projectCounters setObject:[NSNumber numberWithInt:[pbuddy stagedFilesCount]] forKey:@"staged"];
+		NSLog(@"%d staged in %@", [pbuddy stagedFilesCount], projectPath);
+		
+		//Set Unstaged counters
+		if ([pbuddy changedFilesCount] && [data objectForKey:@"unstaged"]) {
+			id changed = [[data objectForKey:@"unstaged"] objectForKey:@"modified"];
+			id removed = [[data objectForKey:@"unstaged"] objectForKey:@"removed"];
+			id added = [[data objectForKey:@"unstaged"] objectForKey:@"added"];
+			id renamed = [[data objectForKey:@"unstaged"] objectForKey:@"renamed"]; 
+			int changedCount, addedCount, removedCount, renamedCount;
+			if (changed) {
+				changedCount = [changed count];
+				[projectCounters setObject:[NSNumber numberWithInt:changedCount] forKey:@"modified"];
+				NSLog(@"Modified %d", changedCount);
+			}
+			
+			if (added) {
+				addedCount = [added count];
+				[projectCounters setObject:[NSNumber numberWithInt:addedCount] forKey:@"added"];
+				NSLog(@"Added %d", addedCount);
+			}
+			
+			if (removed) {
+				removedCount = [removed count];
+				[projectCounters setObject:[NSNumber numberWithInt:removedCount] forKey:@"removed"];
+				NSLog(@"Removed %d", removedCount);
+			}
+			
+			if (renamed) {
+				renamedCount = [renamed count];
+				[projectCounters setObject:[NSNumber numberWithInt:renamedCount] forKey:@"renamed"];		
+				NSLog(@"Renamed %d", renamedCount);
+			}
+			
+		}
+		
+		//set project counters dict
+		[statusCounters setObject:projectCounters forKey:projectPath];
+		
+		
+	}
+	
+	//
+	// Build total, check each project status 
+	//
+	int totalChanged = 0, totalStaged = 0, totalNotPushed = 0, totalNotPulled = 0;
+	if (![defaults boolForKey:@"remoteNotificationsOnlyActive"] && ![defaults boolForKey:@"localNotificationsOnlyActive"] ) {
+		
+		//Calculate total
+		for(NSString *prj in [statusCounters allKeys]) {
+			for (NSString *category in [statusCounters objectForKey:prj]) {
+				NSNumber *value = [[statusCounters objectForKey:prj] objectForKey:category];
+				
+				if ([category isEqual:[NSString stringWithString:@"not_pushed"]]) {
+					totalNotPushed += [value intValue];
+				}
+				else if ([category isEqual:[NSString stringWithString:@"not_pulled"]]) {
+					totalNotPulled += [value intValue];
+				}
+				else if ([category isEqual:[NSString stringWithString:@"added"]]) {
+					totalChanged += [value intValue];
+				}
+				else if ([category isEqual:[NSString stringWithString:@"removed"]]) {
+					totalChanged += [value intValue];
+				}
+				else if ([category isEqual:[NSString stringWithString:@"modified"]]) {
+					totalChanged += [value intValue];
+				}
+				else if ([category isEqual:[NSString stringWithString:@"renamed"]]) {
+					totalChanged += [value intValue];
+				}
+				else if ([category isEqual:[NSString stringWithString:@"staged"]]) {
+					totalStaged += [value intValue];
+				}
+			}
+		}
+	}
+	
+	NSString *total = [NSString string];
+	if (totalStaged && [defaults boolForKey:@"localNumberOfStaged"]) {
+		total = [NSString stringWithFormat:@"ƒ%d", totalStaged];
+		[statusItem setToolTip:[NSString stringWithFormat:@"Found %d files are staged for commit", totalStaged]];
+	}
+	
+	if ([defaults boolForKey:@"localNumberOfChanged"]) {
+		
+		if ([defaults boolForKey:@"localNotificationsOnlyActive"] && [pbuddy changedFilesCount] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
+			NSLog(@"localNotificationsOnlyActive = YES. Skipping total local info build. Active project is %@", [[self getActiveProjectBuddy] path] );
+			
+			//set total = current count local
+			total = [total stringByAppendingFormat:@"±%d", [pbuddy changedFilesCount]];
+		}
+		else if (totalChanged) {
+			total = [total stringByAppendingFormat:@"±%d", totalChanged];
+		}
+	}
+	
+	if ([defaults boolForKey:@"remoteNumberOfNotPulled"]) {
+		
+		if ([defaults boolForKey:@"remoteNotificationsOnlyActive"] && [data objectForKey:@"not_pulled"] && [[data objectForKey:@"not_pulled"] count] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
+			NSLog(@"remoteNotificationsOnlyActive = YES. Skipping total pull info build. Active project is %@", [[self getActiveProjectBuddy] path] );
+			
+			//set total = current count remote
+			total = [total stringByAppendingFormat:@"Ω%d", [[data objectForKey:@"not_pushed"] count]];
+		}
+		else if (totalNotPulled){
+			total = [total stringByAppendingFormat:@"Ω%d", totalNotPulled];
+		}
+	}
+	
+	if ([defaults boolForKey:@"remoteNumberOfNotPushed"]) {
+		
+		if ([defaults boolForKey:@"remoteNotificationsOnlyActive"] && [data objectForKey:@"not_pushed"] && [[data objectForKey:@"not_pushed"] count] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
+			NSLog(@"remoteNotificationsOnlyActive = YES. Skipping total push info build. Active project is %@", [[self getActiveProjectBuddy] path] );
+			
+			//set total = current count remote
+			total = [total stringByAppendingFormat:@"∆%d", [[data objectForKey:@"not_pushed"] count]];
+		}
+		else if (totalNotPushed) {
+			total = [total stringByAppendingFormat:@"∆%d", totalNotPushed];
+		}
+	}
+		
+	if ([total length]) {
+		NSLog(@"Setting total title: %@", total);
 		//update with number of items
-		[statusItem setTitle:[NSString stringWithFormat:@" %d", totalItems]];
+		[statusItem setTitle:total];
 		//set alternate icon
 		currentImage = statusAltImage;
 		[self setCurrentImage];
-		[statusItem setToolTip:[NSString stringWithFormat:@"GitBuddy found %d unstaved changes.", totalItems]];
+		[statusItem setToolTip:[NSString stringWithFormat:@"Found %d unstaged changes, %d commits to pull & %d to push", totalChanged, totalNotPulled, totalNotPushed ]];
+		
 	}
-	else {
-		//set normal icon & no title
-		[statusItem setTitle:@""];
+	else if (![defaults boolForKey:@"remoteNotificationsOnlyActive"] || ![defaults boolForKey:@"localNotificationsOnlyActive"]) {
+		//set normal icon & no title or staged count
 		currentImage = statusImage;
-		[statusItem setToolTip:@"GitBuddy running."];
+		[statusItem setTitle:total];
+		[statusItem setToolTip:@"No changes detected."];
 	}
+	
+	//Update menus of project on notification
+	[pbuddy performSelectorOnMainThread:@selector(updateMenuItems) withObject:nil waitUntilDone:YES];
 }
 
 //	---	Active Project
