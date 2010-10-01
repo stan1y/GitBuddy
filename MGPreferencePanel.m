@@ -246,11 +246,15 @@ NSString * const notificationsIcon = @"NotificationsIcon";
 
 - (void)windowWillClose:(NSNotification *)notification
 {
-	[[NSUserDefaults standardUserDefaults] synchronize];
 	NSLog(@"Saving preferences.");
+	
+	//Save pref values
+	[[NSUserDefaults standardUserDefaults] synchronize];
 	
 	//update menu status if prefs were changed
 	[[NSApp delegate] performSelectorOnMainThread:@selector(rescanAll) withObject:nil waitUntilDone:YES];
+	//restart repo trackers in case period changed
+	[[NSApp delegate] performSelectorOnMainThread:@selector(restartAllTrackers) withObject:nil waitUntilDone:YES];
 }
 
 @end
