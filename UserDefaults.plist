@@ -92,7 +92,7 @@
 	<key>monitorRemoteBranches</key>
 	<true/>
 	<key>monitorRemoteNotifyGrowl</key>
-	<false/>
+	<true/>
 	<key>monitorRemotePeriod</key>
 	<integer>10</integer>
 	<key>monitorRemoteSelectedTermID</key>
