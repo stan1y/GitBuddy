@@ -79,8 +79,6 @@
 		NSString *itemPath = @"";
 		BOOL isFile = NO;
 		
-		NSLog(@"Data: %@", data);
-		
 		// Check what are we going to list here
 		// whenever we read files from staged/unstaged, untracked, branch list or remote list
 		if ( [data objectForKey:@"branch"] ) {
