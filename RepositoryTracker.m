@@ -98,8 +98,20 @@
 			[remoteIds minusSet:[NSMutableSet setWithArray:[localCommits allKeys]]];
 			[localIds minusSet:[NSMutableSet setWithArray:[remoteCommits allKeys]]];
 			
+			/*
+			 * Data for update is a dict with keys:
+			 *	- not_pushed - list of sha256
+			 *	- not_pulled - list of sha256
+			 *	- remote_commits - dict with [sha256:commit array]
+			 *	- local_commits - dict with [sha256:commit array]
+			 *	- cached - array with changed files in repo
+			 */
+			
+			NSLog(@"Remote status: %d commit(s) not pushed and %d not pulled from %@ in project %@", [localIds count], [remoteIds count], rbranch, projectPath);
+			
 			if (branchUdpTarget && branchUdpSel) {
-				[branchUdpTarget performSelectorOnMainThread:branchUdpSel withObject:[NSDictionary dictionaryWithObjectsAndKeys:localIds, "not_pushed", remoteIds, "not_pulled", nil]  waitUntilDone:YES];
+				NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:localIds, @"not_pushed", remoteIds, @"not_pulled", remoteCommits, @"remote_commits", localCommits, @"local_commits", [self projectPath], @"path", nil];
+				[branchUdpTarget performSelectorOnMainThread:branchUdpSel withObject:data  waitUntilDone:YES];
 			}
 			
 			NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -107,7 +119,7 @@
 				//FIXME notify growl here
 			}
 			
-			NSLog(@"Remote status: %d commit(s) not pushed and %d not pulled from %@", [localIds count], [remoteIds count], rbranch);
+			
 		}];
 	}
 }
