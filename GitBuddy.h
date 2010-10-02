@@ -140,7 +140,8 @@
 - (void) rescanRepoAtPath:(NSString*)path;
 
 //projects counters
-- (void) updateCounters:(NSDictionary*)data;
+- (void) receiveNotificationData:(NSDictionary *)data;
+- (void) updateCounters;
 
 //status icon
 - (void) setStatusImage:(NSImage*)image;

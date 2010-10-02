@@ -252,9 +252,7 @@ NSString * const notificationsIcon = @"NotificationsIcon";
 	NSLog(@"Tracker period is %d/%d", [[NSUserDefaults standardUserDefaults] integerForKey:@"monitorRemotePeriod"], [[NSUserDefaults standardUserDefaults] integerForKey:@"monitorRemoteSelectedTermID"]);
 	
 	//update menu status if prefs were changed
-	[[NSApp delegate] performSelectorOnMainThread:@selector(rescanAll) withObject:nil waitUntilDone:NO];
-	//restart repo trackers in case period changed
-	[[NSApp delegate] performSelectorOnMainThread:@selector(restartAllTrackers) withObject:nil waitUntilDone:NO];
+	[[NSApp delegate] performSelector:@selector(updateCounters)];
 }
 
 @end

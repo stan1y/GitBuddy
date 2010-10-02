@@ -423,7 +423,7 @@
 	
 	//tracker
 	tracker = [[RepositoryTracker alloc] initTrackerForProject:aPath withPeriod:[self getRepoTrackerPeriod]];
-	[tracker setBranchUpdatedSelector:@selector(updateCounters:)];
+	[tracker setBranchUpdatedSelector:@selector(receiveNotificationData:)];
 	[tracker setBranchUpdatedTarget:[NSApp delegate]];
 	
 	//set parent menu

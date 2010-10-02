@@ -271,7 +271,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSMenuItem *pathItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:[NSString string]];
 	ProjectBuddy * pbuddy = [[ProjectBuddy alloc] initBuddy:pathItem forPath:path withTitle:title];
 	[pbuddy setStatusTarget:self];
-	[pbuddy setStatusSelector:@selector(updateCounters:)];
+	[pbuddy setStatusSelector:@selector(receiveNotificationData:)];
 	[pathItem setRepresentedObject:pbuddy];
 	[statusMenu insertItem:pathItem atIndex:insertIndex];
 	
@@ -637,7 +637,8 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 //	-- Counters
 
-- (void) updateCounters:(NSDictionary*)data
+
+- (void) receiveNotificationData:(NSDictionary*)data
 {
 	/*
 	 * Data for update is the project status dict plus
@@ -666,8 +667,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	 
 	 */
 
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	
 	NSString *projectPath = [data objectForKey:@"path"];
 	ProjectBuddy *pbuddy = [[self menuItemForPath:projectPath] representedObject];
 	NSMutableDictionary *projectCounters = [statusCounters objectForKey:projectPath];
@@ -692,7 +691,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		}
 		
 		NSLog(@"Processing notification from %@", projectPath);
-		
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 		//Set remote data
 		id notPushed = [data objectForKey:@"not_pushed"];
 		if (notPushed && [notPushed count]) {
@@ -735,9 +734,17 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		}
 	}
 	
+	[self updateCounters];
+	//Update menus of project on notification
+	[pbuddy performSelectorOnMainThread:@selector(updateMenuItems) withObject:nil waitUntilDone:YES];
+}
+
+- (void) updateCounters
+{	
 	//
 	// Build total, check each project status 
 	//
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSLog(@"Project counters dictionary:\n%@\n***", statusCounters);
 	int totalChanged = 0, totalStaged = 0, totalNotPushed = 0, totalNotPulled = 0;
 	if (![defaults boolForKey:@"remoteNotificationsOnlyActive"] && ![defaults boolForKey:@"localNotificationsOnlyActive"] ) {
@@ -778,11 +785,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		
 	if ([defaults boolForKey:@"localNumberOfChanged"]) {
 		
-		if ([defaults boolForKey:@"localNotificationsOnlyActive"] && [pbuddy changedFilesCount] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
+		if ([defaults boolForKey:@"localNotificationsOnlyActive"]) {
 			NSLog(@"localNotificationsOnlyActive = YES. Skipping total local info build. Active project is %@", [[self getActiveProjectBuddy] path] );
 			
 			//set total = current count local
-			total = [total stringByAppendingFormat:[defaults objectForKey:@"localModifiedFormat"], [pbuddy changedFilesCount]];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"localModifiedFormat"], [[self getActiveProjectBuddy] changedFilesCount]];
 		}
 		else if (totalChanged) {
 			total = [total stringByAppendingFormat:[defaults objectForKey:@"localModifiedFormat"], totalChanged];
@@ -791,11 +798,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	
 	if ([defaults boolForKey:@"remoteNumberOfNotPulled"]) {
 		
-		if ([defaults boolForKey:@"remoteNotificationsOnlyActive"] && [data objectForKey:@"not_pulled"] && [[data objectForKey:@"not_pulled"] count] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
+		if ([defaults boolForKey:@"remoteNotificationsOnlyActive"]) {
 			NSLog(@"remoteNotificationsOnlyActive = YES. Skipping total pull info build. Active project is %@", [[self getActiveProjectBuddy] path] );
 			
 			//set total = current count remote
-			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPulledFormat"], [[data objectForKey:@"not_pushed"] count]];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPulledFormat"], [[[[self getActiveProjectBuddy] itemDict] objectForKey:@"not_pushed"] count]];
 		}
 		else if (totalNotPulled){
 			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPulledFormat"], totalNotPulled];
@@ -804,11 +811,11 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	
 	if ([defaults boolForKey:@"remoteNumberOfNotPushed"]) {
 		
-		if ([defaults boolForKey:@"remoteNotificationsOnlyActive"] && [data objectForKey:@"not_pushed"] && [[data objectForKey:@"not_pushed"] count] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
+		if ([defaults boolForKey:@"remoteNotificationsOnlyActive"]) {
 			NSLog(@"remoteNotificationsOnlyActive = YES. Skipping total push info build. Active project is %@", [[self getActiveProjectBuddy] path] );
 			
 			//set total = current count remote
-			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPushedFormat"], [[data objectForKey:@"not_pushed"] count]];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPushedFormat"], [[[[self getActiveProjectBuddy] itemDict] objectForKey:@"not_pushed"] count]];
 		}
 		else if (totalNotPushed) {
 			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPushedFormat"], totalNotPushed];
@@ -838,9 +845,6 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[statusItem setTitle:total];
 		[statusItem setToolTip:@"No changes detected."];
 	}
-	
-	//Update menus of project on notification
-	[pbuddy performSelectorOnMainThread:@selector(updateMenuItems) withObject:nil waitUntilDone:YES];
 }
 
 //	---	Active Project
