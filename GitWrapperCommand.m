@@ -42,7 +42,7 @@
 	[_args insertObject:wrapperPath atIndex:0];
 	[_args insertObject:[NSString stringWithFormat:@"--git=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"gitPath"]] atIndex:1];
 	[gitWrapper setArguments:_args];
-	NSLog(@"git operation: /usr/bin/python %@", [_args componentsJoinedByString:@" "]);
+	//NSLog(@"git operation: /usr/bin/python %@", [_args componentsJoinedByString:@" "]);
 	
 	return self;
 }
@@ -82,7 +82,6 @@
 	}
 	else {
 		int rc = [gitWrapper terminationStatus];
-		NSLog(@"wrapper exit code %d", rc);
 		//	wrapper exit codes: -1 is incorrect usage, other - git exit code
 		if (rc == -1) {
 			
@@ -111,6 +110,7 @@
 
 		//check json answer
 		if ([[[self jsonResult] objectForKey:@"giterr"] count] > 0 && [[[self jsonResult] objectForKey:@"gitrc"] intValue] != 0 ){
+			NSLog(@"Git exit: %d", rc);
 			NSLog(@"Git error: %@", [[self jsonResult] objectForKey:@"giterr"]);
 			int rc = NSRunAlertPanel(@"Oups... Git command failed.", [NSString stringWithFormat:@"Git wrapper failed with code %d. %@", [[[self jsonResult] objectForKey:@"gitrc"] intValue], [[[self jsonResult] objectForKey:@"giterr"] componentsJoinedByString:@" "]], @"Terminate", @"Continue", nil);
 			

@@ -359,8 +359,8 @@ if __name__ == '__main__':
 		count = 0
 		for line in out:
 			commitId, date, author, message = line.split('|', 4)
-			log('commit %s by %s on %s' % (commitId, author, date))
-			obj['items'].append( (commitId, date, author, message) )
+			log('commit %s by %s on %s' % (commitId.strip(), author.strip(), date.strip()))
+			obj['items'].append( (commitId.strip(), date.strip(), author.strip(), message) )
 			count += 1
 			
 		obj['count'] = count
