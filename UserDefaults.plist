@@ -103,5 +103,13 @@
 		<string>minutes</string>
 		<string>hours</string>
 	</array>
+	<key>localModifiedFormat</key>
+	<string>±%d</string>
+	<key>localStagedFormat</key>
+	<string>%d</string>
+	<key>remoteNotPushedFormat</key>
+	<string>∆%d</string>
+	<key>remoteNotPulledFormat</key>
+	<string>Ω%d</string>
 </dict>
 </plist>
