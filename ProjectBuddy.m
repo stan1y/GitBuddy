@@ -214,6 +214,7 @@
 		
 		[self setCurrentBranch:b];
 		NSLog(@"Switched to branch %@", b);
+		[self rescan:sender];
 	}];
 }
 - (IBAction) newBranch:(id)sender
