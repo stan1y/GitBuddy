@@ -138,10 +138,14 @@
 		[ (GitBuddy*)[NSApp delegate] finishOperation];
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
-			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], source] , @"All right", nil, nil);
+			//track pushed branch
+			NSString * trackArg = [NSString stringWithFormat:@"--branch-track=%@", [self currentBranch]];
+			NSString * remotePartArg = [NSString stringWithFormat:@"--remote-part=%@\%@", source, [self currentBranch]];
+			[wrapper executeGit:[NSArray arrayWithObjects:repoArg, trackArg, remotePartArg, nil]];
 			
 			//rescan after push
 			[self rescan:nil];
+			NSRunInformationalAlertPanel(@"Push operation complete.", [NSString stringWithFormat:@"Your commits to branch %@ were successfully pushed to %@", [self currentBranch], source] , @"All right", nil, nil);
 		}
 	}];
 }

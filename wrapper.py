@@ -164,6 +164,8 @@ if __name__ == '__main__':
 	parser.add_option("--branch-rm", help="git branch -d [name]")
 	parser.add_option("--branch-add", help="git branch [name]")
 	parser.add_option("--branch-switch", help="git checkout [name]")
+	parser.add_option("--branch-track", help="git branch --track [name] [remote-part]")
+	parser.add_option("--remote-part", help="specifys [remote-part] for --branch-track")
 	
 	parser.add_option("--remote-branch-list", action="store_true", default=False, help="git branch -r")
 	parser.add_option("--remote-list", action="store_true", default=False, help="git remote")
@@ -239,6 +241,16 @@ if __name__ == '__main__':
 		
 	elif options.branch_switch:
 		obj = b_cmd_json(options.git, options.repo, ['checkout', options.branch_switch], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+	
+	elif options.branch_track:
+		if not options.remote_part:
+			parser.print_help()
+			sys.stderr.write('--remote-part is required argument\n')
+			sys.exit(__ERR_USAGE)
+				
+		obj = b_cmd_json(options.git, options.repo, ['branch', '--track', options.branch_track, options.remote_part], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 	
