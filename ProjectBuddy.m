@@ -198,6 +198,7 @@
 {
 	[ (GitBuddy*)[NSApp delegate] createRemoteFor:self];
 }
+
 - (IBAction) switchToBranch:(id)sender
 {
 	NSString *b = [sender representedObject];

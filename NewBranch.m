@@ -7,7 +7,8 @@
 //
 
 #import "NewBranch.h"
-
+#import "GitBuddy.h"
+#import "ProjectBuddy.h"
 
 @implementation NewBranch
 
@@ -53,10 +54,18 @@
 
 - (IBAction) createNewBranch:(id)sender
 {
+	ProjectBuddy *pbuddy = [ (GitBuddy*)[NSApp delegate] getActiveProjectBuddy];
+	NSLog(@"Pushing NEW branch '%@' to %@", [pbuddy currentBranch], [self selectedSource]);
+	[[self window] orderOut:sender];
+	[pbuddy pushToNamedSource:[self selectedSource]];
 }
 
 - (IBAction) createNewSource:(id)sender
 {
+	ProjectBuddy *pbuddy = [ (GitBuddy*)[NSApp delegate] getActiveProjectBuddy];
+	NSLog(@"Displaying new source dialog");
+	[[self window] orderOut:sender];
+	[pbuddy newSource:sender];
 }
 
 @end
