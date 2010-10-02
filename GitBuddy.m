@@ -686,9 +686,9 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	if (data && [[data allKeys] count]) {
 		
 		//merge with repo repos status data
-		if ([data objectForKey:@"not_pushed"] || [data objectForKey:@"not_pulled"]) {
-			[pbuddy mergeData:data];
-		}
+		//if ([data objectForKey:@"not_pushed"] || [data objectForKey:@"not_pulled"]) {
+		//	[pbuddy mergeData:data];
+		//}
 		
 		NSLog(@"Processing notification from %@", projectPath);
 		//Set remote data
