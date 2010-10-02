@@ -169,6 +169,7 @@ if __name__ == '__main__':
 	parser.add_option("--remote-list", action="store_true", default=False, help="git remote")
 	parser.add_option("--remote-add", help="git remote add [name] [url]")
 	parser.add_option("--remote-rm", help="git remote rm [name]")
+	parser.add_option("--remote-update", help="git fetch [name]")
 	parser.add_option("--url", help="A URL for remote source, used in --remote-add")
 	
 	parser.add_option("--staged-index", action="store_true", default=False, help="git ls-files -s")
@@ -265,6 +266,11 @@ if __name__ == '__main__':
 		
 	elif options.remote_rm:
 		obj = b_cmd_json(options.git, options.repo, ['remote', 'rm', options.remote_rm], {})
+		sys.stdout.write('%s\n' % json.dumps(obj))
+		sys.exit(obj['gitrc'])
+		
+	elif options.remote_update:
+		obj = b_cmd_json(options.git, options.repo, ['fetch', options.remote_update], {})
 		sys.stdout.write('%s\n' % json.dumps(obj))
 		sys.exit(obj['gitrc'])
 		

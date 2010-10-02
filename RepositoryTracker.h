@@ -20,8 +20,11 @@
 	NSMutableArray *notPushed;
 	NSMutableArray *notPulled;
 	NSLock *threadLock;
+	
+	NSArray *sources;
 }
 @property (assign) int period;
+@property (retain) NSArray *sources;
 @property (nonatomic, retain) NSMutableArray *notPushed;
 @property (nonatomic, retain) NSMutableArray *notPulled;
 @property (nonatomic, retain) NSString *projectPath;

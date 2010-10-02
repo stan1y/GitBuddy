@@ -16,7 +16,7 @@
 @implementation RepositoryTracker
 
 @synthesize projectPath;
-@synthesize notPushed, notPulled, period;
+@synthesize notPushed, notPulled, period, sources;
 
 - (void)dealloc
 {
@@ -57,19 +57,25 @@
 - (void) monitorProject
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	while (YES) {
-		
+	GitWrapper *wrapper = [GitWrapper sharedInstance];
+	ProjectBuddy *pbuddy = [[(GitBuddy*)[NSApp delegate] menuItemForPath:projectPath] representedObject];
+
+	while (YES) {		
 		[self exitIfCanceled:pool];
-		GitWrapper *wrapper = [GitWrapper sharedInstance];
-		ProjectBuddy *pbuddy = [[(GitBuddy*)[NSApp delegate] menuItemForPath:projectPath] representedObject];
+		NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath ];
 		
+		//update each source
+		for(NSString *source in sources) {
+			NSLog(@"Updateing remote source %@", source);
+			NSString *sourceArg = [NSString stringWithFormat:@"--remote-update=%@", source ];
+			[wrapper executeGit:[NSArray arrayWithObjects:repoArg, sourceArg, nil]];
+		}
 		//compare each branch with it's couterpart in rbranch
 		for (NSString *branch in [[[pbuddy itemDict] objectForKey:@"branches"] objectForKey:@"branch"]) {
 			NSString *remoteSource = [pbuddy getSourceForBranch:branch];
 			if (remoteSource && [remoteSource length]) {
 				
 				//get local status
-				NSString *repoArg = [NSString stringWithFormat:@"--repo=%@", projectPath ];
 				NSString *remoteInfoArg = [NSString stringWithFormat:@"--log=%@", branch ];
 				NSDictionary *localInfo = [wrapper executeGit:[NSArray arrayWithObjects:repoArg, remoteInfoArg, nil]];
 				NSLog(@"%@ %@ has %d commits", projectPath, branch, [[localInfo objectForKey:@"items"] count]);
@@ -108,7 +114,7 @@
 				NSLog(@"%d commit(s) not pushed and %d not pulled from %@ in project %@", [localIds count], [remoteIds count], branch, projectPath);
 				
 				if (branchUdpTarget && branchUdpSel) {
-					NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:localIds, @"not_pushed", remoteIds, @"not_pulled", remoteCommits, @"remote_commits", localCommits, @"local_commits", [self projectPath], @"path", branch, @"branch", remoteSource, @"source", nil];
+					NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:localIds, @"not_pushed", remoteIds, @"not_pulled", remoteCommits, @"remote_commits", localCommits, @"local_commits", [self projectPath], @"path", branch, @"branch", nil];
 					[branchUdpTarget performSelectorOnMainThread:branchUdpSel withObject:data  waitUntilDone:YES];
 				}
 				
@@ -157,7 +163,7 @@
 
 - (IBAction) startMonitoring:(id)sender
 {
-	if ( !thread ) {
+	if ( !thread && sources) {
 		[threadLock lock];
 		NSLog(@"Starting remote changes monitor thread...");
 		thread = [[NSThread alloc] initWithTarget:self selector:@selector(monitorProject) object:nil];

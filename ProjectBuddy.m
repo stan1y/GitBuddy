@@ -87,6 +87,7 @@
 						if ([[NSUserDefaults standardUserDefaults] objectForKey:@"monitorRemoteBranches"] && ![tracker isRunning]) {
 							//start remote branches monitoring
 							[tracker setPeriod:[self getRepoTrackerPeriod]];
+							[tracker setSources:[[[self itemDict] objectForKey:@"sources"] objectForKey:@"source"]];
 							[tracker startMonitoring:self];
 						}
 						
