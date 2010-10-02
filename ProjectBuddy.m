@@ -72,32 +72,37 @@
 		NSLog(@"Quering repo at %@...", path);
 		//scan remote, branch and changes
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
-		[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-			
-			[self mergeData:dict];
-			[self setCurrentBranch:[[[[self itemDict] objectForKey:@"branches"] objectForKey:@"current_branch"] objectAtIndex:0]];
-			NSLog(@"Current branch is %@", [self currentBranch]);
-		}];
-		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-			
-			[self mergeData:dict];
-		}];
-		[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict) {
-			
-			[self mergeData:dict];
-		}];
-		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *dict){
-			
-			[self mergeData:dict];
-			NSLog(@"Project Status:\n%@\n***", [self itemDict]);
-			//sent notification
-			if (statusTarget && statusSelector) {
-				NSLog(@"Notifying about status update of project %@", [self path]);
-				[statusTarget performSelectorOnMainThread:statusSelector withObject:[self itemDict] waitUntilDone:YES];
-			} 
-			
-			//call user code block
-			codeBlock();
+		[wrapper executeGit:[NSArray arrayWithObjects:@"--status", repoArg, nil] withCompletionBlock: ^(NSDictionary *status){
+			[self mergeData:status];
+			[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *sourcesList){
+				[self mergeData:sourcesList];
+				[wrapper executeGit:[NSArray arrayWithObjects:@"--remote-branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *remoteBranches) {
+					[self mergeData:remoteBranches];
+					[wrapper executeGit:[NSArray arrayWithObjects:@"--branch-list", repoArg, nil] withCompletionBlock: ^(NSDictionary *branchList){
+						[self mergeData:branchList];
+						[self setCurrentBranch:[[[[self itemDict] objectForKey:@"branches"] objectForKey:@"current_branch"] objectAtIndex:0]];
+						NSLog(@"Current branch is %@", [self currentBranch]);
+						NSLog(@"Project Status:\n%@\n***", [self itemDict]);
+						
+						if ([[NSUserDefaults standardUserDefaults] objectForKey:@"monitorRemoteBranches"] && ![tracker isRunning]) {
+							//start remote branches monitoring
+							[tracker setPeriod:[self getRepoTrackerPeriod]];
+							[tracker startMonitoring:self];
+						}
+						
+						//sent notification
+						if (statusTarget && statusSelector) {
+							NSLog(@"Notifying about status update of project %@", [self path]);
+							NSMutableDictionary *notificationDict = [NSMutableDictionary dictionaryWithDictionary:[self itemDict]];
+							[notificationDict setObject:[self currentBranch] forKey:@"branch"];
+							[statusTarget performSelectorOnMainThread:statusSelector withObject:notificationDict waitUntilDone:YES];
+						} 
+						
+						//call user code block
+						codeBlock();
+					}];
+				}];
+			}];
 		}];
 	}
 	@catch (NSException * e) {
@@ -395,7 +400,7 @@
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	if ([tracker isRunning]) {
-		[tracker stopMonitoring:self];
+		[tracker stopMonitoring:self wait:YES];
 	}
 	if ([defaults objectForKey:@"monitorRemoteBranches"]) {
 		//start remote branches monitoring
@@ -420,7 +425,6 @@
 	tracker = [[RepositoryTracker alloc] initTrackerForProject:aPath withPeriod:[self getRepoTrackerPeriod]];
 	[tracker setBranchUpdatedSelector:@selector(updateCounters:)];
 	[tracker setBranchUpdatedTarget:[NSApp delegate]];
-	[self restartTracker];
 	
 	//set parent menu
 	[self setParentItem:anItem];
