@@ -57,7 +57,7 @@
 	ProjectBuddy *pbuddy = [ (GitBuddy*)[NSApp delegate] getActiveProjectBuddy];
 	NSLog(@"Pushing NEW branch '%@' to %@", [pbuddy currentBranch], [self selectedSource]);
 	[[self window] orderOut:sender];
-	[pbuddy pushToNamedSource:[self selectedSource]];
+	[pbuddy pushToNamedSource:[self selectedSource] track:YES];
 }
 
 - (IBAction) createNewSource:(id)sender

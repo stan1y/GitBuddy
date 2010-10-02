@@ -120,7 +120,7 @@
 	[(GitBuddy*)[NSApp delegate] rescanRepoAtPath:path];
 }
 
-- (void) pushToNamedSource:(NSString*)source
+- (void) pushToNamedSource:(NSString*)source track:(BOOL)newBranch
 {
 	GitWrapper *wrapper = [GitWrapper sharedInstance];
 	NSString * repoArg = [NSString stringWithFormat:@"--repo=%@", path];
@@ -139,9 +139,11 @@
 		
 		if ([[dict objectForKey:@"gitrc"] intValue] == 0) {
 			//track pushed branch
-			NSString * trackArg = [NSString stringWithFormat:@"--branch-track=%@", [self currentBranch]];
-			NSString * remotePartArg = [NSString stringWithFormat:@"--remote-part=%@\%@", source, [self currentBranch]];
-			[wrapper executeGit:[NSArray arrayWithObjects:repoArg, trackArg, remotePartArg, nil]];
+			if (newBranch) {
+				NSString * trackArg = [NSString stringWithFormat:@"--branch-track=%@", [self currentBranch]];
+				NSString * remotePartArg = [NSString stringWithFormat:@"--remote-part=%@\%@", source, [self currentBranch]];
+				[wrapper executeGit:[NSArray arrayWithObjects:repoArg, trackArg, remotePartArg, nil]];				
+			}
 			
 			//rescan after push
 			[self rescan:nil];
@@ -160,7 +162,7 @@
 		}
 		return;
 	}
-	[self pushToNamedSource:targetRemoteSource];
+	[self pushToNamedSource:targetRemoteSource track:NO];
 }
 - (IBAction) pull:(id)sender
 {
@@ -200,7 +202,7 @@
 	int rc = NSRunInformationalAlertPanel([NSString stringWithFormat:@"Push %@ to %@", [self currentBranch], source], [NSString stringWithFormat:@"You are about to push your commits in branch %@ to remote source %@. Are you sure about it?", [self currentBranch], source], @"Yes", @"No", nil);
 	
 	if (rc == 1) {
-		[self pushToNamedSource:source];
+		[self pushToNamedSource:source track:NO];
 	}
 }
 

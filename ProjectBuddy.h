@@ -78,7 +78,7 @@
 - (void) rescanWithCompletionBlock:(void (^)(void))codeBlock;
 
 //push commits
-- (void) pushToNamedSource:(NSString*)source;
+- (void) pushToNamedSource:(NSString*)source track:(BOOL)newBranch;
 
 // Selectors
 - (IBAction) addFile:(id)sender;
