@@ -247,14 +247,14 @@ NSString * const notificationsIcon = @"NotificationsIcon";
 - (void)windowWillClose:(NSNotification *)notification
 {
 	NSLog(@"Saving preferences.");
-	
 	//Save pref values
 	[[NSUserDefaults standardUserDefaults] synchronize];
+	NSLog(@"Tracker period is %d/%d", [[NSUserDefaults standardUserDefaults] integerForKey:@"monitorRemotePeriod"], [[NSUserDefaults standardUserDefaults] integerForKey:@"monitorRemoteSelectedTermID"]);
 	
 	//update menu status if prefs were changed
-	[[NSApp delegate] performSelectorOnMainThread:@selector(rescanAll) withObject:nil waitUntilDone:YES];
+	[[NSApp delegate] performSelectorOnMainThread:@selector(rescanAll) withObject:nil waitUntilDone:NO];
 	//restart repo trackers in case period changed
-	[[NSApp delegate] performSelectorOnMainThread:@selector(restartAllTrackers) withObject:nil waitUntilDone:YES];
+	[[NSApp delegate] performSelectorOnMainThread:@selector(restartAllTrackers) withObject:nil waitUntilDone:NO];
 }
 
 @end
