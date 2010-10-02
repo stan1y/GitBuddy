@@ -19,6 +19,7 @@
 	
 	NSMutableArray *notPushed;
 	NSMutableArray *notPulled;
+	NSLock *threadLock;
 }
 @property (assign) int period;
 @property (nonatomic, retain) NSMutableArray *notPushed;
@@ -30,7 +31,7 @@
 - (void) setBranchUpdatedTarget:(id)target;
 
 - (IBAction) startMonitoring:(id)sender;
-- (IBAction) stopMonitoring:(id)sender;
+- (IBAction) stopMonitoring:(id)sender wait:(BOOL)wait;
 
 - (BOOL) isRunning;
 

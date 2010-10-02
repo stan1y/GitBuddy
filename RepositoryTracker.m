@@ -33,6 +33,7 @@
 		return nil;
 	}
 	
+	threadLock = [[NSLock alloc] init];
 	[self setProjectPath:path];
 	period = secs;
 	
@@ -41,19 +42,24 @@
 
 //	-- Thread body
 
+- (void) exitIfCanceled:(NSAutoreleasePool*)pool
+{
+	if ([thread isCancelled]) {
+		NSLog(@"Exiting remote changes monitor thread...");
+		[thread release];
+		thread = nil;
+		[pool release];
+		pool = nil;
+		[NSThread exit];
+	}
+}
+
 - (void) monitorProject
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	while (YES) {
-		if ([thread isCancelled]) {
-			NSLog(@"Exiting remote changes monitor thread...");
-			[thread release];
-			thread = nil;
-			[pool release];
-			pool = nil;
-			[NSThread exit];
-		}
 		
+		[self exitIfCanceled:pool];
 		GitWrapper *wrapper = [GitWrapper sharedInstance];
 		ProjectBuddy *pbuddy = [[(GitBuddy*)[NSApp delegate] menuItemForPath:projectPath] representedObject];
 		
@@ -67,10 +73,12 @@
 				NSString *remoteInfoArg = [NSString stringWithFormat:@"--log=%@", branch ];
 				NSDictionary *localInfo = [wrapper executeGit:[NSArray arrayWithObjects:repoArg, remoteInfoArg, nil]];
 				NSLog(@"%@ %@ has %d commits", projectPath, branch, [[localInfo objectForKey:@"items"] count]);
+				[self exitIfCanceled:pool];
 				
 				NSString *remoteArg = [NSString stringWithFormat:@"--log=%@/%@", remoteSource, branch];
 				NSDictionary *remoteInfo = [wrapper executeGit:[NSArray arrayWithObjects:repoArg, remoteArg, nil]];
 				NSLog(@"%@ branch %@/%@ has %d commits", projectPath, remoteSource, branch, [[remoteInfo objectForKey:@"items"] count]);
+				[self exitIfCanceled:pool];
 				
 				//compare
 				NSMutableDictionary *remoteCommits = [NSMutableDictionary dictionary];
@@ -100,7 +108,7 @@
 				NSLog(@"%d commit(s) not pushed and %d not pulled from %@ in project %@", [localIds count], [remoteIds count], branch, projectPath);
 				
 				if (branchUdpTarget && branchUdpSel) {
-					NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:localIds, @"not_pushed", remoteIds, @"not_pulled", remoteCommits, @"remote_commits", localCommits, @"local_commits", [self projectPath], @"path", nil];
+					NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:localIds, @"not_pushed", remoteIds, @"not_pulled", remoteCommits, @"remote_commits", localCommits, @"local_commits", [self projectPath], @"path", branch, @"branch", remoteSource, @"source", nil];
 					[branchUdpTarget performSelectorOnMainThread:branchUdpSel withObject:data  waitUntilDone:YES];
 				}
 				
@@ -108,18 +116,22 @@
 				if ([remoteIds count] && [defaults boolForKey:@"monitorRemoteNotifyGrowl"]) {
 					
 					//remote notify with growl
+					NSLog(@"Notifying about local changes to be pushed to remote repo");
 					[GrowlApplicationBridge notifyWithTitle:[NSString stringWithFormat:@"%@ on %@ was updated.", branch, remoteSource] description:[NSString stringWithFormat:@"%d commit(s) appeared. Pull to %@", [remoteIds count], projectPath] notificationName:@"REMOTE_BRANCH_CHANGED" iconData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy" ofType:@"png"]] priority:0 isSticky:NO clickContext:nil];
 				}
 				
 				if ([localIds count] && [defaults boolForKey:@"monitorRemoteNotifyGrowl"]) {
 					
 					//remote notify with growl
+					NSLog(@"Notifying about available changes in remote repo");
 					[GrowlApplicationBridge notifyWithTitle:[NSString stringWithFormat:@"%@ was updated.", branch] description:[NSString stringWithFormat:@"You need to push %d commit(s) from %@", [localIds count], projectPath] notificationName:@"LOCAL_BRANCH_CHANGED" iconData:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GitBuddy" ofType:@"png"]] priority:0 isSticky:NO clickContext:nil];
 				}
 			}
 		}
 		
 		NSLog(@"Remote changes thread for %@ is sleeping for %d seconds.", projectPath, period);
+		
+		[self exitIfCanceled:pool];
 		sleep(period);
 	}
 }
@@ -146,16 +158,25 @@
 - (IBAction) startMonitoring:(id)sender
 {
 	if ( !thread ) {
+		[threadLock lock];
 		NSLog(@"Starting remote changes monitor thread...");
 		thread = [[NSThread alloc] initWithTarget:self selector:@selector(monitorProject) object:nil];
 		[thread start];
+		[threadLock unlock];
 	}
 }
 
-- (IBAction) stopMonitoring:(id)sender
+- (IBAction) stopMonitoring:(id)sender wait:(BOOL)wait
 {
 	if (thread) {
+		[threadLock lock];
 		[thread cancel];
+		if (wait) {
+			while ( [self isRunning] ) {
+				sleep(1);
+			}
+		}
+		[threadLock unlock];
 	}
 }
 
