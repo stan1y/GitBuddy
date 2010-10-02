@@ -691,16 +691,15 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		}
 		
 		NSLog(@"Processing notification from %@", projectPath);
-		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 		//Set remote data
 		id notPushed = [data objectForKey:@"not_pushed"];
-		if (notPushed && [notPushed count]) {
+		if (notPushed) {
 			NSLog(@"%d commits to push in %@.%@", [notPushed count], projectPath, [data objectForKey:@"branch"]);
 			[branchCounters setObject:[NSNumber numberWithInt:[notPushed count]] forKey:@"not_pushed"];
 			
 		}
 		id notPulled = [data objectForKey:@"not_pulled"];
-		if (notPulled && [notPulled count] && [defaults boolForKey:@"remoteNumberOfNotPulled"]) {
+		if (notPulled) {
 			NSLog(@"%d commits to pull in %@.%@", [notPulled count], projectPath, [data objectForKey:@"branch"]);
 			[branchCounters setObject:[NSNumber numberWithInt:[notPulled count]] forKey:@"not_pulled"];
 		}
