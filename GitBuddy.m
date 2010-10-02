@@ -673,6 +673,12 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 	NSMutableDictionary *projectCounters = [statusCounters objectForKey:projectPath];
 	if (!projectCounters) {
 		projectCounters = [NSMutableDictionary dictionary];
+		[statusCounters setObject:projectCounters forKey:projectPath];
+	}
+	NSMutableDictionary *branchCounters = [projectCounters objectForKey:[data objectForKey:@"branch"]];
+	if (!branchCounters) {
+		branchCounters = [NSMutableDictionary dictionary];
+		[projectCounters setObject:branchCounters forKey:[data objectForKey:@"branch"]];
 	}
 	
 	//
@@ -687,111 +693,99 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		
 		NSLog(@"Processing notification from %@", projectPath);
 		
+		//Set remote data
 		id notPushed = [data objectForKey:@"not_pushed"];
 		if (notPushed && [notPushed count]) {
+			NSLog(@"%d commits to push in %@.%@", [notPushed count], projectPath, [data objectForKey:@"branch"]);
+			[branchCounters setObject:[NSNumber numberWithInt:[notPushed count]] forKey:@"not_pushed"];
 			
-			NSLog(@"%d commits to push in %@", [notPushed count], projectPath);
-			[projectCounters setObject:[NSNumber numberWithInt:[notPushed count]] forKey:@"not_pushed"];
 		}
-		
 		id notPulled = [data objectForKey:@"not_pulled"];
 		if (notPulled && [notPulled count] && [defaults boolForKey:@"remoteNumberOfNotPulled"]) {
-			
-			NSLog(@"%d commits to pull in %@", [notPulled count], projectPath);
-			[projectCounters setObject:[NSNumber numberWithInt:[notPulled count]] forKey:@"not_pulled"];
+			NSLog(@"%d commits to pull in %@.%@", [notPulled count], projectPath, [data objectForKey:@"branch"]);
+			[branchCounters setObject:[NSNumber numberWithInt:[notPulled count]] forKey:@"not_pulled"];
 		}
 		
 		//Set Staged count
-		[projectCounters setObject:[NSNumber numberWithInt:[pbuddy stagedFilesCount]] forKey:@"staged"];
+		[branchCounters setObject:[NSNumber numberWithInt:[pbuddy stagedFilesCount]] forKey:@"staged"];
 		NSLog(@"%d staged in %@", [pbuddy stagedFilesCount], projectPath);
 		
 		//Set Unstaged counters
-		if ([pbuddy changedFilesCount] && [data objectForKey:@"unstaged"]) {
+		if ([data objectForKey:@"unstaged"]) {
 			id changed = [[data objectForKey:@"unstaged"] objectForKey:@"modified"];
 			id removed = [[data objectForKey:@"unstaged"] objectForKey:@"removed"];
 			id added = [[data objectForKey:@"unstaged"] objectForKey:@"added"];
-			id renamed = [[data objectForKey:@"unstaged"] objectForKey:@"renamed"]; 
-			int changedCount, addedCount, removedCount, renamedCount;
+			id renamed = [[data objectForKey:@"unstaged"] objectForKey:@"renamed"];
+
 			if (changed) {
-				changedCount = [changed count];
-				[projectCounters setObject:[NSNumber numberWithInt:changedCount] forKey:@"modified"];
+				[branchCounters setObject:[NSNumber numberWithInt:[changed count]] forKey:@"modified"];
 			}
 			
 			if (added) {
-				addedCount = [added count];
-				[projectCounters setObject:[NSNumber numberWithInt:addedCount] forKey:@"added"];
+				[branchCounters setObject:[NSNumber numberWithInt:[added count]] forKey:@"added"];
 			}
 			
 			if (removed) {
-				removedCount = [removed count];
-				[projectCounters setObject:[NSNumber numberWithInt:removedCount] forKey:@"removed"];
+				[branchCounters setObject:[NSNumber numberWithInt:[removed count]] forKey:@"removed"];
 			}
 			
 			if (renamed) {
-				renamedCount = [renamed count];
-				[projectCounters setObject:[NSNumber numberWithInt:renamedCount] forKey:@"renamed"];		
+				[branchCounters setObject:[NSNumber numberWithInt:[renamed count]] forKey:@"renamed"];
 			}
-			
 		}
-		
-		//set project counters dict
-		[statusCounters setObject:projectCounters forKey:projectPath];
-		
-		
 	}
 	
 	//
 	// Build total, check each project status 
 	//
+	NSLog(@"Project counters dictionary:\n%@\n***", statusCounters);
 	int totalChanged = 0, totalStaged = 0, totalNotPushed = 0, totalNotPulled = 0;
 	if (![defaults boolForKey:@"remoteNotificationsOnlyActive"] && ![defaults boolForKey:@"localNotificationsOnlyActive"] ) {
 		
 		//Calculate total
 		for(NSString *prj in [statusCounters allKeys]) {
-			for (NSString *category in [statusCounters objectForKey:prj]) {
-				NSNumber *value = [[statusCounters objectForKey:prj] objectForKey:category];
-				
-				if ([category isEqual:[NSString stringWithString:@"not_pushed"]]) {
-					totalNotPushed += [value intValue];
-				}
-				else if ([category isEqual:[NSString stringWithString:@"not_pulled"]]) {
-					totalNotPulled += [value intValue];
-				}
-				else if ([category isEqual:[NSString stringWithString:@"added"]]) {
-					totalChanged += [value intValue];
-				}
-				else if ([category isEqual:[NSString stringWithString:@"removed"]]) {
-					totalChanged += [value intValue];
-				}
-				else if ([category isEqual:[NSString stringWithString:@"modified"]]) {
-					totalChanged += [value intValue];
-				}
-				else if ([category isEqual:[NSString stringWithString:@"renamed"]]) {
-					totalChanged += [value intValue];
-				}
-				else if ([category isEqual:[NSString stringWithString:@"staged"]]) {
-					totalStaged += [value intValue];
+			for (NSString *brn in [statusCounters objectForKey:prj]) {
+				for (NSString *category in [[statusCounters objectForKey:prj] objectForKey:brn]) {
+					NSNumber *value = [[[statusCounters objectForKey:prj] objectForKey:brn] objectForKey:category];
+					
+					if ([category isEqual:[NSString stringWithString:@"not_pushed"]]) {
+						totalNotPushed += [value intValue];
+					}
+					else if ([category isEqual:[NSString stringWithString:@"not_pulled"]]) {
+						totalNotPulled += [value intValue];
+					}
+					else if ([category isEqual:[NSString stringWithString:@"added"]]) {
+						totalChanged += [value intValue];
+					}
+					else if ([category isEqual:[NSString stringWithString:@"removed"]]) {
+						totalChanged += [value intValue];
+					}
+					else if ([category isEqual:[NSString stringWithString:@"modified"]]) {
+						totalChanged += [value intValue];
+					}
+					else if ([category isEqual:[NSString stringWithString:@"renamed"]]) {
+						totalChanged += [value intValue];
+					}
+					else if ([category isEqual:[NSString stringWithString:@"staged"]]) {
+						totalStaged += [value intValue];
+					}
 				}
 			}
 		}
 	}
 	
 	NSString *total = [NSString string];
-	if (totalStaged && [defaults boolForKey:@"localNumberOfStaged"]) {
-		total = [NSString stringWithFormat:@"ƒ%d", totalStaged];
-		[statusItem setToolTip:[NSString stringWithFormat:@"Found %d files are staged for commit", totalStaged]];
-	}
-	
+		
 	if ([defaults boolForKey:@"localNumberOfChanged"]) {
 		
 		if ([defaults boolForKey:@"localNotificationsOnlyActive"] && [pbuddy changedFilesCount] && [projectPath isEqual:[[self getActiveProjectBuddy] path]]) {
 			NSLog(@"localNotificationsOnlyActive = YES. Skipping total local info build. Active project is %@", [[self getActiveProjectBuddy] path] );
 			
 			//set total = current count local
-			total = [total stringByAppendingFormat:@"±%d", [pbuddy changedFilesCount]];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"localModifiedFormat"], [pbuddy changedFilesCount]];
 		}
 		else if (totalChanged) {
-			total = [total stringByAppendingFormat:@"±%d", totalChanged];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"localModifiedFormat"], totalChanged];
 		}
 	}
 	
@@ -801,10 +795,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			NSLog(@"remoteNotificationsOnlyActive = YES. Skipping total pull info build. Active project is %@", [[self getActiveProjectBuddy] path] );
 			
 			//set total = current count remote
-			total = [total stringByAppendingFormat:@"Ω%d", [[data objectForKey:@"not_pushed"] count]];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPulledFormat"], [[data objectForKey:@"not_pushed"] count]];
 		}
 		else if (totalNotPulled){
-			total = [total stringByAppendingFormat:@"Ω%d", totalNotPulled];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPulledFormat"], totalNotPulled];
 		}
 	}
 	
@@ -814,15 +808,15 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 			NSLog(@"remoteNotificationsOnlyActive = YES. Skipping total push info build. Active project is %@", [[self getActiveProjectBuddy] path] );
 			
 			//set total = current count remote
-			total = [total stringByAppendingFormat:@"∆%d", [[data objectForKey:@"not_pushed"] count]];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPushedFormat"], [[data objectForKey:@"not_pushed"] count]];
 		}
 		else if (totalNotPushed) {
-			total = [total stringByAppendingFormat:@"∆%d", totalNotPushed];
+			total = [total stringByAppendingFormat:[defaults objectForKey:@"remoteNotPushedFormat"], totalNotPushed];
 		}
 	}
 		
 	if ([total length]) {
-		NSLog(@"Setting total title: %@", total);
+		NSLog(@"Setting title: %@", total);
 		//update with number of items
 		[statusItem setTitle:total];
 		//set alternate icon
@@ -831,6 +825,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		[statusItem setToolTip:[NSString stringWithFormat:@"Found %d unstaged changes, %d commits to pull & %d to push", totalChanged, totalNotPulled, totalNotPushed ]];
 		
 	}
+	else if (totalStaged && [defaults boolForKey:@"localNumberOfStaged"]) {
+		//set normal icon & number of staged
+		currentImage = statusImage;
+		[statusItem setTitle:[NSString stringWithFormat:[defaults objectForKey:@"localStagedFormat"], totalStaged]];
+		[statusItem setToolTip:[NSString stringWithFormat:@"Found %d files staged for commit", totalStaged]];
+	}
+	
 	else if (![defaults boolForKey:@"remoteNotificationsOnlyActive"] || ![defaults boolForKey:@"localNotificationsOnlyActive"]) {
 		//set normal icon & no title or staged count
 		currentImage = statusImage;
