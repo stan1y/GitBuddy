@@ -348,17 +348,19 @@
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	if ([defaults boolForKey:@"monitorRemoteBranches"]) {
 		
-		if ([[[self itemDict] objectForKey:@"not_pushed"] count] && [self currentBranch]) {
-			[push setTitle:[NSString stringWithFormat:@"Push to %@ %d commits", [self currentBranch], [[[self itemDict] objectForKey:@"not_pushed"] count]]];
+		if ([[[self itemDict] objectForKey:@"not_pushed"] intValue] && [self currentBranch]) {
+			[push setTitle:[NSString stringWithFormat:@"Push to %@ %@ commit(s)", [self currentBranch], [[self itemDict] objectForKey:@"not_pushed"]]];
 			[push setTarget:self];
+			[push setAction:@selector(push:)];
 		}
 		else {
 			[push setTitle:[NSString stringWithFormat:@"Nothing to push in %@", [self currentBranch]]];
 			[push setTarget:nil];
 		}
-		if ([[[self itemDict] objectForKey:@"not_pulled"] count] && [self currentBranch]) {
-			[pull setTitle:[NSString stringWithFormat:@"Pull from %@ %d commits", [self currentBranch], [[[self itemDict] objectForKey:@"not_pulled"] count]]];
+		if ([[[self itemDict] objectForKey:@"not_pulled"] intValue] && [self currentBranch]) {
+			[pull setTitle:[NSString stringWithFormat:@"Pull from %@ %@ commit(s)", [self currentBranch], [[self itemDict] objectForKey:@"not_pulled"]]];
 			[pull setTarget:self];
+			[pull setAction:@selector(pull:)];
 		}
 		else {
 			[pull setTitle:[NSString stringWithFormat:@"Nothing to pull from %@/%@", [self getSourceForBranch:[self currentBranch]], [self currentBranch]]];
@@ -373,9 +375,11 @@
 		
 		[pull setTitle:[NSString stringWithFormat:@"Pull from %@/%@", [self getSourceForBranch:[self currentBranch]], [self currentBranch]]];
 		[pull setTarget:self];
+		[pull setAction:@selector(pull:)];
 		
-		[push setTitle:[NSString stringWithFormat:@"Push to %@/%@", [self getSourceForBranch:[self currentBranch]], [self currentBranch]]];
+		[push setTitle:[NSString stringWithFormat:@"Push commits in %@", [self currentBranch]]];
 		[push setTarget:self];
+		[push setAction:@selector(push:)];
 	}
 	
 	//set parent item
