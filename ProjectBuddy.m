@@ -344,19 +344,39 @@
 	}
 	
 	//set remote pull/push items
-	/*if ([[[self itemDict] objectForKey:@"not_pushed"] count]) {
-		[push setTitle:[NSString stringWithFormat:@"Push (%d)", [[[self itemDict] objectForKey:@"not_pushed"] count]]];
+	
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	if ([defaults boolForKey:@"monitorRemoteBranches"]) {
+		
+		if ([[[self itemDict] objectForKey:@"not_pushed"] count] && [self currentBranch]) {
+			[push setTitle:[NSString stringWithFormat:@"Push to %@ %d commits", [self currentBranch], [[[self itemDict] objectForKey:@"not_pushed"] count]]];
+			[push setTarget:self];
+		}
+		else {
+			[push setTitle:[NSString stringWithFormat:@"Nothing to push in %@", [self currentBranch]]];
+			[push setTarget:nil];
+		}
+		if ([[[self itemDict] objectForKey:@"not_pulled"] count] && [self currentBranch]) {
+			[pull setTitle:[NSString stringWithFormat:@"Pull from %@ %d commits", [self currentBranch], [[[self itemDict] objectForKey:@"not_pulled"] count]]];
+			[pull setTarget:self];
+		}
+		else {
+			[pull setTitle:[NSString stringWithFormat:@"Nothing to pull from %@/%@", [self getSourceForBranch:[self currentBranch]], [self currentBranch]]];
+			[pull setTarget:nil];
+		}
+		
 	}
 	else {
-		[push setTitle:@"Push"];
+		
+		//if remote changes are not monitored, then
+		//enable push/pull all the time
+		
+		[pull setTitle:[NSString stringWithFormat:@"Pull from %@/%@", [self getSourceForBranch:[self currentBranch]], [self currentBranch]]];
+		[pull setTarget:self];
+		
+		[push setTitle:[NSString stringWithFormat:@"Push to %@/%@", [self getSourceForBranch:[self currentBranch]], [self currentBranch]]];
+		[push setTarget:self];
 	}
-	if ([[[self itemDict] objectForKey:@"not_pulled"] count]) {
-		[pull setTitle:[NSString stringWithFormat:@"Pull (%d)", [[[self itemDict] objectForKey:@"not_pulled"] count]]];
-	}
-	else {
-		[pull setTitle:@"Pull"];
-	}
-*/
 	
 	//set parent item
 	if ([self totalChangeSetItems]) {
@@ -514,12 +534,10 @@
 	
 	//push
 	push = [[NSMenuItem alloc] initWithTitle:@"Push" action:@selector(push:) keyEquivalent:[NSString string]];
-	[push setTarget:self];
 	[parentMenu addItem:push];
 	
 	//pull
 	pull = [[NSMenuItem alloc] initWithTitle:@"Pull" action:@selector(pull:) keyEquivalent:[NSString string]];
-	[pull setTarget:self];
 	[parentMenu	addItem:pull];
 	
 	//rescan
