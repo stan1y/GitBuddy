@@ -669,6 +669,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 	NSString *projectPath = [data objectForKey:@"path"];
 	ProjectBuddy *pbuddy = [[self menuItemForPath:projectPath] representedObject];
+	
 	NSMutableDictionary *projectCounters = [statusCounters objectForKey:projectPath];
 	if (!projectCounters) {
 		projectCounters = [NSMutableDictionary dictionary];
@@ -696,12 +697,16 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 		if (notPushed) {
 			NSLog(@"%d commits to push in %@.%@", [notPushed count], projectPath, [data objectForKey:@"branch"]);
 			[branchCounters setObject:[NSNumber numberWithInt:[notPushed count]] forKey:@"not_pushed"];
+			//merge with project data
+			[pbuddy mergeData:[NSDictionary dictionaryWithObject:notPushed forKey:@"not_pushed"]];
 			
 		}
 		id notPulled = [data objectForKey:@"not_pulled"];
 		if (notPulled) {
 			NSLog(@"%d commits to pull in %@.%@", [notPulled count], projectPath, [data objectForKey:@"branch"]);
 			[branchCounters setObject:[NSNumber numberWithInt:[notPulled count]] forKey:@"not_pulled"];
+			//merge with project data
+			[pbuddy mergeData:[NSDictionary dictionaryWithObject:notPulled forKey:@"not_pulled"]];
 		}
 		
 		//Set Staged count
